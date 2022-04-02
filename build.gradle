@@ -19,8 +19,8 @@ repositories {
 }
 
 dependencies {
-	//데이터베이스 연결하면 jpa 주석 해제
-//	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	runtimeOnly 'mysql:mysql-connector-java'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	//spring security 설정 하고나면 아래 주석 해제
 //	implementation 'org.springframework.boot:spring-boot-starter-security'

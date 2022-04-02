@@ -38,3 +38,6 @@ out/
 
 ### s3 settings ###
 application-s3.properties
+
+### mysql settings ###
+application-mysql.properties
