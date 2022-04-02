@@ -6,7 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
-public class UploadVO {
+public class TestUploadVO {
     private String category;
     private MultipartFile file;
 }
