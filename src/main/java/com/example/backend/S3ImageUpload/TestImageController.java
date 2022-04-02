@@ -19,10 +19,7 @@ public class TestImageController {
         String category=uploadVO.getCategory();
         MultipartFile file= uploadVO.getFile();
 
-        //url.toString 에러 해결 해야함
-        URL url = s3Service.uploadFile(category, file);
-        System.out.println("url = " + url);
-        return "success";
+        return s3Service.uploadFile(category, file);
     }
 
 }

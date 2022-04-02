@@ -22,7 +22,7 @@ public class AwsS3Service {
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
 
-    public URL uploadFile(String category, MultipartFile multipartFile) {
+    public String uploadFile(String category, MultipartFile multipartFile) {
 
         String fileName = CommonUtils.buildFileName(category, multipartFile.getOriginalFilename());
 
@@ -36,8 +36,7 @@ public class AwsS3Service {
             e.printStackTrace();
         }
 
-        return amazonS3Client.getUrl(bucketName, fileName);
-
+        return amazonS3Client.getUrl(bucketName, fileName).toString();
     }
 
     private void validateFileExists(MultipartFile multipartFile) {
