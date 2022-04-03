@@ -1,4 +1,4 @@
-package com.example.backend.S3ImageUpload;
+package com.example.backend.s3Image;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
@@ -11,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 
 @Service
 @RequiredArgsConstructor

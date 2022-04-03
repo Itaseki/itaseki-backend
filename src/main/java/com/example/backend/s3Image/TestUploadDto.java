@@ -1,4 +1,4 @@
-package com.example.backend.S3ImageUpload;
+package com.example.backend.s3Image;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,4 +1,4 @@
-package com.example.backend;
+package com.example.backend.s3Image;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;

@@ -1,10 +1,10 @@
 package com.example.backend;
 
-import com.example.backend.Community.CommunityPost;
-import com.example.backend.Community.CommunityPostDto;
-import com.example.backend.Community.CommunityPostService;
-import com.example.backend.S3ImageUpload.AwsS3Service;
-import com.example.backend.S3ImageUpload.TestUploadDto;
+import com.example.backend.community.CommunityPost;
+import com.example.backend.community.CommunityPostDto;
+import com.example.backend.community.CommunityPostService;
+import com.example.backend.s3Image.AwsS3Service;
+import com.example.backend.s3Image.TestUploadDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
 @RestController
-//s3 연결, mysql 연결 테스트용 컨트롤러
+//s3 연결, mysql 연결 테스트용 컨트롤러 -> 추후 삭제
 public class TestController {
     private final AwsS3Service s3Service;
     private final CommunityPostService communityPostService;

@@ -1,4 +1,4 @@
-package com.example.backend.S3ImageUpload;
+package com.example.backend.s3Image;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;

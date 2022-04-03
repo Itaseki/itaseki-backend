@@ -1,4 +1,4 @@
-package com.example.backend.Community;
+package com.example.backend.community;
 
 import lombok.Builder;
 import lombok.Data;

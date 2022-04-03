@@ -1,4 +1,4 @@
-package com.example.backend;
+package com.example.backend.security;
 
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
