@@ -4,7 +4,7 @@ import com.example.backend.Community.CommunityPost;
 import com.example.backend.Community.CommunityPostDto;
 import com.example.backend.Community.CommunityPostService;
 import com.example.backend.S3ImageUpload.AwsS3Service;
-import com.example.backend.S3ImageUpload.TestUploadVO;
+import com.example.backend.S3ImageUpload.TestUploadDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,13 +21,18 @@ public class TestController {
     private final CommunityPostService communityPostService;
 
     @PostMapping("/test")
-    public String uploadFile(TestUploadVO testUploadVO){
+    public String uploadFile(TestUploadDto testUploadDto){
         System.out.println("controller called");
-        String category= testUploadVO.getCategory();
-        MultipartFile file= testUploadVO.getFile();
+        String category= testUploadDto.getCategory();
+        MultipartFile file= testUploadDto.getFile();
 
         return s3Service.uploadFile(category, file);
     }
+
+//    @GetMapping("/test")
+//    public String getFile(@RequestParam String fileName){
+//        return s3Service.findFile(fileName);
+//    }
 
     @PostMapping("/test-db")
     public String uploadData(@RequestBody CommunityPostDto postDto){

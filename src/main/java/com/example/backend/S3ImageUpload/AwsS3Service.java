@@ -44,5 +44,9 @@ public class AwsS3Service {
             System.out.println("file empty error");
         }
     }
+//
+//    public String findFile(String fileName){
+//        return amazonS3Client.getUrl(bucketName,fileName).toString();
+//    }
 
 }
