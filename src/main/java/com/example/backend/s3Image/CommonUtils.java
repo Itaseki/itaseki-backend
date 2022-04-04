@@ -8,13 +8,13 @@ public class CommonUtils {
     private static final String FILE_EXTENSION_SEPARATOR = ".";
 
     //디폴트 파일 이름 생성자 -> category_원본파일명_생성시간.확장자 : 디비에 url 저장 + 원본파일명 따로 저장
-    public static String buildFileName(String category, String originalFileName) {
+    public static String buildFileName(String originalFileName) {
         int fileExtensionIndex = originalFileName.lastIndexOf(FILE_EXTENSION_SEPARATOR);
         String fileExtension = originalFileName.substring(fileExtensionIndex);
         String fileName = originalFileName.substring(0, fileExtensionIndex);
         String now = String.valueOf(System.currentTimeMillis()); //날짜 생성방식 YYMMDDHHMM 으로 수정하기
 
-        return category + "_" + fileName + "_" + now + fileExtension;
+        return fileName + "_" + now + fileExtension;
     }
 
     public static String generateHash(String input){

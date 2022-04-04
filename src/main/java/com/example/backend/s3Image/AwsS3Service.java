@@ -21,9 +21,9 @@ public class AwsS3Service {
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
 
-    public String uploadFile(String category, MultipartFile multipartFile) {
+    public String uploadFile(MultipartFile multipartFile) {
 
-        String fileName = CommonUtils.buildFileName(category, multipartFile.getOriginalFilename());
+        String fileName = CommonUtils.buildFileName(multipartFile.getOriginalFilename());
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentType(multipartFile.getContentType());
@@ -43,6 +43,7 @@ public class AwsS3Service {
             System.out.println("file empty error");
         }
     }
+
 //
 //    public String findFile(String fileName){
 //        return amazonS3Client.getUrl(bucketName,fileName).toString();
