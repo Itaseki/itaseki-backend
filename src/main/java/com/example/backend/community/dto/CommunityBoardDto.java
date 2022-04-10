@@ -1,4 +1,4 @@
-package com.example.backend.community;
+package com.example.backend.community.dto;
 
 import lombok.Getter;
 import lombok.Setter;
