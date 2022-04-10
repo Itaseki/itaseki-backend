@@ -1,5 +1,9 @@
 package com.example.backend.community;
 
+import com.example.backend.community.domain.CommunityBoard;
+import com.example.backend.community.domain.CommunityBoardImage;
+import com.example.backend.community.repository.CommunityBoardImageRepository;
+import com.example.backend.community.repository.CommunityBoardRepository;
 import com.example.backend.s3Image.AwsS3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,23 +20,23 @@ import java.util.Optional;
 public class CommunityBoardService {
     private final CommunityBoardRepository communityBoardRepository;
     private final AwsS3Service awsS3Service;
+    private final CommunityBoardImageRepository communityImageRepository;
 
-    public void savePost(CommunityBoard communityBoard){
+    public void savePost(CommunityBoard communityBoard, List<MultipartFile> files){
         communityBoardRepository.save(communityBoard);
+        savePostImages(files,communityBoard);
     }
 
-    public List<String> savePostImages(List<MultipartFile> files){
-        List<String> savedUrls=new ArrayList<>();
-        for(MultipartFile file:files){
+
+    private void savePostImages(List<MultipartFile> files,CommunityBoard board){
+        for(int i=0;i<files.size();i++){
+            MultipartFile file=files.get(i);
+            String originName=file.getOriginalFilename();
             String url = awsS3Service.uploadFile(file);
-            savedUrls.add(url); //list 저장 -> DB 저장으로 변경
+            CommunityBoardImage boardImage=CommunityBoardImage.builder()
+                            .board(board).fileName(originName).url(url).order(i+1).build();
+            communityImageRepository.save(boardImage);
         }
-        return savedUrls;
-    }
-
-    public CommunityBoard findPostById(Long id){
-        Optional<CommunityBoard> post = communityBoardRepository.findById(id);
-        return post.orElse(null);
     }
 
 }
