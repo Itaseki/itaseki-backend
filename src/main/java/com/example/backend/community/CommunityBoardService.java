@@ -13,12 +13,12 @@ import java.util.Optional;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class CommunityPostService {
-    private final CommunityPostRepository communityPostRepository;
+public class CommunityBoardService {
+    private final CommunityBoardRepository communityBoardRepository;
     private final AwsS3Service awsS3Service;
 
-    public void savePost(CommunityPost communityPost){
-        communityPostRepository.save(communityPost);
+    public void savePost(CommunityBoard communityBoard){
+        communityBoardRepository.save(communityBoard);
     }
 
     public List<String> savePostImages(List<MultipartFile> files){
@@ -30,8 +30,8 @@ public class CommunityPostService {
         return savedUrls;
     }
 
-    public CommunityPost findPostById(Long id){
-        Optional<CommunityPost> post = communityPostRepository.findById(id);
+    public CommunityBoard findPostById(Long id){
+        Optional<CommunityBoard> post = communityBoardRepository.findById(id);
         return post.orElse(null);
     }
 

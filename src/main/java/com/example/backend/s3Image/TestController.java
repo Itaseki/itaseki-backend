@@ -1,10 +1,8 @@
-package com.example.backend;
+package com.example.backend.s3Image;
 
-import com.example.backend.community.CommunityPost;
-import com.example.backend.community.CommunityPostDto;
-import com.example.backend.community.CommunityPostService;
-import com.example.backend.s3Image.AwsS3Service;
-import com.example.backend.s3Image.TestUploadDto;
+import com.example.backend.community.CommunityBoard;
+import com.example.backend.community.CommunityBoardDto;
+import com.example.backend.community.CommunityBoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +17,7 @@ import java.util.List;
 //s3 연결, mysql 연결 테스트용 컨트롤러 -> 추후 삭제
 public class TestController {
     private final AwsS3Service s3Service;
-    private final CommunityPostService communityPostService;
+    private final CommunityBoardService communityBoardService;
 
     //s3 서버 이미지 업로드 테스트
     @PostMapping("/test")
@@ -37,22 +35,22 @@ public class TestController {
 
     //게시글 + 이미지 리스트 업로드 + 디비 반영 테스트
     @PostMapping("/test-db")
-    public ResponseEntity<List<String>> uploadData(CommunityPostDto postDto){
-        CommunityPost post=CommunityPost.builder()
+    public ResponseEntity<List<String>> uploadData(CommunityBoardDto postDto){
+        CommunityBoard post= CommunityBoard.builder()
                 .title(postDto.getTitle()).content(postDto.getContent()).createdTime(LocalDateTime.now())
                 .build();
-        communityPostService.savePost(post);
+        communityBoardService.savePost(post);
 
         List<MultipartFile> files = postDto.getFiles();
-        List<String> savedUrls=communityPostService.savePostImages(files);
+        List<String> savedUrls= communityBoardService.savePostImages(files);
 
         return new ResponseEntity<>(savedUrls,HttpStatus.CREATED);
     }
 
     //디비 조회 테스트
     @GetMapping("/test-db/{communityPostId}")
-    public ResponseEntity<CommunityPost> getData(@PathVariable Long communityPostId){
-        CommunityPost post = communityPostService.findPostById(communityPostId);
+    public ResponseEntity<CommunityBoard> getData(@PathVariable Long communityPostId){
+        CommunityBoard post = communityBoardService.findPostById(communityPostId);
         return new ResponseEntity<>(post, HttpStatus.OK);
     }
 

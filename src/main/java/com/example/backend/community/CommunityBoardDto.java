@@ -8,7 +8,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class CommunityPostDto {
+public class CommunityBoardDto {
     private String title;
     private String content;
     private List<MultipartFile> files;
