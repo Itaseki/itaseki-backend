@@ -1,4 +1,4 @@
-package com.example.backend.community;
+package com.example.backend.community.dto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +8,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class CommunityPostDto {
+public class CommunityBoardDto {
     private String title;
     private String content;
     private List<MultipartFile> files;
