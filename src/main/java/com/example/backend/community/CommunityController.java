@@ -39,8 +39,11 @@ public class CommunityController {
                 .content(commentDto.getContent()).parentId(commentDto.getParentCommentId())
                 .createdTime(LocalDateTime.now()).communityBoard(targetBoard)
                 .build();
-        commentService.saveCommunityComment(comment, commentDto.getParentCommentId());
-        return new ResponseEntity<>("잡담 게시판 댓글 등록 성공",HttpStatus.CREATED);
+        String saveResult=commentService.saveCommunityComment(comment, commentDto.getParentCommentId());
+        if(saveResult.equals("success"))
+            return new ResponseEntity<>("잡담 게시판 댓글 등록 성공",HttpStatus.CREATED);
+        else
+            return new ResponseEntity<>("존재하지 않는 댓글에 대한 대댓글 요청",HttpStatus.NOT_FOUND);
     }
 
 }
