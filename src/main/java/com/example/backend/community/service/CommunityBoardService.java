@@ -29,6 +29,9 @@ public class CommunityBoardService {
 
 
     private void savePostImages(List<MultipartFile> files,CommunityBoard board){
+        if(files==null){
+            return;
+        }
         for(int i=0;i<files.size();i++){
             MultipartFile file=files.get(i);
             String originName=file.getOriginalFilename();
