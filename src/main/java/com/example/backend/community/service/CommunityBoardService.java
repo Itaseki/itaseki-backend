@@ -39,4 +39,9 @@ public class CommunityBoardService {
         }
     }
 
+    public CommunityBoard findCommunityBoardEntity(Long boardId){
+        Optional<CommunityBoard> board = communityBoardRepository.findById(boardId);
+        return board.orElse(null);
+    }
+
 }

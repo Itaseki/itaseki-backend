@@ -1,5 +1,6 @@
 package com.example.backend.community.domain;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -21,7 +22,7 @@ public class CommunityComment {
     @Column(nullable = false)
     private Boolean isParentComment; //true 면 원댓글 (부모댓글) 이라는 의미
 
-    @Column(nullable = false)
+    @Column
     private Long commentGroupId;
     //원댓글과 그 대댓글들의 묶음이 몇 번 그룹인지에 대한 내용
 
@@ -35,4 +36,16 @@ public class CommunityComment {
     private CommunityBoard communityBoard;
 
     //manyToOne User 연관관계 매핑 추가 필요
+
+    @Builder
+    public CommunityComment(String content, Long parentId,LocalDateTime createdTime, CommunityBoard communityBoard){
+        this.content=content;
+        this.isParentComment= parentId==0;
+        this.createdTime=createdTime;
+        this.communityBoard=communityBoard;
+    }
+
+    public void setCommentGroupId(Long groupId){
+        this.commentGroupId=groupId;
+    }
 }
