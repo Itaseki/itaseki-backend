@@ -1,4 +1,4 @@
-package com.example.backend.community;
+package com.example.backend.community.service;
 
 import com.example.backend.community.domain.CommunityBoard;
 import com.example.backend.community.domain.CommunityBoardImage;
