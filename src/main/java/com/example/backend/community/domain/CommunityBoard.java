@@ -7,6 +7,8 @@ import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "communityBoards")
@@ -36,6 +38,12 @@ public class CommunityBoard {
     private Integer reportCount=0;
 
     //User column 추가 (ManyToOne)
+
+    @OneToMany(mappedBy = "communityBoard",targetEntity = CommunityComment.class)
+    private List<CommunityComment> comments=new ArrayList<>();
+
+    @OneToMany(mappedBy = "communityBoard",targetEntity = CommunityBoardImage.class)
+    private List<CommunityBoardImage> images=new ArrayList<>();
 
     @Builder
     public CommunityBoard(String title, String content, LocalDateTime createdTime){
