@@ -33,6 +33,7 @@ public class CommunityBoard {
 
     @Column(nullable = false)
     private Integer likeCount=0;
+    //Sort 위해 필요
 
     @Column(nullable = false)
     private Integer reportCount=0;
