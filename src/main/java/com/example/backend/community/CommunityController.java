@@ -52,6 +52,7 @@ public class CommunityController {
         if(targetBoard==null){
             return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
         }
+        communityBoardService.updateCommunityBoardViewCount(targetBoard);
         DetailCommunityBoardResponse boardResponse = communityBoardService.getDetailBoardResponse(targetBoard);
         return new ResponseEntity<>(boardResponse,HttpStatus.OK);
 

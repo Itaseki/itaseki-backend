@@ -71,4 +71,9 @@ public class CommunityBoardService {
         return DetailCommunityBoardResponse.fromEntity(communityBoard,comments,images);
     }
 
+    public void updateCommunityBoardViewCount(CommunityBoard board){
+        board.updateViewCount();
+        communityBoardRepository.save(board);
+    }
+
 }

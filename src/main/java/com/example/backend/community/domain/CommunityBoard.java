@@ -51,4 +51,8 @@ public class CommunityBoard {
         this.content=content;
         this.createdTime=createdTime;
     }
+
+    public void updateViewCount(){
+        this.viewCount++;
+    }
 }
