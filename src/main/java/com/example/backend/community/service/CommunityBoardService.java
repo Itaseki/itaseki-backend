@@ -2,6 +2,7 @@ package com.example.backend.community.service;
 
 import com.example.backend.community.domain.CommunityBoard;
 import com.example.backend.community.domain.CommunityBoardImage;
+import com.example.backend.community.domain.CommunityComment;
 import com.example.backend.community.dto.CommunityCommentsResponse;
 import com.example.backend.community.dto.DetailCommunityBoardResponse;
 import com.example.backend.community.repository.CommunityBoardImageRepository;
@@ -63,7 +64,8 @@ public class CommunityBoardService {
     }
 
     public DetailCommunityBoardResponse getDetailBoardResponse(CommunityBoard communityBoard){
-        //comment 가져올 때 부모 댓글들만 가져오게 수정해주어야함
+        List<CommunityComment> originComments=communityBoard.getComments();
+        originComments.removeIf(comment -> !comment.getIsParentComment()); //Iterator 을 사용한 remove statement 를 Collections.removeIf로 단순화
         List<CommunityCommentsResponse> comments=commentService.getCommentsResponses(communityBoard.getComments());
         List<String> images=this.getImageUrlsInPost(communityBoard);
         return DetailCommunityBoardResponse.fromEntity(communityBoard,comments,images);
