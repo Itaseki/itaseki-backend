@@ -1,4 +1,4 @@
-package com.example.backend.community;
+package com.example.backend.community.service;
 
 import com.example.backend.community.domain.CommunityBoard;
 import com.example.backend.community.domain.CommunityBoardImage;
@@ -29,6 +29,9 @@ public class CommunityBoardService {
 
 
     private void savePostImages(List<MultipartFile> files,CommunityBoard board){
+        if(files==null){
+            return;
+        }
         for(int i=0;i<files.size();i++){
             MultipartFile file=files.get(i);
             String originName=file.getOriginalFilename();
@@ -37,6 +40,11 @@ public class CommunityBoardService {
                             .board(board).fileName(originName).url(url).order(i+1).build();
             communityImageRepository.save(boardImage);
         }
+    }
+
+    public CommunityBoard findCommunityBoardEntity(Long boardId){
+        Optional<CommunityBoard> board = communityBoardRepository.findById(boardId);
+        return board.orElse(null);
     }
 
 }
