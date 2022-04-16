@@ -2,16 +2,22 @@ package com.example.backend.community;
 
 import com.example.backend.community.domain.CommunityBoard;
 import com.example.backend.community.domain.CommunityComment;
+import com.example.backend.community.dto.AllCommunityBoardsResponse;
 import com.example.backend.community.dto.CommunityBoardDto;
 import com.example.backend.community.dto.CommunityCommentDto;
+import com.example.backend.community.dto.DetailCommunityBoardResponse;
 import com.example.backend.community.service.CommunityBoardService;
 import com.example.backend.community.service.CommunityCommentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/boards/community")
@@ -39,11 +45,25 @@ public class CommunityController {
                 .content(commentDto.getContent()).parentId(commentDto.getParentCommentId())
                 .createdTime(LocalDateTime.now()).communityBoard(targetBoard)
                 .build();
-        String saveResult=commentService.saveCommunityComment(comment, commentDto.getParentCommentId());
-        if(saveResult.equals("success"))
-            return new ResponseEntity<>("잡담 게시판 댓글 등록 성공",HttpStatus.CREATED);
-        else
-            return new ResponseEntity<>("존재하지 않는 댓글에 대한 대댓글 요청",HttpStatus.NOT_FOUND);
+        commentService.saveCommunityComment(comment, commentDto.getParentCommentId());
+        return new ResponseEntity<>("잡담 게시판 댓글 등록 성공",HttpStatus.CREATED);
+
+    }
+
+    @GetMapping("/{communityBoardId}")
+    public ResponseEntity<DetailCommunityBoardResponse> getDetailCommunityBoard(@PathVariable Long communityBoardId){
+        CommunityBoard targetBoard=communityBoardService.findCommunityBoardEntity(communityBoardId);
+        if(targetBoard==null){
+            return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+        }
+        communityBoardService.updateCommunityBoardViewCount(targetBoard);
+        DetailCommunityBoardResponse boardResponse = communityBoardService.getDetailBoardResponse(targetBoard);
+        return new ResponseEntity<>(boardResponse,HttpStatus.OK);
+    }
+
+    @GetMapping("")
+    public ResponseEntity<List<AllCommunityBoardsResponse>> getAllCommunityBoards(@PageableDefault(size=10, sort="id", direction = Sort.Direction.DESC) Pageable pageable){
+        return new ResponseEntity<>(communityBoardService.getAllResponsesOfCommunityBoard(pageable),HttpStatus.OK);
     }
 
 }

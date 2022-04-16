@@ -3,12 +3,14 @@ package com.example.backend.community.domain;
 import com.example.backend.community.domain.CommunityBoard;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
 @Data
 @Table(name = "communityBoardImages")
+@NoArgsConstructor
 public class CommunityBoardImage {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
