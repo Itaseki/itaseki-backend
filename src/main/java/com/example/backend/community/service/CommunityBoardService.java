@@ -69,7 +69,7 @@ public class CommunityBoardService {
     public DetailCommunityBoardResponse getDetailBoardResponse(CommunityBoard communityBoard){
         List<CommunityComment> originComments=communityBoard.getComments();
         originComments.removeIf(comment -> !comment.getIsParentComment()); //Iterator 을 사용한 remove statement 를 Collections.removeIf로 단순화
-        List<CommunityCommentsResponse> comments=commentService.getCommentsResponses(communityBoard.getComments());
+        List<CommunityCommentsResponse> comments=commentService.getCommentsResponses(originComments);
         List<String> images=this.getImageUrlsInPost(communityBoard);
         return DetailCommunityBoardResponse.fromEntity(communityBoard,comments,images);
     }
@@ -81,8 +81,6 @@ public class CommunityBoardService {
 
     public List<AllCommunityBoardsResponse> getAllResponsesOfCommunityBoard(Pageable pageable){
         Page<CommunityBoard> boardPages = communityBoardRepository.findAll(pageable);
-        //좋아요 순, 조회 순 정렬 시 "값이 동일한 애들 중에서는 더 최근 게시글이 먼저 나오게 수정: -> Sort 차순위 설정,,,?
-        //그러려면 sort 객체를 따로 만들어주어야 하나?
         List<AllCommunityBoardsResponse> responses=new ArrayList<>();
         for(CommunityBoard board : boardPages){
             responses.add(AllCommunityBoardsResponse.fromEntity(board));
