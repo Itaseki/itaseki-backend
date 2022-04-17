@@ -13,8 +13,7 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-@Entity
-@Table(name = "communityComments")
+@Entity @Table(name = "communityComment")
 public class CommunityComment {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) //mysql은 pk값 자동증가로 IDENTITY 를 사용한다
     @Column(name = "communityCommentId")

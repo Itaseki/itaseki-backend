@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "communityBoards")
+@Table(name = "communityBoard")
 @Data
 @NoArgsConstructor
 public class CommunityBoard {
