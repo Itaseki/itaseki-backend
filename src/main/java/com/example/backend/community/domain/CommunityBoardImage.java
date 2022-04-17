@@ -9,7 +9,7 @@ import javax.persistence.*;
 
 @Entity
 @Data
-@Table(name = "communityBoardImages")
+@Table(name = "communityBoardImage")
 @NoArgsConstructor
 public class CommunityBoardImage {
 
