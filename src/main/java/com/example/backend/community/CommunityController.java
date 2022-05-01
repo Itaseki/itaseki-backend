@@ -28,6 +28,7 @@ public class CommunityController {
 
     @PostMapping("")
     public ResponseEntity<String> createCommunityPost(CommunityBoardDto communityBoardDto){
+        //principal 로 유저 정보 받아오는 부분 추가 (회원가입, 로그인 구현 후)
         CommunityBoard post= CommunityBoard.builder()
                 .title(communityBoardDto.getTitle()).content(communityBoardDto.getContent()).createdTime(LocalDateTime.now())
                 .build();
@@ -37,6 +38,7 @@ public class CommunityController {
 
     @PostMapping("/{communityBoardId}/comments")
     public ResponseEntity<String> createCommunityComment(@PathVariable Long communityBoardId, @RequestBody CommunityCommentDto commentDto){
+        //principal 추가
         CommunityBoard targetBoard=communityBoardService.findCommunityBoardEntity(communityBoardId);
         if(targetBoard==null){
             return new ResponseEntity<>("존재하지 않는 게시글에 대한 댓글 등록 요청",HttpStatus.NOT_FOUND);

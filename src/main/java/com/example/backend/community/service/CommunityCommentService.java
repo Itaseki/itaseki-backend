@@ -4,6 +4,7 @@ import com.example.backend.community.domain.CommunityBoard;
 import com.example.backend.community.domain.CommunityComment;
 import com.example.backend.community.dto.CommunityCommentsResponse;
 import com.example.backend.community.repository.CommunityCommentRepository;
+import com.example.backend.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,21 +38,28 @@ public class CommunityCommentService {
     }
 
     public List<CommunityCommentsResponse> getCommentsResponses(List<CommunityComment> comments){
+        Long boardWriterId=0L;
+        if(comments!=null&&!comments.isEmpty()){
+            CommunityComment comment = comments.get(0);
+            boardWriterId = comment.getCommunityBoard().getUser().getUserId();
+        }
         List<CommunityCommentsResponse> responses=new ArrayList<>();
+
         for(CommunityComment comment:comments){
-            responses.add(toCommentResponse(comment));
+            responses.add(toCommentResponse(comment,boardWriterId));
         }
         return responses;
     }
 
 
-    private CommunityCommentsResponse toCommentResponse(CommunityComment comment){
-        CommunityCommentsResponse response = CommunityCommentsResponse.fromEntity(comment);
+    private CommunityCommentsResponse toCommentResponse(CommunityComment comment,Long boardWriterId){
+
+        CommunityCommentsResponse response = CommunityCommentsResponse.fromEntity(comment,boardWriterId,1L);
         if(comment.getIsParentComment()){
             List<CommunityComment> childComments = comment.getChildComments();
             List<CommunityCommentsResponse> childResponses=new ArrayList<>();
             for(CommunityComment child:childComments){
-                childResponses.add(toCommentResponse(child));
+                childResponses.add(toCommentResponse(child,boardWriterId));
             }
             response.setNestedComments(childResponses);
         }else{

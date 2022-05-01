@@ -71,7 +71,7 @@ public class CommunityBoardService {
         originComments.removeIf(comment -> !comment.getIsParentComment()); //Iterator 을 사용한 remove statement 를 Collections.removeIf로 단순화
         List<CommunityCommentsResponse> comments=commentService.getCommentsResponses(originComments);
         List<String> images=this.getImageUrlsInPost(communityBoard);
-        return DetailCommunityBoardResponse.fromEntity(communityBoard,comments,images);
+        return DetailCommunityBoardResponse.fromEntity(communityBoard,comments,images,1L);
     }
 
     public void updateCommunityBoardViewCount(CommunityBoard board){
