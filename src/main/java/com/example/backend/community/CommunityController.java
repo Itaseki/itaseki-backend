@@ -8,6 +8,9 @@ import com.example.backend.community.dto.CommunityCommentDto;
 import com.example.backend.community.dto.DetailCommunityBoardResponse;
 import com.example.backend.community.service.CommunityBoardService;
 import com.example.backend.community.service.CommunityCommentService;
+import com.example.backend.like.LikeService;
+import com.example.backend.user.UserService;
+import com.example.backend.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -25,6 +28,8 @@ import java.util.List;
 public class CommunityController {
     private final CommunityBoardService communityBoardService;
     private final CommunityCommentService commentService;
+    private final LikeService likeService;
+    private final UserService userService;
 
     @PostMapping("")
     public ResponseEntity<String> createCommunityPost(CommunityBoardDto communityBoardDto){
@@ -54,18 +59,28 @@ public class CommunityController {
 
     @GetMapping("/{communityBoardId}")
     public ResponseEntity<DetailCommunityBoardResponse> getDetailCommunityBoard(@PathVariable Long communityBoardId){
+        Long loginId=1L;
         CommunityBoard targetBoard=communityBoardService.findCommunityBoardEntity(communityBoardId);
         if(targetBoard==null){
             return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
         }
         communityBoardService.updateCommunityBoardViewCount(targetBoard);
-        DetailCommunityBoardResponse boardResponse = communityBoardService.getDetailBoardResponse(targetBoard);
+        DetailCommunityBoardResponse boardResponse = communityBoardService.getDetailBoardResponse(targetBoard,loginId);
         return new ResponseEntity<>(boardResponse,HttpStatus.OK);
     }
 
     @GetMapping("")
     public ResponseEntity<List<AllCommunityBoardsResponse>> getAllCommunityBoards(@PageableDefault(size=10, sort="id", direction = Sort.Direction.DESC) Pageable pageable){
         return new ResponseEntity<>(communityBoardService.getAllResponsesOfCommunityBoard(pageable),HttpStatus.OK);
+    }
+
+    @PostMapping("/{communityBoardId}/likes")
+    public ResponseEntity<Integer> setLikeOnCommunityBoard(@PathVariable Long communityBoardId){
+        Long loginId=1L;
+        CommunityBoard communityBoard = communityBoardService.findCommunityBoardEntity(communityBoardId);
+        User user = userService.findUserById(loginId);
+        int likeCount = likeService.saveLike(communityBoard, user);
+        return new ResponseEntity<>(likeCount,HttpStatus.OK);
     }
 
 }
