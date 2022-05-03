@@ -66,6 +66,11 @@ public class CommunityBoardService {
         return board.orElse(null);
     }
 
+    public int getTotalPageCount(){
+        List<CommunityBoard> communityBoards = communityBoardRepository.findAll();
+        return communityBoards.size()/10+1;
+    }
+
     public DetailCommunityBoardResponse getDetailBoardResponse(CommunityBoard communityBoard,Long loginId){
         List<CommunityComment> originComments=communityBoard.getComments();
         originComments.removeIf(comment -> !comment.getIsParentComment()); //Iterator 을 사용한 remove statement 를 Collections.removeIf로 단순화

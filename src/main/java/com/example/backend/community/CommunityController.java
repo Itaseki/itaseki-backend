@@ -2,10 +2,7 @@ package com.example.backend.community;
 
 import com.example.backend.community.domain.CommunityBoard;
 import com.example.backend.community.domain.CommunityComment;
-import com.example.backend.community.dto.AllCommunityBoardsResponse;
-import com.example.backend.community.dto.CommunityBoardDto;
-import com.example.backend.community.dto.CommunityCommentDto;
-import com.example.backend.community.dto.DetailCommunityBoardResponse;
+import com.example.backend.community.dto.*;
 import com.example.backend.community.service.CommunityBoardService;
 import com.example.backend.community.service.CommunityCommentService;
 import com.example.backend.like.LikeService;
@@ -70,8 +67,10 @@ public class CommunityController {
     }
 
     @GetMapping("")
-    public ResponseEntity<List<AllCommunityBoardsResponse>> getAllCommunityBoards(@PageableDefault(size=10, sort="id", direction = Sort.Direction.DESC) Pageable pageable){
-        return new ResponseEntity<>(communityBoardService.getAllResponsesOfCommunityBoard(pageable),HttpStatus.OK);
+    public ResponseEntity<AllBoardResponseWithPageCount> getAllCommunityBoards(@PageableDefault(size=10, sort="id", direction = Sort.Direction.DESC) Pageable pageable){
+        int totalPageCount = communityBoardService.getTotalPageCount();
+        List<AllCommunityBoardsResponse> allResponsesOfCommunityBoard = communityBoardService.getAllResponsesOfCommunityBoard(pageable);
+        return new ResponseEntity<>(new AllBoardResponseWithPageCount(totalPageCount,allResponsesOfCommunityBoard),HttpStatus.OK);
     }
 
     @PostMapping("/{communityBoardId}/likes")
