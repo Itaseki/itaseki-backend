@@ -37,7 +37,7 @@ public class CommunityCommentService {
 
     }
 
-    public List<CommunityCommentsResponse> getCommentsResponses(List<CommunityComment> comments){
+    public List<CommunityCommentsResponse> getCommentsResponses(List<CommunityComment> comments,Long loginId){
         Long boardWriterId=0L;
         if(comments!=null&&!comments.isEmpty()){
             CommunityComment comment = comments.get(0);
@@ -46,20 +46,20 @@ public class CommunityCommentService {
         List<CommunityCommentsResponse> responses=new ArrayList<>();
 
         for(CommunityComment comment:comments){
-            responses.add(toCommentResponse(comment,boardWriterId));
+            responses.add(toCommentResponse(comment,boardWriterId,loginId));
         }
         return responses;
     }
 
 
-    private CommunityCommentsResponse toCommentResponse(CommunityComment comment,Long boardWriterId){
+    private CommunityCommentsResponse toCommentResponse(CommunityComment comment,Long boardWriterId,Long loginId){
 
-        CommunityCommentsResponse response = CommunityCommentsResponse.fromEntity(comment,boardWriterId,1L);
+        CommunityCommentsResponse response = CommunityCommentsResponse.fromEntity(comment,boardWriterId,loginId);
         if(comment.getIsParentComment()){
             List<CommunityComment> childComments = comment.getChildComments();
             List<CommunityCommentsResponse> childResponses=new ArrayList<>();
             for(CommunityComment child:childComments){
-                childResponses.add(toCommentResponse(child,boardWriterId));
+                childResponses.add(toCommentResponse(child,boardWriterId,loginId));
             }
             response.setNestedComments(childResponses);
         }else{

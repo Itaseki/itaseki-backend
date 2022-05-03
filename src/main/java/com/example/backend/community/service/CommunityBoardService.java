@@ -66,12 +66,12 @@ public class CommunityBoardService {
         return board.orElse(null);
     }
 
-    public DetailCommunityBoardResponse getDetailBoardResponse(CommunityBoard communityBoard){
+    public DetailCommunityBoardResponse getDetailBoardResponse(CommunityBoard communityBoard,Long loginId){
         List<CommunityComment> originComments=communityBoard.getComments();
         originComments.removeIf(comment -> !comment.getIsParentComment()); //Iterator 을 사용한 remove statement 를 Collections.removeIf로 단순화
-        List<CommunityCommentsResponse> comments=commentService.getCommentsResponses(originComments);
+        List<CommunityCommentsResponse> comments=commentService.getCommentsResponses(originComments,loginId);
         List<String> images=this.getImageUrlsInPost(communityBoard);
-        return DetailCommunityBoardResponse.fromEntity(communityBoard,comments,images,1L);
+        return DetailCommunityBoardResponse.fromEntity(communityBoard,comments,images,loginId);
     }
 
     public void updateCommunityBoardViewCount(CommunityBoard board){
