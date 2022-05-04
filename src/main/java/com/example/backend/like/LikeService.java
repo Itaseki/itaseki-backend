@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -32,9 +33,13 @@ public class LikeService {
         return likeRepository.findByUserAndCommunityBoard(user, communityBoard);
     }
 
+    //고민 중: OneToMany 로 양방향 매핑을 해서 CommunityBoard 에서 List 로 가져올지, 아니면 지금 처럼 findBy 로 like 객체에서 찾아올지
     public int getLikeCount(CommunityBoard communityBoard){
-        List<Like> likeList = likeRepository.findAllByCommunityBoard(communityBoard);
-        return likeList.size();
+        List<Like> originLikes = likeRepository.findAllByCommunityBoard(communityBoard);
+        List<Like> likes = originLikes.stream()
+                .filter(like -> like.getLikeStatus().equals(true))
+                .collect(Collectors.toList());
+        return likes.size();
     }
 
 
