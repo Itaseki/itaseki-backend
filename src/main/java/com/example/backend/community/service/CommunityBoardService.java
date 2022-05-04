@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -55,9 +56,10 @@ public class CommunityBoardService {
         if(images==null){
             return imageUrls;
         }
-        for(CommunityBoardImage image:images){
-            imageUrls.add(image.getImageUrl());
-        }
+        imageUrls = images.stream()
+                .map(CommunityBoardImage::getImageUrl)
+                .collect(Collectors.toList());
+
         return imageUrls;
     }
 
@@ -86,11 +88,9 @@ public class CommunityBoardService {
 
     public List<AllCommunityBoardsResponse> getAllResponsesOfCommunityBoard(Pageable pageable){
         Page<CommunityBoard> boardPages = communityBoardRepository.findAll(pageable);
-        List<AllCommunityBoardsResponse> responses=new ArrayList<>();
-        for(CommunityBoard board : boardPages){
-            responses.add(AllCommunityBoardsResponse.fromEntity(board));
-        }
-        return responses;
+        return boardPages.stream()
+                .map(AllCommunityBoardsResponse::fromEntity) //lambda (board -> AllCommunityBoardsResponse.fromEntity(board)) 를 변경한 것
+                .collect(Collectors.toList());
     }
 
 }
