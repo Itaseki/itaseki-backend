@@ -65,18 +65,24 @@ public class CommunityBoardService {
 
     public CommunityBoard findCommunityBoardEntity(Long boardId){
         Optional<CommunityBoard> board = communityBoardRepository.findById(boardId);
-        return board.orElse(null);
+        if(board.isPresent()&&board.get().getStatus()){
+            return board.get();
+        }
+        return null;
     }
 
     public int getTotalPageCount(){
-        List<CommunityBoard> communityBoards = communityBoardRepository.findAll();
+        List<CommunityBoard> communityBoards = communityBoardRepository.findAll()
+                .stream().filter(board->board.getStatus().equals(true)).collect(Collectors.toList());
         return communityBoards.size()/10+1;
     }
 
     public DetailCommunityBoardResponse getDetailBoardResponse(CommunityBoard communityBoard,Long loginId){
-        List<CommunityComment> originComments=communityBoard.getComments();
-        originComments.removeIf(comment -> !comment.getIsParentComment()); //Iterator 을 사용한 remove statement 를 Collections.removeIf로 단순화
-        List<CommunityCommentsResponse> comments=commentService.getCommentsResponses(originComments,loginId);
+        List<CommunityComment> parentComments=communityBoard.getComments()
+                        .stream()
+                        .filter(comment->comment.getStatus().equals(true)&&comment.getIsParentComment().equals(true))
+                        .collect(Collectors.toList());
+        List<CommunityCommentsResponse> comments=commentService.getCommentsResponses(parentComments,loginId);
         List<String> images=this.getImageUrlsInPost(communityBoard);
         return DetailCommunityBoardResponse.fromEntity(communityBoard,comments,images,loginId);
     }
@@ -96,6 +102,7 @@ public class CommunityBoardService {
 
     private List<AllCommunityBoardsResponse> toAllCommunityBoardResponse(List<CommunityBoard> boards){
         return boards.stream()
+                .filter(board->board.getStatus().equals(true))
                 .map(AllCommunityBoardsResponse::fromEntity)
                 .collect(Collectors.toList());
     }

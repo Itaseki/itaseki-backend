@@ -59,6 +59,9 @@ public class CommunityCommentService {
             List<CommunityComment> childComments = comment.getChildComments();
             List<CommunityCommentsResponse> childResponses=new ArrayList<>();
             for(CommunityComment child:childComments){
+                if(!child.getStatus()){ //status 가 false, 즉 지워진 대댓글이라면 저장 안하고 continue
+                    continue;
+                }
                 childResponses.add(toCommentResponse(child,boardWriterId,loginId));
             }
             response.setNestedComments(childResponses);

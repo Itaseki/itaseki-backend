@@ -29,6 +29,9 @@ public class CommunityComment {
     @Column(nullable = false)
     private LocalDateTime createdTime;
 
+    @Column(nullable=false, name = "commentStatus")
+    private Boolean status=true;
+
     @ManyToOne(targetEntity = CommunityComment.class)
     @JoinColumn(name = "parentCommentId")
     @JsonBackReference
