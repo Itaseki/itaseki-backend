@@ -24,6 +24,7 @@ public class AllCommunityBoardsResponse {
         return AllCommunityBoardsResponse.builder()
                 .id(board.getId()).title(board.getTitle()).createdTime(board.getCreatedTime())
                 .likeCount(board.getLikeCount()).viewCount(board.getViewCount()).commentCount(board.getComments().size())
+                .writerNickname(board.getUser().getNickname())
                 .build();
     }
 }

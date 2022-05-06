@@ -1,5 +1,6 @@
 package com.example.backend.community.domain;
 
+import com.example.backend.user.domain.User;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -38,7 +39,10 @@ public class CommunityBoard {
     @Column(nullable = false)
     private Integer reportCount=0;
 
-    //User column 추가 (ManyToOne)
+    //추후 필요시 양방향 매핑 추가
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId")
+    private User user;
 
     @OneToMany(mappedBy = "communityBoard",targetEntity = CommunityComment.class)
     private List<CommunityComment> comments=new ArrayList<>();

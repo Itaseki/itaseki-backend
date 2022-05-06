@@ -1,5 +1,6 @@
 package com.example.backend.community.domain;
 
+import com.example.backend.user.domain.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Builder;
@@ -43,7 +44,9 @@ public class CommunityComment {
     @JoinColumn(name = "communityBoardId")
     private CommunityBoard communityBoard;
 
-    //manyToOne User 연관관계 매핑 추가 필요
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId")
+    private User user;
 
     @Builder
     public CommunityComment(String content, Long parentId, LocalDateTime createdTime, CommunityBoard communityBoard){

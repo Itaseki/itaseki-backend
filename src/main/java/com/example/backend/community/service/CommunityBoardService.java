@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -55,9 +56,10 @@ public class CommunityBoardService {
         if(images==null){
             return imageUrls;
         }
-        for(CommunityBoardImage image:images){
-            imageUrls.add(image.getImageUrl());
-        }
+        imageUrls = images.stream()
+                .map(CommunityBoardImage::getImageUrl)
+                .collect(Collectors.toList());
+
         return imageUrls;
     }
 
@@ -66,12 +68,17 @@ public class CommunityBoardService {
         return board.orElse(null);
     }
 
-    public DetailCommunityBoardResponse getDetailBoardResponse(CommunityBoard communityBoard){
+    public int getTotalPageCount(){
+        List<CommunityBoard> communityBoards = communityBoardRepository.findAll();
+        return communityBoards.size()/10+1;
+    }
+
+    public DetailCommunityBoardResponse getDetailBoardResponse(CommunityBoard communityBoard,Long loginId){
         List<CommunityComment> originComments=communityBoard.getComments();
         originComments.removeIf(comment -> !comment.getIsParentComment()); //Iterator 을 사용한 remove statement 를 Collections.removeIf로 단순화
-        List<CommunityCommentsResponse> comments=commentService.getCommentsResponses(originComments);
+        List<CommunityCommentsResponse> comments=commentService.getCommentsResponses(originComments,loginId);
         List<String> images=this.getImageUrlsInPost(communityBoard);
-        return DetailCommunityBoardResponse.fromEntity(communityBoard,comments,images);
+        return DetailCommunityBoardResponse.fromEntity(communityBoard,comments,images,loginId);
     }
 
     public void updateCommunityBoardViewCount(CommunityBoard board){
@@ -81,11 +88,9 @@ public class CommunityBoardService {
 
     public List<AllCommunityBoardsResponse> getAllResponsesOfCommunityBoard(Pageable pageable){
         Page<CommunityBoard> boardPages = communityBoardRepository.findAll(pageable);
-        List<AllCommunityBoardsResponse> responses=new ArrayList<>();
-        for(CommunityBoard board : boardPages){
-            responses.add(AllCommunityBoardsResponse.fromEntity(board));
-        }
-        return responses;
+        return boardPages.stream()
+                .map(AllCommunityBoardsResponse::fromEntity) //lambda (board -> AllCommunityBoardsResponse.fromEntity(board)) 를 변경한 것
+                .collect(Collectors.toList());
     }
 
 }
