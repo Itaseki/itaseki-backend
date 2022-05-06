@@ -99,13 +99,30 @@ public class CommunityController {
         if(reportService.checkReportExistence(user,communityBoard)){
             return new ResponseEntity<>("해당 사용자가 이미 신고한 잡담글",HttpStatus.OK);
         }
-        Report report = Report.builder().board(communityBoard).user(user).build();
+        Report report = Report.builder().communityBoard(communityBoard).user(user).build();
         reportService.saveReport(report);
         if(communityBoard.getReports().size()>=5){
             communityBoardService.deleteCommunityBoard(communityBoard); //삭제하기 보다는 그냥 status 를 0으로 바꿔둘까,,?
             return new ResponseEntity<>("신고 5번 누적으로 삭제",HttpStatus.OK);
         }
         return new ResponseEntity<>("잡담글 신고 성공",HttpStatus.OK);
+    }
+
+    @PostMapping("/{communityBoardId}/comments/{communityCommentId}/reports")
+    public ResponseEntity<String> reportCommunityComment(@PathVariable Long communityBoardId, @PathVariable Long communityCommentId){
+        Long loginId=1L;
+        CommunityComment comment = commentService.findCommunityCommentById(communityCommentId);
+        User user=userService.findUserById(loginId);
+        if(reportService.checkReportExistence(user,comment)){
+            return new ResponseEntity<>("해당 사용자가 이미 신고한 잡담댓글",HttpStatus.OK);
+        }
+        Report report = Report.builder().communityComment(comment).user(user).build();
+        reportService.saveReport(report);
+        if(comment.getReports().size()>=5){
+            commentService.deleteCommunityComment(comment); //삭제하기 보다는 그냥 status 를 0으로 바꿔둘까,,?
+            return new ResponseEntity<>("신고 5번 누적으로 삭제",HttpStatus.OK);
+        }
+        return new ResponseEntity<>("잡담댓글 신고 성공",HttpStatus.OK);
     }
 
 }

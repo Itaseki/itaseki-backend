@@ -28,6 +28,10 @@ public class CommunityCommentService {
         commentRepository.save(comment);
     }
 
+    public CommunityComment findCommunityCommentById(Long commentId){
+        Optional<CommunityComment> comment = commentRepository.findById(commentId);
+        return comment.filter(CommunityComment::getStatus).orElse(null);
+    }
 
     private CommunityComment checkParentComment(Long parentId){
         if(parentId.equals(0L))
@@ -69,5 +73,10 @@ public class CommunityCommentService {
             response.setNestedComments(null);
         }
         return response;
+    }
+
+    public void deleteCommunityComment(CommunityComment comment){
+        comment.setStatus(false);
+        commentRepository.save(comment);
     }
 }

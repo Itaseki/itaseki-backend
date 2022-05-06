@@ -1,6 +1,7 @@
 package com.example.backend.report;
 
 import com.example.backend.community.domain.CommunityBoard;
+import com.example.backend.community.domain.CommunityComment;
 import com.example.backend.user.domain.User;
 import lombok.Builder;
 import lombok.Data;
@@ -27,10 +28,15 @@ public class Report {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @ManyToOne
+    @JoinColumn(name = "community_comment_id")
+    private CommunityComment communityComment;
+
     //신고사유는 어떻게 하기로 했더라
     @Builder
-    public Report (CommunityBoard board,User user){
-        this.communityBoard=board;
+    public Report (CommunityBoard communityBoard,User user,CommunityComment communityComment){
+        this.communityBoard=communityBoard;
         this.user=user;
+        this.communityComment=communityComment;
     }
 }
