@@ -106,4 +106,9 @@ public class CommunityBoardService {
                 .map(AllCommunityBoardsResponse::fromEntity)
                 .collect(Collectors.toList());
     }
+
+    public void deleteCommunityBoard(CommunityBoard board){
+        board.setStatus(false);
+        communityBoardRepository.save(board);
+    }
 }
