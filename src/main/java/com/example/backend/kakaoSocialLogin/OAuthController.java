@@ -2,8 +2,15 @@ package com.example.backend.kakaoSocialLogin;
 
 import com.example.backend.kakaoSocialLogin.service.OAuthService;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.nimbusds.jose.shaded.json.JSONObject;
+import io.jsonwebtoken.Header;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.Duration;
+import java.util.Date;
 
 @RestController
 @AllArgsConstructor
@@ -18,19 +25,22 @@ public class OAuthController {
      */
     @ResponseBody
     @GetMapping("/kakao")
-    public void kakaoCallback(@RequestParam String code) {
-//        System.out.println(code);
-//        oAuthService.getKakaoAccessToken(code); // Access Token 받기 (원래 프론트에서 줘야할 값, 테스트를 위해 만들어놈)
-//        oAuthService.getKakaoUserInfo(code);
-        JsonNode userInfo = oAuthService.getKakaoUserInfo(code);
-        System.out.println(userInfo);
-//        String email = userInfo.get("kaccount_email").toString();
-//        String image = userInfo.get("properties").get("profile_image").toString();
-//        String nickname = userInfo.get("properties").get("nickname").toString();
-//        System.out.println(email);
-//        System.out.println(image);
-//        System.out.println(nickname);
+    public String kakaoCallback(@RequestParam String code) {
 
+        JsonNode userInfo = oAuthService.getKakaoUserInfo(code);
+        // 카카오에서 받아온 정보들 중에 유일한 값 "id" 파싱하기
+        JsonNode userId = userInfo.get("id");
+        // 이 id를 DB를 돌면서 있는지 없는지 check 후 없으며 넣어주기
+        Date now = new Date();
+        return Jwts.builder()
+                .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
+                .setIssuer("fresh")
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + Duration.ofMinutes(30).toMillis()))
+                .claim("id", userId)
+                .signWith(SignatureAlgorithm.HS256, "secret")
+                .compact();
     }
+
 
 }
