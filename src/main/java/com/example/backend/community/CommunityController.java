@@ -125,4 +125,18 @@ public class CommunityController {
         return new ResponseEntity<>("잡담댓글 신고 성공",HttpStatus.OK);
     }
 
+    @DeleteMapping("/{communityBoardId}")
+    public ResponseEntity<String> deleteCommunityBoard(@PathVariable Long communityBoardId){
+        CommunityBoard boardEntity = communityBoardService.findCommunityBoardEntity(communityBoardId);
+        communityBoardService.deleteCommunityBoard(boardEntity);
+        return new ResponseEntity<>("잡담글 삭제 성공",HttpStatus.NO_CONTENT);
+    }
+
+    @DeleteMapping("/{communityBoardId}/comments/{communityCommentId}")
+    public ResponseEntity<String> deleteCommunityComment(@PathVariable Long communityCommentId){
+        CommunityComment comment = commentService.findCommunityCommentById(communityCommentId);
+        commentService.deleteCommunityComment(comment);
+        return new ResponseEntity<>("댓글 삭제 성공",HttpStatus.NO_CONTENT);
+    }
+
 }
