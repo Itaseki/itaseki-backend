@@ -84,6 +84,7 @@ public class CommunityController {
         CommunityBoard communityBoard = communityBoardService.findCommunityBoardEntity(communityBoardId);
         User user = userService.findUserById(loginId);
         int likeCount = likeService.saveLike(communityBoard, user);
+        communityBoard.updateLikeCount(likeCount);
         return new ResponseEntity<>(likeCount,HttpStatus.OK);
     }
 

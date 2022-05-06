@@ -60,4 +60,5 @@ public class CommunityBoard {
     public void updateViewCount(){
         this.viewCount++;
     }
+    public void updateLikeCount(int likeCount){this.likeCount+=likeCount;}
 }
