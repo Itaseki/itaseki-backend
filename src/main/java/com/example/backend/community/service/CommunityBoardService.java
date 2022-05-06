@@ -87,10 +87,16 @@ public class CommunityBoardService {
     }
 
     public List<AllCommunityBoardsResponse> getAllResponsesOfCommunityBoard(Pageable pageable){
-        Page<CommunityBoard> boardPages = communityBoardRepository.findAll(pageable);
-        return boardPages.stream()
-                .map(AllCommunityBoardsResponse::fromEntity) //lambda (board -> AllCommunityBoardsResponse.fromEntity(board)) 를 변경한 것
-                .collect(Collectors.toList());
+        return toAllCommunityBoardResponse(communityBoardRepository.findAll(pageable).toList());
     }
 
+    public List<AllCommunityBoardsResponse> getBestResponseOfCommunityBoard(){
+        return toAllCommunityBoardResponse(communityBoardRepository.findBestBoards());
+    }
+
+    private List<AllCommunityBoardsResponse> toAllCommunityBoardResponse(List<CommunityBoard> boards){
+        return boards.stream()
+                .map(AllCommunityBoardsResponse::fromEntity)
+                .collect(Collectors.toList());
+    }
 }

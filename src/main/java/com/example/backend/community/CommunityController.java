@@ -73,6 +73,11 @@ public class CommunityController {
         return new ResponseEntity<>(new AllBoardResponseWithPageCount(totalPageCount,allResponsesOfCommunityBoard),HttpStatus.OK);
     }
 
+    @GetMapping("best")
+    public ResponseEntity<List<AllCommunityBoardsResponse>> getBestCommunityBoards(){
+        return new ResponseEntity<>(communityBoardService.getBestResponseOfCommunityBoard(),HttpStatus.OK);
+    }
+
     @PostMapping("/{communityBoardId}/likes")
     public ResponseEntity<Integer> setLikeOnCommunityBoard(@PathVariable Long communityBoardId){
         Long loginId=1L;
