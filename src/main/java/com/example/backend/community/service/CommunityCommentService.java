@@ -28,6 +28,10 @@ public class CommunityCommentService {
         commentRepository.save(comment);
     }
 
+    public CommunityComment findCommunityCommentById(Long commentId){
+        Optional<CommunityComment> comment = commentRepository.findById(commentId);
+        return comment.filter(CommunityComment::getStatus).orElse(null);
+    }
 
     private CommunityComment checkParentComment(Long parentId){
         if(parentId.equals(0L))
@@ -59,6 +63,9 @@ public class CommunityCommentService {
             List<CommunityComment> childComments = comment.getChildComments();
             List<CommunityCommentsResponse> childResponses=new ArrayList<>();
             for(CommunityComment child:childComments){
+                if(!child.getStatus()){ //status 가 false, 즉 지워진 대댓글이라면 저장 안하고 continue
+                    continue;
+                }
                 childResponses.add(toCommentResponse(child,boardWriterId,loginId));
             }
             response.setNestedComments(childResponses);
@@ -66,5 +73,10 @@ public class CommunityCommentService {
             response.setNestedComments(null);
         }
         return response;
+    }
+
+    public void deleteCommunityComment(CommunityComment comment){
+        comment.setStatus(false);
+        commentRepository.save(comment);
     }
 }
