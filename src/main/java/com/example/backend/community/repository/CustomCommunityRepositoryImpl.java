@@ -29,7 +29,8 @@ public class CustomCommunityRepositoryImpl implements CustomCommunityRepository{
     @Override
     public List<CommunityBoard> findBestBoards() {
         return jpaQueryFactory.selectFrom(communityBoard)
-                .orderBy(communityBoard.likeCount.desc())
+                .where(communityBoard.status.eq(true))
+                .orderBy(communityBoard.likeCount.desc(),communityBoard.id.desc())
                 .limit(5)
                 .fetch();
     }
