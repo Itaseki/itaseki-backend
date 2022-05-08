@@ -70,10 +70,9 @@ public class CommunityController {
     }
 
     @GetMapping("")
-    public ResponseEntity<AllBoardResponseWithPageCount> getAllCommunityBoards(@PageableDefault(size=10, sort="id", direction = Sort.Direction.DESC) Pageable pageable){
-        int totalPageCount = communityBoardService.getTotalPageCount();
-        List<AllCommunityBoardsResponse> allResponsesOfCommunityBoard = communityBoardService.getAllResponsesOfCommunityBoard(pageable);
-        return new ResponseEntity<>(new AllBoardResponseWithPageCount(totalPageCount,allResponsesOfCommunityBoard),HttpStatus.OK);
+    public ResponseEntity<AllBoardResponseWithPageCount> getAllCommunityBoards(@PageableDefault(size=3, sort="id", direction = Sort.Direction.DESC) Pageable pageable,
+                                                                               @RequestParam(required = false) String q){
+        return new ResponseEntity<>(communityBoardService.getAllResponsesOfCommunityBoard(pageable,q),HttpStatus.OK);
     }
 
     @GetMapping("best")
