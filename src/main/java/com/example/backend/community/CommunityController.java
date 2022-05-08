@@ -34,8 +34,10 @@ public class CommunityController {
     @PostMapping("")
     public ResponseEntity<String> createCommunityPost(CommunityBoardDto communityBoardDto){
         //principal 로 유저 정보 받아오는 부분 추가 (회원가입, 로그인 구현 후)
+        Long loginId=1L;
+        User user=userService.findUserById(loginId);
         CommunityBoard post= CommunityBoard.builder()
-                .title(communityBoardDto.getTitle()).content(communityBoardDto.getContent()).createdTime(LocalDateTime.now())
+                .title(communityBoardDto.getTitle()).content(communityBoardDto.getContent()).createdTime(LocalDateTime.now()).user(user)
                 .build();
         communityBoardService.savePost(post,communityBoardDto.getFiles());
         return new ResponseEntity<>("잡담 게시글 등록 성공", HttpStatus.CREATED);
@@ -44,13 +46,15 @@ public class CommunityController {
     @PostMapping("/{communityBoardId}/comments")
     public ResponseEntity<String> createCommunityComment(@PathVariable Long communityBoardId, @RequestBody CommunityCommentDto commentDto){
         //principal 추가
+        Long loginId=1L;
+        User user=userService.findUserById(loginId);
         CommunityBoard targetBoard=communityBoardService.findCommunityBoardEntity(communityBoardId);
         if(targetBoard==null){
             return new ResponseEntity<>("존재하지 않는 게시글에 대한 댓글 등록 요청",HttpStatus.NOT_FOUND);
         }
         CommunityComment comment=CommunityComment.builder()
                 .content(commentDto.getContent()).parentId(commentDto.getParentCommentId())
-                .createdTime(LocalDateTime.now()).communityBoard(targetBoard)
+                .createdTime(LocalDateTime.now()).communityBoard(targetBoard).user(user)
                 .build();
         commentService.saveCommunityComment(comment, commentDto.getParentCommentId());
         return new ResponseEntity<>("잡담 게시판 댓글 등록 성공",HttpStatus.CREATED);
@@ -70,10 +74,9 @@ public class CommunityController {
     }
 
     @GetMapping("")
-    public ResponseEntity<AllBoardResponseWithPageCount> getAllCommunityBoards(@PageableDefault(size=10, sort="id", direction = Sort.Direction.DESC) Pageable pageable){
-        int totalPageCount = communityBoardService.getTotalPageCount();
-        List<AllCommunityBoardsResponse> allResponsesOfCommunityBoard = communityBoardService.getAllResponsesOfCommunityBoard(pageable);
-        return new ResponseEntity<>(new AllBoardResponseWithPageCount(totalPageCount,allResponsesOfCommunityBoard),HttpStatus.OK);
+    public ResponseEntity<AllBoardResponseWithPageCount> getAllCommunityBoards(@PageableDefault(sort="id", direction = Sort.Direction.DESC) Pageable pageable,
+                                                                               @RequestParam(required = false) String q){
+        return new ResponseEntity<>(communityBoardService.getAllResponsesOfCommunityBoard(pageable,q),HttpStatus.OK);
     }
 
     @GetMapping("best")

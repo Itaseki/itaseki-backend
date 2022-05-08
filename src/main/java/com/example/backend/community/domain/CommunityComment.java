@@ -56,11 +56,12 @@ public class CommunityComment {
     private List<Report> reports=new ArrayList<>();
 
     @Builder
-    public CommunityComment(String content, Long parentId, LocalDateTime createdTime, CommunityBoard communityBoard){
+    public CommunityComment(String content, Long parentId, LocalDateTime createdTime, CommunityBoard communityBoard,User user){
         this.content=content;
         this.isParentComment= parentId==0;
         this.createdTime=createdTime;
         this.communityBoard=communityBoard;
+        this.user=user;
     }
 
 }

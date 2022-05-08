@@ -3,6 +3,7 @@ package com.example.backend.community.service;
 import com.example.backend.community.domain.CommunityBoard;
 import com.example.backend.community.domain.CommunityBoardImage;
 import com.example.backend.community.domain.CommunityComment;
+import com.example.backend.community.dto.AllBoardResponseWithPageCount;
 import com.example.backend.community.dto.AllCommunityBoardsResponse;
 import com.example.backend.community.dto.CommunityCommentsResponse;
 import com.example.backend.community.dto.DetailCommunityBoardResponse;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -71,12 +73,6 @@ public class CommunityBoardService {
         return null;
     }
 
-    public int getTotalPageCount(){
-        List<CommunityBoard> communityBoards = communityBoardRepository.findAll()
-                .stream().filter(board->board.getStatus().equals(true)).collect(Collectors.toList());
-        return communityBoards.size()/10+1;
-    }
-
     public DetailCommunityBoardResponse getDetailBoardResponse(CommunityBoard communityBoard,Long loginId){
         List<CommunityComment> parentComments=communityBoard.getComments()
                         .stream()
@@ -92,8 +88,14 @@ public class CommunityBoardService {
         communityBoardRepository.save(board);
     }
 
-    public List<AllCommunityBoardsResponse> getAllResponsesOfCommunityBoard(Pageable pageable){
-        return toAllCommunityBoardResponse(communityBoardRepository.findAll(pageable).toList());
+    public AllBoardResponseWithPageCount getAllResponsesOfCommunityBoard(Pageable pageable, String query){
+        String[] queryList=null;
+        if(query!=null){
+            queryList= query.split(" ");
+        }
+        Page<CommunityBoard> boardPages = communityBoardRepository.findAll(pageable, queryList);
+        List<AllCommunityBoardsResponse> boardResponses = toAllCommunityBoardResponse(boardPages.getContent());
+        return new AllBoardResponseWithPageCount(boardPages.getTotalPages(), boardResponses);
     }
 
     public List<AllCommunityBoardsResponse> getBestResponseOfCommunityBoard(){

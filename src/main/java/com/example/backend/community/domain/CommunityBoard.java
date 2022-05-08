@@ -58,10 +58,11 @@ public class CommunityBoard {
     private List<Report> reports=new ArrayList<>();
 
     @Builder
-    public CommunityBoard(String title, String content, LocalDateTime createdTime){
+    public CommunityBoard(String title, String content, LocalDateTime createdTime,User user){
         this.title=title;
         this.content=content;
         this.createdTime=createdTime;
+        this.user=user;
     }
 
     public void updateViewCount(){
