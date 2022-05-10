@@ -31,6 +31,9 @@ public class CommunityBoardImage {
     @Column(nullable = false)
     private int imageOrder; //order는 mysql 내에서 예약어로 쓰이는 경우가 많음
 
+    @Column(nullable=false, name = "boardImageStatus")
+    private Boolean status=true;
+
     @Builder
     public CommunityBoardImage(CommunityBoard board,String url, String fileName,int order){
         this.communityBoard=board;

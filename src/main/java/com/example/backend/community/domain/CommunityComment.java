@@ -1,5 +1,6 @@
 package com.example.backend.community.domain;
 
+import com.example.backend.report.Report;
 import com.example.backend.user.domain.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -29,6 +30,9 @@ public class CommunityComment {
     @Column(nullable = false)
     private LocalDateTime createdTime;
 
+    @Column(nullable=false, name = "commentStatus")
+    private Boolean status=true;
+
     @ManyToOne(targetEntity = CommunityComment.class)
     @JoinColumn(name = "parentCommentId")
     @JsonBackReference
@@ -48,12 +52,16 @@ public class CommunityComment {
     @JoinColumn(name = "userId")
     private User user;
 
+    @OneToMany(mappedBy = "communityComment",targetEntity = Report.class)
+    private List<Report> reports=new ArrayList<>();
+
     @Builder
-    public CommunityComment(String content, Long parentId, LocalDateTime createdTime, CommunityBoard communityBoard){
+    public CommunityComment(String content, Long parentId, LocalDateTime createdTime, CommunityBoard communityBoard,User user){
         this.content=content;
         this.isParentComment= parentId==0;
         this.createdTime=createdTime;
         this.communityBoard=communityBoard;
+        this.user=user;
     }
 
 }

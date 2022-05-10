@@ -3,6 +3,7 @@ package com.example.backend.community.service;
 import com.example.backend.community.domain.CommunityBoard;
 import com.example.backend.community.domain.CommunityBoardImage;
 import com.example.backend.community.domain.CommunityComment;
+import com.example.backend.community.dto.AllBoardResponseWithPageCount;
 import com.example.backend.community.dto.AllCommunityBoardsResponse;
 import com.example.backend.community.dto.CommunityCommentsResponse;
 import com.example.backend.community.dto.DetailCommunityBoardResponse;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -65,18 +67,18 @@ public class CommunityBoardService {
 
     public CommunityBoard findCommunityBoardEntity(Long boardId){
         Optional<CommunityBoard> board = communityBoardRepository.findById(boardId);
-        return board.orElse(null);
-    }
-
-    public int getTotalPageCount(){
-        List<CommunityBoard> communityBoards = communityBoardRepository.findAll();
-        return communityBoards.size()/10+1;
+        if(board.isPresent()&&board.get().getStatus()){
+            return board.get();
+        }
+        return null;
     }
 
     public DetailCommunityBoardResponse getDetailBoardResponse(CommunityBoard communityBoard,Long loginId){
-        List<CommunityComment> originComments=communityBoard.getComments();
-        originComments.removeIf(comment -> !comment.getIsParentComment()); //Iterator 을 사용한 remove statement 를 Collections.removeIf로 단순화
-        List<CommunityCommentsResponse> comments=commentService.getCommentsResponses(originComments,loginId);
+        List<CommunityComment> parentComments=communityBoard.getComments()
+                        .stream()
+                        .filter(comment->comment.getStatus().equals(true)&&comment.getIsParentComment().equals(true))
+                        .collect(Collectors.toList());
+        List<CommunityCommentsResponse> comments=commentService.getCommentsResponses(parentComments,loginId);
         List<String> images=this.getImageUrlsInPost(communityBoard);
         return DetailCommunityBoardResponse.fromEntity(communityBoard,comments,images,loginId);
     }
@@ -86,11 +88,29 @@ public class CommunityBoardService {
         communityBoardRepository.save(board);
     }
 
-    public List<AllCommunityBoardsResponse> getAllResponsesOfCommunityBoard(Pageable pageable){
-        Page<CommunityBoard> boardPages = communityBoardRepository.findAll(pageable);
-        return boardPages.stream()
-                .map(AllCommunityBoardsResponse::fromEntity) //lambda (board -> AllCommunityBoardsResponse.fromEntity(board)) 를 변경한 것
+    public AllBoardResponseWithPageCount getAllResponsesOfCommunityBoard(Pageable pageable, String query){
+        String[] queryList=null;
+        if(query!=null){
+            queryList= query.split(" ");
+        }
+        Page<CommunityBoard> boardPages = communityBoardRepository.findAll(pageable, queryList);
+        List<AllCommunityBoardsResponse> boardResponses = toAllCommunityBoardResponse(boardPages.getContent());
+        return new AllBoardResponseWithPageCount(boardPages.getTotalPages(), boardResponses);
+    }
+
+    public List<AllCommunityBoardsResponse> getBestResponseOfCommunityBoard(){
+        return toAllCommunityBoardResponse(communityBoardRepository.findBestBoards());
+    }
+
+    private List<AllCommunityBoardsResponse> toAllCommunityBoardResponse(List<CommunityBoard> boards){
+        return boards.stream()
+                .filter(board->board.getStatus().equals(true))
+                .map(AllCommunityBoardsResponse::fromEntity)
                 .collect(Collectors.toList());
     }
 
+    public void deleteCommunityBoard(CommunityBoard board){
+        board.setStatus(false);
+        communityBoardRepository.save(board);
+    }
 }
