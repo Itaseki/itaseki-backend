@@ -94,4 +94,11 @@ public class VideoService {
         }
         return new int[]{hour, min, sec};
     }
+
+    public String checkVideoUrlExistence(String url){
+        Video video = videoRepository.findByVideoUrl(url);
+        if(video==null)
+            return "등록 가능";
+        return "등록 불가능";
+    }
 }

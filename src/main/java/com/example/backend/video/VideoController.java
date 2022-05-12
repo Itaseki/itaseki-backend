@@ -15,6 +15,12 @@ public class VideoController {
     private final VideoService videoService;
     private final UserService userService;
 
+    @GetMapping("")
+    public ResponseEntity<String> verifyVideoUrl(@RequestParam String url){
+        String existence= videoService.checkVideoUrlExistence(url);
+        return new ResponseEntity<>(existence,HttpStatus.OK);
+    }
+
     @PostMapping("")
     public ResponseEntity<String> uploadVideo(@RequestBody VideoDto videoDto){
         Long loginId=1L;
