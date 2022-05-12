@@ -2,12 +2,15 @@ package com.example.backend.video;
 
 import com.example.backend.user.domain.User;
 import com.example.backend.video.domain.*;
+import com.example.backend.video.dto.InnerInfoResponse;
 import com.example.backend.video.dto.VideoDto;
+import com.example.backend.video.dto.VideoUploadInfoResponse;
 import com.example.backend.video.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,7 +37,7 @@ public class VideoService {
                 .build();
         int[] times = toHourMinSec(video, videoDto.getRuntime());
         video.setVideoRuntime(times);
-        List<Hashtag> hashtags = getHashtags(videoDto.getHashtags());
+        List<Hashtag> hashtags = getHashtagsByIds(videoDto.getHashtags());
         if(hashtags!=null){
             saveVideoHashtag(video,hashtags);
         }
@@ -44,7 +47,7 @@ public class VideoService {
         videoRepository.save(video);
     }
 
-    private List<Hashtag> getHashtags(List<Long> ids){
+    private List<Hashtag> getHashtagsByIds(List<Long> ids){
         if(ids==null){
             return null;
         }
@@ -100,5 +103,26 @@ public class VideoService {
         if(video==null)
             return "등록 가능";
         return "등록 불가능";
+    }
+
+    private List<InnerInfoResponse> findAllSeries(){
+        return seriesRepository.findAll().stream()
+                .map(InnerInfoResponse::new)
+                .collect(Collectors.toList());
+    }
+
+    private List<InnerInfoResponse> findAllHashtags(){
+        return hashtagRepository.findAll()
+                .stream()
+                .map(InnerInfoResponse::new)
+                .collect(Collectors.toList());
+    }
+
+    private List<InnerInfoResponse> findAllPlayListsOfUser(User user){
+        return new ArrayList<>();
+    }
+
+    public VideoUploadInfoResponse getPreInfoForVideoUpload(User user){
+        return VideoUploadInfoResponse.toInfoResponse(findAllSeries(),findAllHashtags(),findAllPlayListsOfUser(user));
     }
 }
