@@ -76,10 +76,10 @@ public class Video {
         this.user=user;
     }
 
-    public void setVideoRuntime(Integer hour, Integer min, Integer sec){
-        this.runtimeHour=hour;
-        this.runtimeMin=min;
-        this.runtimeSec=sec;
+    public void setVideoRuntime(int[] times){
+        this.runtimeHour=times[0];
+        this.runtimeMin=times[1];
+        this.runtimeSec=times[2];
     }
 
 }

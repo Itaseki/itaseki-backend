@@ -32,7 +32,8 @@ public class VideoService {
                 .originTitle(videoDto.getTitle()).series(series)
                 .episodeNumber(videoDto.getEpisode()).user(user)
                 .build();
-        video=toHourMinSec(video,videoDto.getRuntime());
+        int[] times = toHourMinSec(video, videoDto.getRuntime());
+        video.setVideoRuntime(times);
         List<Hashtag> hashtags = getHashtags(videoDto.getHashtags());
         if(hashtags!=null){
             saveVideoHashtag(video,hashtags);
@@ -72,7 +73,7 @@ public class VideoService {
     }
 
     //넘어오는 시간 형태 11:10:1 (시간) 11:10 (분) 00:04 (초)
-    private Video toHourMinSec(Video video, String runtime){
+    private int[] toHourMinSec(Video video, String runtime){
         String[] strings = runtime.split(":");
         int hour,min,sec;
         switch (strings.length){
@@ -91,7 +92,6 @@ public class VideoService {
                 min=0;
                 sec=0;
         }
-        video.setVideoRuntime(hour,min,sec);
-        return video;
+        return new int[]{hour, min, sec};
     }
 }
