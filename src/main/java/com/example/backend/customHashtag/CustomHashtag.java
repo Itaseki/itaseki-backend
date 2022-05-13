@@ -1,5 +1,6 @@
-package com.example.backend.video.domain;
+package com.example.backend.customHashtag;
 
+import com.example.backend.video.domain.Video;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;

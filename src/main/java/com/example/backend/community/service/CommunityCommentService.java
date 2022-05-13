@@ -41,12 +41,7 @@ public class CommunityCommentService {
 
     }
 
-    public List<CommunityCommentsResponse> getCommentsResponses(List<CommunityComment> comments,Long loginId){
-        Long boardWriterId=0L;
-        if(comments!=null&&!comments.isEmpty()){
-            CommunityComment comment = comments.get(0);
-            boardWriterId = comment.getCommunityBoard().getUser().getUserId();
-        }
+    public List<CommunityCommentsResponse> getCommentsResponses(List<CommunityComment> comments,Long loginId,Long boardWriterId){
         List<CommunityCommentsResponse> responses=new ArrayList<>();
 
         for(CommunityComment comment:comments){

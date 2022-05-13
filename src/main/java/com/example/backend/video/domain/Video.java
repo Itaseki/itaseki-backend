@@ -1,5 +1,6 @@
 package com.example.backend.video.domain;
 
+import com.example.backend.customHashtag.CustomHashtag;
 import com.example.backend.user.domain.User;
 import lombok.Builder;
 import lombok.Data;
@@ -7,8 +8,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
-import javax.persistence.criteria.CriteriaBuilder;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -65,6 +66,18 @@ public class Video {
     @Column(nullable = false)
     private int viewCount=0;
 
+    @Column(nullable = false, name = "video_status")
+    private Boolean status=true;
+
+    @OneToMany(mappedBy = "video", targetEntity = VideoComment.class)
+    private List<VideoComment> videoComments;
+
+    @OneToMany(mappedBy = "video",targetEntity = VideoHashtag.class)
+    private List<VideoHashtag> videoHashtags;
+
+    @OneToMany(mappedBy = "video",targetEntity = CustomHashtag.class)
+    private List<CustomHashtag> customHashtags;
+
     @Builder
     public Video (String originTitle, String description, String videoUrl, Integer episodeNumber, Series series,User user){
         this.originVideoTitle=originTitle;
@@ -80,6 +93,10 @@ public class Video {
         this.runtimeHour=times[0];
         this.runtimeMin=times[1];
         this.runtimeSec=times[2];
+    }
+
+    public void updateVideoViewCount(){
+        this.viewCount++;
     }
 
 }
