@@ -1,5 +1,7 @@
 package com.example.backend.video;
 
+import com.example.backend.customHashtag.CustomHashtag;
+import com.example.backend.customHashtag.CustomHashtagRepository;
 import com.example.backend.user.domain.User;
 import com.example.backend.video.domain.*;
 import com.example.backend.video.dto.*;

@@ -1,5 +1,6 @@
 package com.example.backend.video.domain;
 
+import com.example.backend.customHashtag.CustomHashtag;
 import com.example.backend.user.domain.User;
 import lombok.Builder;
 import lombok.Data;
@@ -7,7 +8,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
-import javax.persistence.criteria.CriteriaBuilder;
 import java.time.LocalDateTime;
 import java.util.List;
 
