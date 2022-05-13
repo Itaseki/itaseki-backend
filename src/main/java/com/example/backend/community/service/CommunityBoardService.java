@@ -74,11 +74,12 @@ public class CommunityBoardService {
     }
 
     public DetailCommunityBoardResponse getDetailBoardResponse(CommunityBoard communityBoard,Long loginId){
+        Long boardWriterId=communityBoard.getUser().getUserId();
         List<CommunityComment> parentComments=communityBoard.getComments()
                         .stream()
                         .filter(comment->comment.getStatus().equals(true)&&comment.getIsParentComment().equals(true))
                         .collect(Collectors.toList());
-        List<CommunityCommentsResponse> comments=commentService.getCommentsResponses(parentComments,loginId);
+        List<CommunityCommentsResponse> comments=commentService.getCommentsResponses(parentComments,loginId,boardWriterId);
         List<String> images=this.getImageUrlsInPost(communityBoard);
         return DetailCommunityBoardResponse.fromEntity(communityBoard,comments,images,loginId);
     }
