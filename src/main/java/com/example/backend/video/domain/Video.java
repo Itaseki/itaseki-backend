@@ -9,6 +9,7 @@ import org.springframework.data.annotation.CreatedDate;
 import javax.persistence.*;
 import javax.persistence.criteria.CriteriaBuilder;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -64,6 +65,12 @@ public class Video {
 
     @Column(nullable = false)
     private int viewCount=0;
+
+    @Column(nullable = false, name = "video_status")
+    private Boolean status=true;
+
+    @OneToMany(mappedBy = "video", targetEntity = VideoComment.class)
+    private List<Video> videos;
 
     @Builder
     public Video (String originTitle, String description, String videoUrl, Integer episodeNumber, Series series,User user){
