@@ -70,7 +70,13 @@ public class Video {
     private Boolean status=true;
 
     @OneToMany(mappedBy = "video", targetEntity = VideoComment.class)
-    private List<Video> videos;
+    private List<VideoComment> videoComments;
+
+    @OneToMany(mappedBy = "video",targetEntity = VideoHashtag.class)
+    private List<VideoHashtag> videoHashtags;
+
+    @OneToMany(mappedBy = "video",targetEntity = CustomHashtag.class)
+    private List<CustomHashtag> customHashtags;
 
     @Builder
     public Video (String originTitle, String description, String videoUrl, Integer episodeNumber, Series series,User user){
@@ -87,6 +93,10 @@ public class Video {
         this.runtimeHour=times[0];
         this.runtimeMin=times[1];
         this.runtimeSec=times[2];
+    }
+
+    public void updateVideoViewCount(){
+        this.viewCount++;
     }
 
 }

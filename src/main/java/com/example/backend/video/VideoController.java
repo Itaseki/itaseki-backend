@@ -4,6 +4,7 @@ import com.example.backend.user.UserService;
 import com.example.backend.user.domain.User;
 import com.example.backend.video.domain.Video;
 import com.example.backend.video.domain.VideoComment;
+import com.example.backend.video.dto.DetailVideoResponse;
 import com.example.backend.video.dto.VideoCommentDto;
 import com.example.backend.video.dto.VideoDto;
 import com.example.backend.video.dto.VideoUploadInfoResponse;
@@ -57,5 +58,18 @@ public class VideoController {
         return new ResponseEntity<>("영상 댓글 등록 성공",HttpStatus.CREATED);
 
     }
+
+    @GetMapping("/{videoId}")
+    public ResponseEntity<DetailVideoResponse> getDetailVideo(@PathVariable Long videoId){
+        Long loginId=1L;
+        Video video = videoService.findVideoEntityById(videoId);
+        if(video==null)
+            return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+        DetailVideoResponse detailVideoResponse = videoService.getDetailVideoResponse(video, loginId);
+        videoService.updateVideoViewCount(video);
+        return new ResponseEntity<>(detailVideoResponse,HttpStatus.OK);
+    }
+
+
 
 }

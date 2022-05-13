@@ -2,9 +2,7 @@ package com.example.backend.video;
 
 import com.example.backend.user.domain.User;
 import com.example.backend.video.domain.*;
-import com.example.backend.video.dto.InnerInfoResponse;
-import com.example.backend.video.dto.VideoDto;
-import com.example.backend.video.dto.VideoUploadInfoResponse;
+import com.example.backend.video.dto.*;
 import com.example.backend.video.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.Integer.parseInt;
 
@@ -26,6 +25,7 @@ public class VideoService {
     private final SeriesRepository seriesRepository;
     private final VideoHashtagRepository videoTagRepository;
     private final CustomHashtagRepository customHashtagRepository;
+    private final VideoCommentService videoCommentService;
 
     public void saveVideo(VideoDto videoDto, User user){
         //플레이리스트에 영상 저장하는 부분 추가
@@ -133,4 +133,30 @@ public class VideoService {
         }
         return null;
     }
+
+    private List<String> getHashtagKeywordStringInVideo(Video video){
+        List<VideoHashtag> videoHashtags = video.getVideoHashtags();
+        List<CustomHashtag> customHashtags = video.getCustomHashtags();
+        //두 개의 list 를 각각 string stream 으로 변경한 후, 두 stream을 하나로 합친 list를 반환
+        return Stream.concat(videoHashtags.stream().map(videoHashtag -> videoHashtag.getHashtag().getHashtagName())
+                        ,customHashtags.stream().map(customHashtag->customHashtag.getCustomHashtagName()))
+                .collect(Collectors.toList());
+    }
+
+    public DetailVideoResponse getDetailVideoResponse(Video video, Long loginId){
+        User videoWriter = video.getUser();
+        Long videoWriterId=videoWriter.getUserId();
+        List<VideoComment> parentComments = video.getVideoComments()
+                .stream()
+                .filter(comment -> comment.getStatus().equals(true) && comment.getIsParentComment().equals(true)) //status true고, 부모인 댓글만 넘김
+                .collect(Collectors.toList());
+        List<VideoCommentsResponse> videoCommentResponses = videoCommentService.getVideoCommentResponses(parentComments, loginId, videoWriterId);
+        return DetailVideoResponse.fromEntity(video,videoCommentResponses,loginId,getHashtagKeywordStringInVideo(video));
+    }
+
+    public void updateVideoViewCount(Video video){
+        video.updateVideoViewCount();
+        videoRepository.save(video);
+    }
+
 }
