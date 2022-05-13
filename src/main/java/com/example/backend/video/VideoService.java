@@ -125,4 +125,12 @@ public class VideoService {
     public VideoUploadInfoResponse getPreInfoForVideoUpload(User user){
         return VideoUploadInfoResponse.toInfoResponse(findAllSeries(),findAllHashtags(),findAllPlayListsOfUser(user));
     }
+
+    public Video findVideoEntityById(Long id){
+        Optional<Video> video = videoRepository.findById(id);
+        if(video.isPresent()&&video.get().getStatus()){
+            return video.get();
+        }
+        return null;
+    }
 }
