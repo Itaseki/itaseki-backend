@@ -7,10 +7,13 @@ import com.example.backend.video.domain.*;
 import com.example.backend.video.dto.*;
 import com.example.backend.video.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -159,6 +162,18 @@ public class VideoService {
     public void updateVideoViewCount(Video video){
         video.updateVideoViewCount();
         videoRepository.save(video);
+    }
+
+    public AllVideoResponseWithPageCount getAllVideosResponse(Pageable pageable, String tag, String nickname, String q){
+        List<String> tags=null;
+        if(tag!=null){
+            tags = Arrays.stream(tag.split(",")).collect(Collectors.toList());
+        }
+        Page<Video> videoPage = videoRepository.findAll(pageable, tags, nickname, null);
+        List<AllVideoResponse> allVideoResponses = videoPage.stream()
+                .map(video -> AllVideoResponse.fromEntity(video, video.getUser().getNickname(), video.getLikeCount()))
+                .collect(Collectors.toList());
+        return new AllVideoResponseWithPageCount(allVideoResponses,videoPage.getTotalPages());
     }
 
 }
