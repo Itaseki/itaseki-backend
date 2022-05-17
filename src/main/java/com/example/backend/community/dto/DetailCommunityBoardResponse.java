@@ -28,11 +28,11 @@ public class DetailCommunityBoardResponse {
     private List<CommunityCommentsResponse> comments;
 
 
-    public static DetailCommunityBoardResponse fromEntity(CommunityBoard board,List<CommunityCommentsResponse> comments,List<String> images,Long loginId){
+    public static DetailCommunityBoardResponse fromEntity(CommunityBoard board,List<CommunityCommentsResponse> comments,List<String> images,Long loginId,Integer commentCount){
 //        User 객체, 요청사용자 id 파라미터 추가 + builder 패턴에 추가
         User boardWriter=board.getUser();
         return DetailCommunityBoardResponse.builder()
-                .id(board.getId()).title(board.getTitle()).content(board.getContent()).commentCount(board.getComments().size())
+                .id(board.getId()).title(board.getTitle()).content(board.getContent()).commentCount(commentCount)
                 .createdTime(board.getCreatedTime()).viewCount(board.getViewCount()).likeCount(board.getLikeCount())
                 .comments(comments).imageUrls(images)
                 .writerId(boardWriter.getUserId()).writerNickname(boardWriter.getNickname()).isThisUserWriter(boardWriter.getUserId().equals(loginId))

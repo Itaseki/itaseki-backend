@@ -75,13 +75,14 @@ public class CommunityBoardService {
 
     public DetailCommunityBoardResponse getDetailBoardResponse(CommunityBoard communityBoard,Long loginId){
         Long boardWriterId=communityBoard.getUser().getUserId();
-        List<CommunityComment> parentComments=communityBoard.getComments()
+        List<CommunityComment> allComments= commentService.getAllCommentsOnBoard(communityBoard);
+        List<CommunityComment> parentComments=allComments
                         .stream()
-                        .filter(comment->comment.getStatus().equals(true)&&comment.getIsParentComment().equals(true))
+                        .filter(comment->comment.getIsParentComment().equals(true))
                         .collect(Collectors.toList());
         List<CommunityCommentsResponse> comments=commentService.getCommentsResponses(parentComments,loginId,boardWriterId);
         List<String> images=this.getImageUrlsInPost(communityBoard);
-        return DetailCommunityBoardResponse.fromEntity(communityBoard,comments,images,loginId);
+        return DetailCommunityBoardResponse.fromEntity(communityBoard,comments,images,loginId,allComments.size());
     }
 
     public void updateCommunityBoardViewCount(CommunityBoard board){
@@ -106,7 +107,7 @@ public class CommunityBoardService {
     private List<AllCommunityBoardsResponse> toAllCommunityBoardResponse(List<CommunityBoard> boards){
         return boards.stream()
                 .filter(board->board.getStatus().equals(true))
-                .map(AllCommunityBoardsResponse::fromEntity)
+                .map(board->AllCommunityBoardsResponse.fromEntity(board,commentService.getAllCommentsOnBoard(board).size()))
                 .collect(Collectors.toList());
     }
 
