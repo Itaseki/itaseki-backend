@@ -1,5 +1,6 @@
 package com.example.backend.user;
 
+import com.example.backend.report.Report;
 import com.example.backend.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,4 +18,14 @@ public class UserService {
         Optional<User> user = userRepository.findById(userId);
         return user.orElse(null);
     }
+
+    public User findUserByEmail(String email){
+        Optional<User> user = userRepository.findByEmail(email);
+        return user.orElse(null);
+    }
+
+    public void saveUser(User user){
+        userRepository.save(user);
+    }
+
 }
