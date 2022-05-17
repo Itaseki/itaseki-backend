@@ -53,7 +53,7 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository{
             nicknameExpression = checkNickname(nickname);
         }
 
-        return tagExpression.and(nicknameExpression);
+        return Expressions.allOf(tagExpression,nicknameExpression);
     }
 
     //join 쿼리로 바꿀 수 있나?
