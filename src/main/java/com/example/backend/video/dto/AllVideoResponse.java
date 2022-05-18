@@ -14,10 +14,10 @@ public class AllVideoResponse {
     private String writerNickname;
     private Integer likeCount;
 
-    public static AllVideoResponse fromEntity(Video video, String name, Integer likeCount){
+    public static AllVideoResponse fromEntity(Video video){
         return AllVideoResponse.builder()
                 .id(video.getId()).title(video.getDescription())
-                .writerNickname(name).likeCount(likeCount)
+                .writerNickname(video.getUser().getNickname()).likeCount(video.getLikeCount())
                 .build();
 
     }
