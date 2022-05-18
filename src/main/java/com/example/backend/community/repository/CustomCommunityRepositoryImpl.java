@@ -71,8 +71,10 @@ public class CustomCommunityRepositoryImpl implements CustomCommunityRepository{
                     return orders;
                 case "likeCount":
                     orders.add(new OrderSpecifier(direction,communityBoard.likeCount));
+                    break;
                 case "viewCount":
                     orders.add(new OrderSpecifier(direction,communityBoard.viewCount));
+                    break;
             }
         }
         return orders;

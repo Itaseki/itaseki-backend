@@ -7,10 +7,13 @@ import com.example.backend.video.domain.*;
 import com.example.backend.video.dto.*;
 import com.example.backend.video.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -141,7 +144,7 @@ public class VideoService {
         List<CustomHashtag> customHashtags = video.getCustomHashtags();
         //두 개의 list 를 각각 string stream 으로 변경한 후, 두 stream을 하나로 합친 list를 반환
         return Stream.concat(videoHashtags.stream().map(videoHashtag -> videoHashtag.getHashtag().getHashtagName())
-                        ,customHashtags.stream().map(customHashtag->customHashtag.getCustomHashtagName()))
+                        ,customHashtags.stream().map(CustomHashtag::getCustomHashtagName))
                 .collect(Collectors.toList());
     }
 
@@ -159,6 +162,27 @@ public class VideoService {
     public void updateVideoViewCount(Video video){
         video.updateVideoViewCount();
         videoRepository.save(video);
+    }
+
+    public AllVideoResponseWithPageCount getAllVideosResponse(Pageable pageable, String tag, String nickname, String q){
+        List<String> tags=null;
+        if(tag!=null){
+            tags = Arrays.stream(tag.split(",")).collect(Collectors.toList());
+        }
+        Page<Video> videoPage = videoRepository.findAll(pageable, tags, nickname, null);
+        List<AllVideoResponse> allVideoResponses = toAllResponse(videoPage.getContent());
+        return new AllVideoResponseWithPageCount(allVideoResponses,videoPage.getTotalPages());
+    }
+
+    private List<AllVideoResponse> toAllResponse(List<Video> videos){
+        return videos.stream()
+                .map(AllVideoResponse::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    public List<AllVideoResponse> getBestVideos(){
+        return toAllResponse(videoRepository.findBestVideos());
+
     }
 
 }

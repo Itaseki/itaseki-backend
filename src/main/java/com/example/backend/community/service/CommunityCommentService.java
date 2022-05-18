@@ -74,4 +74,8 @@ public class CommunityCommentService {
         comment.setStatus(false);
         commentRepository.save(comment);
     }
+
+    public List<CommunityComment> getAllCommentsOnBoard(CommunityBoard board){
+        return commentRepository.findAllCommentsOnBoard(board);
+    }
 }

@@ -19,11 +19,11 @@ public class AllCommunityBoardsResponse {
     private Integer likeCount;
     private Integer commentCount;
 
-    public static AllCommunityBoardsResponse fromEntity(CommunityBoard board){
+    public static AllCommunityBoardsResponse fromEntity(CommunityBoard board,Integer commentCount){
         //UserNickname 파라미터, 빌더 추가
         return AllCommunityBoardsResponse.builder()
                 .id(board.getId()).title(board.getTitle()).createdTime(board.getCreatedTime())
-                .likeCount(board.getLikeCount()).viewCount(board.getViewCount()).commentCount(board.getComments().size())
+                .likeCount(board.getLikeCount()).viewCount(board.getViewCount()).commentCount(commentCount)
                 .writerNickname(board.getUser().getNickname())
                 .build();
     }
