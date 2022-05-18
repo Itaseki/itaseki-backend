@@ -11,7 +11,10 @@ import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.AllArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.CookieGenerator;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -62,14 +65,12 @@ public class OAuthController {
         }
 
         String token = jwtAuthenticationProvider.createToken(newUser.getEmail(), newUser.getRoles());
-        response.setHeader("X-AUTH-TOKEN", token);
-
-        Cookie cookie = new Cookie("X-AUTH-TOKEN", token);
+        response.setHeader("ITASEKKI", token);
+        Cookie cookie = new Cookie("ITASEKKI", token);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
         response.addCookie(cookie);
-//        System.out.println(token);
     }
 
 }

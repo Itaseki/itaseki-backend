@@ -53,10 +53,10 @@ public class JwtAuthenticationProvider {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
     }
 
-    // Request의 Header에서 token 값을 가져옵니다. "X-AUTH-TOKEN" : "TOKEN값'
+    // Request의 Header에서 token 값을 가져옵니다. "ITASEKKI" : "TOKEN값'
     public String resolveToken(HttpServletRequest request) {
         String token = null;
-        Cookie cookie = WebUtils.getCookie(request, "X-AUTH-TOKEN");
+        Cookie cookie = WebUtils.getCookie(request, "ITASEKKI");
         if(cookie != null) token = cookie.getValue();
         return token;
     }
