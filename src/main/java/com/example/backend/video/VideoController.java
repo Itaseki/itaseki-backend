@@ -2,6 +2,8 @@ package com.example.backend.video;
 
 import com.example.backend.like.Like;
 import com.example.backend.like.LikeService;
+import com.example.backend.report.Report;
+import com.example.backend.report.ReportService;
 import com.example.backend.user.UserService;
 import com.example.backend.user.domain.User;
 import com.example.backend.video.domain.Video;
@@ -25,6 +27,7 @@ public class VideoController {
     private final UserService userService;
     private final VideoCommentService commentService;
     private final LikeService likeService;
+    private final ReportService reportService;
 
     @GetMapping("/verify")
     public ResponseEntity<String> verifyVideoUrl(@RequestParam String url){
@@ -112,8 +115,23 @@ public class VideoController {
         return new ResponseEntity<>("영상 삭제 성공",HttpStatus.NO_CONTENT);
     }
 
-
-
+    @PostMapping("/{videoId}/reports")
+    public ResponseEntity<String> reportVideo(@PathVariable Long videoId){
+        Long loginId=1L;
+        Video video = videoService.findVideoEntityById(videoId);
+        User user = userService.findUserById(loginId);
+        Boolean existence = reportService.checkReportExistence(user, video);
+        if(existence)
+            return new ResponseEntity<>("해당 사용자가 이미 신고한 영상",HttpStatus.OK);
+        Report report = Report.builder()
+                .user(user).video(video).build();
+        reportService.saveReport(report);
+        if(video.getReports().size()>=5){
+            videoService.deleteVideo(video);
+            return new ResponseEntity<>("신고 5번 누적으로 삭제",HttpStatus.OK);
+        }
+        return new ResponseEntity<>("영상 신고 성공",HttpStatus.OK);
+    }
 
 
 }

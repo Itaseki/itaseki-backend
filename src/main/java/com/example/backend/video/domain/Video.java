@@ -1,6 +1,7 @@
 package com.example.backend.video.domain;
 
 import com.example.backend.customHashtag.CustomHashtag;
+import com.example.backend.report.Report;
 import com.example.backend.user.domain.User;
 import lombok.Builder;
 import lombok.Data;
@@ -77,6 +78,9 @@ public class Video {
 
     @OneToMany(mappedBy = "video",targetEntity = CustomHashtag.class)
     private List<CustomHashtag> customHashtags;
+
+    @OneToMany(mappedBy = "video",targetEntity = Report.class)
+    private List<Report> reports;
 
     @Builder
     public Video (String originTitle, String description, String videoUrl, Integer episodeNumber, Series series,User user){
