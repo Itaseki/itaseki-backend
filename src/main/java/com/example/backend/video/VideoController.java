@@ -140,5 +140,23 @@ public class VideoController {
         return new ResponseEntity<>("영상 댓글 삭제 성공",HttpStatus.NO_CONTENT);
     }
 
+    @PostMapping("/{videoId}/comments/{videoCommentId}/reports")
+    public ResponseEntity<String> reportVideoComment(@PathVariable Long videoId, @PathVariable Long videoCommentId){
+        Long loginId=1L;
+        VideoComment comment = commentService.findVideoCommentById(videoCommentId);
+        User user = userService.findUserById(loginId);
+        Boolean existence = reportService.checkReportExistence(user, comment);
+        if(existence)
+            return new ResponseEntity<>("해당 사용자가 이미 신고한 영상 댓글",HttpStatus.OK);
+        Report report = Report.builder()
+                .user(user).videoComment(comment).build();
+        reportService.saveReport(report);
+        if(comment.getReports().size()>=5){
+            commentService.deleteVideoComment(comment);
+            return new ResponseEntity<>("신고 5번 누적으로 삭제",HttpStatus.OK);
+        }
+        return new ResponseEntity<>("영상 댓글 신고 성공",HttpStatus.OK);
+    }
+
 
 }

@@ -4,6 +4,7 @@ import com.example.backend.community.domain.CommunityBoard;
 import com.example.backend.community.domain.CommunityComment;
 import com.example.backend.user.domain.User;
 import com.example.backend.video.domain.Video;
+import com.example.backend.video.domain.VideoComment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.embedded.undertow.UndertowServletWebServer;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,11 @@ public class ReportService {
 
     public Boolean checkReportExistence(User user, Video video){
         Report report = reportRepository.findByUserAndVideo(user, video);
+        return report!=null;
+    }
+
+    public Boolean checkReportExistence(User user, VideoComment comment){
+        Report report = reportRepository.findByUserAndVideoComment(user, comment);
         return report!=null;
     }
 
