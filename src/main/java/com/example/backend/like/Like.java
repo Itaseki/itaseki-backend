@@ -34,7 +34,8 @@ public class Like {
         this.communityBoard=communityBoard;
     }
 
-    public void modifyLikeStatus(){
+    public Boolean modifyLikeStatus(){
         this.likeStatus=!this.likeStatus;
+        return this.likeStatus;
     }
 }
