@@ -86,7 +86,7 @@ public class VideoController {
         return new ResponseEntity<>(videoService.getBestVideos(),HttpStatus.OK);
     }
 
-    @PostMapping("{videoId}/likes")
+    @PostMapping("/{videoId}/likes")
     public ResponseEntity<Integer> likeOnVideo(@PathVariable Long videoId){
         Long loginId=1L;
         Video video = videoService.findVideoEntityById(videoId);
@@ -104,6 +104,15 @@ public class VideoController {
         likeService.saveLike(like);
         return new ResponseEntity<>(likeCount,HttpStatus.OK);
     }
+
+    @DeleteMapping("/{videoId}")
+    public ResponseEntity<String> deleteVideo(@PathVariable Long videoId){
+        Video video = videoService.findVideoEntityById(videoId);
+        videoService.deleteVideo(video);
+        return new ResponseEntity<>("영상 삭제 성공",HttpStatus.NO_CONTENT);
+    }
+
+
 
 
 
