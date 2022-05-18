@@ -22,6 +22,7 @@ public class User {
      * userReportCount
      */
 
+    //카카오 컬럼 하나 추가해주기
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user")
@@ -36,10 +37,10 @@ public class User {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String profileUrl;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String userDescription;
 
     @Column(nullable = false)
