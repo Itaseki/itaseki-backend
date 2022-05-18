@@ -2,6 +2,7 @@ package com.example.backend.like;
 
 import com.example.backend.community.domain.CommunityBoard;
 import com.example.backend.user.domain.User;
+import com.example.backend.video.domain.Video;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,11 +29,17 @@ public class Like {
     @JoinColumn(name = "communityBoardId")
     private CommunityBoard communityBoard;
 
+    @ManyToOne
+    @JoinColumn(name = "videoId")
+    private Video video;
+
     @Builder
-    public Like(User user, CommunityBoard communityBoard){
+    public Like(User user, CommunityBoard communityBoard, Video video){
         this.user=user;
         this.communityBoard=communityBoard;
+        this.video=video;
     }
+
 
     public Boolean modifyLikeStatus(){
         this.likeStatus=!this.likeStatus;

@@ -99,4 +99,9 @@ public class Video {
         this.viewCount++;
     }
 
+    public Integer updateLikeCount(int likeVal){
+        this.likeCount+=likeVal;
+        return this.likeCount;
+    }
+
 }

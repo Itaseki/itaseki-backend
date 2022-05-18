@@ -1,5 +1,7 @@
 package com.example.backend.video;
 
+import com.example.backend.like.Like;
+import com.example.backend.like.LikeService;
 import com.example.backend.user.UserService;
 import com.example.backend.user.domain.User;
 import com.example.backend.video.domain.Video;
@@ -22,6 +24,7 @@ public class VideoController {
     private final VideoService videoService;
     private final UserService userService;
     private final VideoCommentService commentService;
+    private final LikeService likeService;
 
     @GetMapping("/verify")
     public ResponseEntity<String> verifyVideoUrl(@RequestParam String url){
@@ -81,6 +84,25 @@ public class VideoController {
     @GetMapping("/best")
     public ResponseEntity<List<AllVideoResponse>> getBestVideos(){
         return new ResponseEntity<>(videoService.getBestVideos(),HttpStatus.OK);
+    }
+
+    @PostMapping("{videoId}/likes")
+    public ResponseEntity<Integer> likeOnVideo(@PathVariable Long videoId){
+        Long loginId=1L;
+        Video video = videoService.findVideoEntityById(videoId);
+        User user = userService.findUserById(loginId);
+        Like like = likeService.findExistingLike(video, user);
+        Integer likeCount;
+        if(like==null){
+            like=Like.builder()
+                    .video(video).user(user).build();
+            likeCount = video.updateLikeCount(1);
+        }else{
+            Boolean likeStatus = like.modifyLikeStatus();
+            likeCount = video.updateLikeCount(likeStatus?1:-1);
+        }
+        likeService.saveLike(like);
+        return new ResponseEntity<>(likeCount,HttpStatus.OK);
     }
 
 
