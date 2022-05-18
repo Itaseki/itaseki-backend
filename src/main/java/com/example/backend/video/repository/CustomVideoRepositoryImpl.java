@@ -29,6 +29,15 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository{
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
+    public List<Video> findBestVideos() {
+        return jpaQueryFactory.selectFrom(video)
+                .where(video.status.eq(true))
+                .orderBy(video.likeCount.desc(), video.id.desc())
+                .limit(4)
+                .fetch();
+    }
+
+    @Override
     public Page<Video> findAll(Pageable pageable, List<String> tags, String nickname, List<String> queries) {
         QueryResults<Video> results = jpaQueryFactory.selectFrom(video)
                 .where(video.status.eq(true), predicate(tags, nickname, queries))

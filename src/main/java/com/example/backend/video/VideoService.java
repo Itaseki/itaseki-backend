@@ -144,7 +144,7 @@ public class VideoService {
         List<CustomHashtag> customHashtags = video.getCustomHashtags();
         //두 개의 list 를 각각 string stream 으로 변경한 후, 두 stream을 하나로 합친 list를 반환
         return Stream.concat(videoHashtags.stream().map(videoHashtag -> videoHashtag.getHashtag().getHashtagName())
-                        ,customHashtags.stream().map(customHashtag->customHashtag.getCustomHashtagName()))
+                        ,customHashtags.stream().map(CustomHashtag::getCustomHashtagName))
                 .collect(Collectors.toList());
     }
 
@@ -170,10 +170,19 @@ public class VideoService {
             tags = Arrays.stream(tag.split(",")).collect(Collectors.toList());
         }
         Page<Video> videoPage = videoRepository.findAll(pageable, tags, nickname, null);
-        List<AllVideoResponse> allVideoResponses = videoPage.stream()
-                .map(video -> AllVideoResponse.fromEntity(video, video.getUser().getNickname(), video.getLikeCount()))
-                .collect(Collectors.toList());
+        List<AllVideoResponse> allVideoResponses = toAllResponse(videoPage.getContent());
         return new AllVideoResponseWithPageCount(allVideoResponses,videoPage.getTotalPages());
+    }
+
+    private List<AllVideoResponse> toAllResponse(List<Video> videos){
+        return videos.stream()
+                .map(AllVideoResponse::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    public List<AllVideoResponse> getBestVideos(){
+        return toAllResponse(videoRepository.findBestVideos());
+
     }
 
 }

@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/boards/video")
 @RequiredArgsConstructor
@@ -74,6 +76,11 @@ public class VideoController {
     public ResponseEntity<AllVideoResponseWithPageCount> getAllVideos(@PageableDefault(size=4, sort="id",direction = Sort.Direction.DESC) Pageable pageable,
                                                                       @RequestParam(required = false) String tag, @RequestParam(required = false) String nickname, @RequestParam(required = false) String q){
         return new ResponseEntity<>(videoService.getAllVideosResponse(pageable, tag, nickname, q),HttpStatus.OK);
+    }
+
+    @GetMapping("/best")
+    public ResponseEntity<List<AllVideoResponse>> getBestVideos(){
+        return new ResponseEntity<>(videoService.getBestVideos(),HttpStatus.OK);
     }
 
 
