@@ -133,5 +133,12 @@ public class VideoController {
         return new ResponseEntity<>("영상 신고 성공",HttpStatus.OK);
     }
 
+    @DeleteMapping("/{videoId}/comments/{videoCommentId}")
+    public ResponseEntity<String> deleteVideo(@PathVariable Long videoId, @PathVariable Long videoCommentId){
+        VideoComment videoComment = commentService.findVideoCommentById(videoCommentId);
+        commentService.deleteVideoComment(videoComment);
+        return new ResponseEntity<>("영상 댓글 삭제 성공",HttpStatus.NO_CONTENT);
+    }
+
 
 }
