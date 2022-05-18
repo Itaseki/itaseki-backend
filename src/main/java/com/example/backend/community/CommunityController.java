@@ -5,6 +5,7 @@ import com.example.backend.community.domain.CommunityComment;
 import com.example.backend.community.dto.*;
 import com.example.backend.community.service.CommunityBoardService;
 import com.example.backend.community.service.CommunityCommentService;
+import com.example.backend.like.Like;
 import com.example.backend.like.LikeService;
 import com.example.backend.report.Report;
 import com.example.backend.report.ReportService;
@@ -89,9 +90,19 @@ public class CommunityController {
         Long loginId=1L;
         CommunityBoard communityBoard = communityBoardService.findCommunityBoardEntity(communityBoardId);
         User user = userService.findUserById(loginId);
-        int likeCount = likeService.saveLike(communityBoard, user);
-        communityBoard.updateLikeCount(likeCount);
-        return new ResponseEntity<>(likeCount,HttpStatus.OK);
+        Like like = likeService.findExistingLike(communityBoard, user);
+        Integer totalLikeCount;
+        if(like==null){
+            like=Like.builder()
+                    .communityBoard(communityBoard).user(user)
+                    .build();
+            totalLikeCount=communityBoard.updateLikeCount(1);
+        }else{
+            Boolean likeStatus = like.modifyLikeStatus();
+            totalLikeCount= communityBoard.updateLikeCount(likeStatus?1:-1);
+        }
+        likeService.saveLike(like);
+        return new ResponseEntity<>(totalLikeCount,HttpStatus.OK);
     }
 
     @PostMapping("/{communityBoardId}/reports")

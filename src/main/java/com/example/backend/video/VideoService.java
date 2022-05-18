@@ -185,4 +185,9 @@ public class VideoService {
 
     }
 
+    public void deleteVideo(Video video){
+        video.setStatus(false);
+        videoRepository.save(video);
+    }
+
 }

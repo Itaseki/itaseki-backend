@@ -52,6 +52,9 @@ public class VideoComment {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @OneToMany(mappedBy = "videoComment",targetEntity = Report.class)
+    private List<Report> reports;
+
     @Builder
     public VideoComment(String content, Long parentId,Video video, User user){
         this.content=content;

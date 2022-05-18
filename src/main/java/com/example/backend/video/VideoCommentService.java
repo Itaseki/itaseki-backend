@@ -53,4 +53,17 @@ public class VideoCommentService {
         return response;
     }
 
+    public VideoComment findVideoCommentById(Long id){
+        Optional<VideoComment> comment = commentRepository.findById(id);
+        if(comment.isPresent()&&comment.get().getStatus()){
+            return comment.get();
+        }
+        return null;
+    }
+
+    public void deleteVideoComment(VideoComment comment){
+        comment.setStatus(false);
+        commentRepository.save(comment);
+    }
+
 }
