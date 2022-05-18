@@ -1,6 +1,6 @@
 package com.example.backend.kakaoSocialLogin;
 
-import com.example.backend.kakaoSocialLogin.service.JwtTokenProviderService;
+//import com.example.backend.kakaoSocialLogin.service.JwtTokenProviderService;
 import com.example.backend.kakaoSocialLogin.service.OAuthService;
 import com.example.backend.user.UserService;
 import com.example.backend.user.domain.User;
@@ -11,8 +11,13 @@ import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.AllArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.CookieGenerator;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.time.Duration;
 import java.util.Date;
 
@@ -22,7 +27,7 @@ import java.util.Date;
 public class OAuthController {
 
     private final OAuthService oAuthService;
-    private final JwtTokenProviderService jwtTokenProviderService;
+    private final JwtAuthenticationProvider jwtAuthenticationProvider;
     private final UserService userService;
 
     /**
@@ -31,7 +36,7 @@ public class OAuthController {
      */
     @ResponseBody
     @GetMapping("/kakao")
-    public void kakaoCallback(@RequestParam String code) {
+    public void kakaoCallback(@RequestParam String code, HttpServletResponse response) {
 
         JsonNode userInfo = oAuthService.getKakaoUserInfo(code);
 
@@ -48,9 +53,9 @@ public class OAuthController {
         profileUrl = profileUrl.substring(1,profileUrl.length()-1);
 
         User user = userService.findUserByEmail(email);
+        User newUser = new User();
 
         if(user == null){
-            User newUser = new User();
             newUser.setEmail(email);
             newUser.setName(name);
             newUser.setNickname(nickname);
@@ -59,10 +64,13 @@ public class OAuthController {
             userService.saveUser(newUser);
         }
 
-        // 로그인 처리
-
-        // 스프링 시큐리티 통해 인증된 사용자로 등록
-
+        String token = jwtAuthenticationProvider.createToken(newUser.getEmail(), newUser.getRoles());
+        response.setHeader("ITASEKKI", token);
+        Cookie cookie = new Cookie("ITASEKKI", token);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        response.addCookie(cookie);
     }
 
 }
