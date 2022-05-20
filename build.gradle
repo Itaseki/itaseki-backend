@@ -49,6 +49,8 @@ dependencies {
 //			"javax.annotation:javax.annotation-api",
 //			"com.querydsl:querydsl-apt:${queryDslVersion}:jpa")
 
+	implementation 'org.jsoup:jsoup:1.14.2'
+
 }
 
 tasks.named('test') {
