@@ -9,6 +9,8 @@ import com.example.backend.user.domain.User;
 import com.example.backend.video.domain.Video;
 import com.example.backend.video.domain.VideoComment;
 import com.example.backend.video.dto.*;
+import com.example.backend.video.service.VideoCommentService;
+import com.example.backend.video.service.VideoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

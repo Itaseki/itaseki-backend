@@ -1,4 +1,4 @@
-package com.example.backend.video;
+package com.example.backend.video.service;
 
 import com.example.backend.video.domain.VideoComment;
 import com.example.backend.video.dto.VideoCommentsResponse;

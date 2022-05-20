@@ -1,4 +1,4 @@
-package com.example.backend.video;
+package com.example.backend.video.service;
 
 import com.example.backend.customHashtag.CustomHashtag;
 import com.example.backend.customHashtag.CustomHashtagRepository;
@@ -6,6 +6,7 @@ import com.example.backend.user.domain.User;
 import com.example.backend.video.domain.*;
 import com.example.backend.video.dto.*;
 import com.example.backend.video.repository.*;
+import com.example.backend.video.service.VideoCommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
