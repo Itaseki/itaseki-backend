@@ -9,10 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -42,12 +40,11 @@ public class CommunityCommentService {
     }
 
     public List<CommunityCommentsResponse> getCommentsResponses(List<CommunityComment> comments,Long loginId,Long boardWriterId){
-        List<CommunityCommentsResponse> responses=new ArrayList<>();
 
-        for(CommunityComment comment:comments){
-            responses.add(toCommentResponse(comment,boardWriterId,loginId));
-        }
-        return responses;
+        return comments.stream()
+                .map(comment -> toCommentResponse(comment, boardWriterId, loginId))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
 
@@ -56,12 +53,16 @@ public class CommunityCommentService {
         CommunityCommentsResponse response = CommunityCommentsResponse.fromEntity(comment,boardWriterId,loginId);
         if(comment.getIsParentComment()){
             List<CommunityComment> childComments = comment.getChildComments();
-            List<CommunityCommentsResponse> childResponses=new ArrayList<>();
-            for(CommunityComment child:childComments){
-                if(!child.getStatus()){ //status 가 false, 즉 지워진 대댓글이라면 저장 안하고 continue
-                    continue;
-                }
-                childResponses.add(toCommentResponse(child,boardWriterId,loginId));
+
+            List<CommunityCommentsResponse> childResponses = childComments.stream()
+                    .filter(CommunityComment::getStatus)
+                    .map(child->toCommentResponse(child,boardWriterId,loginId))
+                    .collect(Collectors.toList());
+
+            if(!comment.getStatus()){
+                if(childResponses.isEmpty()) //자식 대댓글이 없는, 삭제된 댓글이라면 null
+                    return null;
+                response.setContent("삭제된 댓글입니다");//자식 대댓글이 있는, 삭제된 댓글이라면 "삭제된 댓글 표시"
             }
             response.setNestedComments(childResponses);
         }else{
