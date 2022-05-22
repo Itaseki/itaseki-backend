@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,7 @@ public class VideoCommentService {
     public List<VideoCommentsResponse> getVideoCommentResponses(List<VideoComment> comments,Long loginId, Long boardWriterId){
         return comments.stream()
                 .map(comment->toVideoCommentResponse(comment,boardWriterId,loginId))
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
     }
@@ -45,10 +47,16 @@ public class VideoCommentService {
         }else{
             List<VideoComment> childComments = comment.getChildComments();
             //각 부모 댓글들의 자식 댓글들 세팅
-            response.setNestedComments(childComments.stream()
-                            .filter(childComment->childComment.getStatus().equals(true)) //자식댓글들 중, status true인 애들만 세팅
-                            .map(childComment -> VideoCommentsResponse.fromEntity(childComment, boardWriterId, loginId))
-                            .collect(Collectors.toList()));
+            List<VideoCommentsResponse> childResponses = childComments.stream()
+                    .filter(childComment -> childComment.getStatus().equals(true)) //자식댓글들 중, status true인 애들만 세팅
+                    .map(childComment -> VideoCommentsResponse.fromEntity(childComment, boardWriterId, loginId))
+                    .collect(Collectors.toList());
+            if(!comment.getStatus()){
+                if(childResponses.isEmpty())
+                    return null;
+                response.setContent("삭제된 댓글입니다");
+            }
+            response.setNestedComments(childResponses);
         }
         return response;
     }

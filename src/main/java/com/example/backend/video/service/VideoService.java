@@ -154,7 +154,7 @@ public class VideoService {
         Long videoWriterId=videoWriter.getUserId();
         List<VideoComment> parentComments = video.getVideoComments()
                 .stream()
-                .filter(comment -> comment.getStatus().equals(true) && comment.getIsParentComment().equals(true)) //status true고, 부모인 댓글만 넘김
+                .filter(comment -> comment.getIsParentComment().equals(true)) //부모댓글만 넘김
                 .collect(Collectors.toList());
         List<VideoCommentsResponse> videoCommentResponses = videoCommentService.getVideoCommentResponses(parentComments, loginId, videoWriterId);
         return DetailVideoResponse.fromEntity(video,videoCommentResponses,loginId,getHashtagKeywordStringInVideo(video));
