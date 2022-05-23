@@ -9,6 +9,8 @@ import com.example.backend.user.domain.User;
 import com.example.backend.video.domain.Video;
 import com.example.backend.video.domain.VideoComment;
 import com.example.backend.video.dto.*;
+import com.example.backend.video.service.VideoCommentService;
+import com.example.backend.video.service.VideoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -79,7 +81,7 @@ public class VideoController {
     }
 
     @GetMapping("")
-    public ResponseEntity<AllVideoResponseWithPageCount> getAllVideos(@PageableDefault(size=4, sort="id",direction = Sort.Direction.DESC) Pageable pageable,
+    public ResponseEntity<AllVideoResponseWithPageCount> getAllVideos(@PageableDefault(size=8, sort="id",direction = Sort.Direction.DESC) Pageable pageable,
                                                                       @RequestParam(required = false) String tag, @RequestParam(required = false) String nickname, @RequestParam(required = false) String q){
         return new ResponseEntity<>(videoService.getAllVideosResponse(pageable, tag, nickname, q),HttpStatus.OK);
     }

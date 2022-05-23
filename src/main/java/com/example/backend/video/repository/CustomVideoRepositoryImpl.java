@@ -39,11 +39,17 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository{
 
     @Override
     public Page<Video> findAll(Pageable pageable, List<String> tags, String nickname, List<String> queries) {
+        long pageOffset= pageable.getOffset()-4;
+        int pageSize = pageable.getPageSize();
+        if(pageable.getPageNumber()==0){
+            pageOffset=0;
+            pageSize=4;
+        }
         QueryResults<Video> results = jpaQueryFactory.selectFrom(video)
                 .where(video.status.eq(true), predicate(tags, nickname, queries))
                 .orderBy(order(pageable.getSort()).toArray(OrderSpecifier[]::new))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+                .offset(pageOffset)
+                .limit(pageSize)
                 .fetchResults();
 
         return new PageImpl<>(results.getResults(),pageable,results.getTotal());

@@ -75,7 +75,7 @@ public class CommunityBoardService {
 
     public DetailCommunityBoardResponse getDetailBoardResponse(CommunityBoard communityBoard,Long loginId){
         Long boardWriterId=communityBoard.getUser().getUserId();
-        List<CommunityComment> allComments= commentService.getAllCommentsOnBoard(communityBoard);
+        List<CommunityComment> allComments= communityBoard.getComments();
         List<CommunityComment> parentComments=allComments
                         .stream()
                         .filter(comment->comment.getIsParentComment().equals(true))
