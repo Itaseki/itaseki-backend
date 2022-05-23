@@ -172,7 +172,13 @@ public class VideoService {
         }
         Page<Video> videoPage = videoRepository.findAll(pageable, tags, nickname, null);
         List<AllVideoResponse> allVideoResponses = toAllResponse(videoPage.getContent());
-        return new AllVideoResponseWithPageCount(allVideoResponses,videoPage.getTotalPages());
+        return new AllVideoResponseWithPageCount(allVideoResponses,getTotalPageCount(videoPage.getTotalElements()));
+    }
+
+    private int getTotalPageCount(long pages){
+        //total video count 를 기준으로 한 페이지는 4개 -> 다음페이지는 8개로 나뉜다는걸 생각해서 전체 페이지 수 반환
+        //데이터 13개 (의도: 3페이지, 잘못된 연산: 2페이지) 넣어놓고 체크해보면 될듯
+        return (int) (1+Math.ceil((pages-4)/(double)8));
     }
 
     private List<AllVideoResponse> toAllResponse(List<Video> videos){
