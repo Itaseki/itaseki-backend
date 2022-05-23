@@ -2,6 +2,7 @@ package com.example.backend.report;
 
 import com.example.backend.community.domain.CommunityBoard;
 import com.example.backend.community.domain.CommunityComment;
+import com.example.backend.image.domain.ImageBoard;
 import com.example.backend.user.domain.User;
 import com.example.backend.video.domain.Video;
 import com.example.backend.video.domain.VideoComment;
@@ -25,6 +26,11 @@ public class ReportService {
 
     public Boolean checkReportExistence(User user, CommunityBoard communityBoard){
         Report report = reportRepository.findByUserAndCommunityBoard(user, communityBoard);
+        return report!=null;
+    }
+
+    public Boolean checkReportExistence(User user, ImageBoard imageBoard){
+        Report report = reportRepository.findByUserAndImageBoard(user, imageBoard);
         return report!=null;
     }
 
