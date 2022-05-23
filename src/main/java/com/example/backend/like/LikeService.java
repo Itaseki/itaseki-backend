@@ -2,6 +2,7 @@ package com.example.backend.like;
 
 import com.example.backend.community.domain.CommunityBoard;
 import com.example.backend.community.domain.CommunityComment;
+import com.example.backend.image.domain.ImageBoard;
 import com.example.backend.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,25 @@ public class LikeService {
                 .filter(like -> like.getLikeStatus().equals(true))
                 .collect(Collectors.toList());
         return likes.size();
+    }
+
+//    public int imageBoardSaveLike(ImageBoard imageBoard, User user){
+//        Like like = imageBoardFindExistingLike(imageBoard,user);
+//        if(like==null){
+//            like = Like.builder().
+//        }
+//    }
+
+    public int imageBoardGetLikeCount(ImageBoard imageBoard){
+        List<Like> originLikes = likeRepository.findAllByImageBoard(imageBoard);
+        List<Like> likes = originLikes.stream()
+                .filter(like -> like.getLikeStatus().equals(true))
+                .collect(Collectors.toList());
+        return likes.size();
+    }
+
+    public Like imageBoardFindExistingLike(ImageBoard imageBoard, User user){
+        return likeRepository.findByUserAndImageBoard(user, imageBoard);
     }
 
 

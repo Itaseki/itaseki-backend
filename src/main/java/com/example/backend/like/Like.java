@@ -1,6 +1,7 @@
 package com.example.backend.like;
 
 import com.example.backend.community.domain.CommunityBoard;
+import com.example.backend.image.domain.ImageBoard;
 import com.example.backend.user.domain.User;
 import lombok.Builder;
 import lombok.Data;
@@ -27,6 +28,10 @@ public class Like {
     @ManyToOne
     @JoinColumn(name = "communityBoardId")
     private CommunityBoard communityBoard;
+
+    @ManyToOne
+    @JoinColumn(name = "imageBoardId")
+    private ImageBoard imageBoard;
 
     @Builder
     public Like(User user, CommunityBoard communityBoard){

@@ -2,6 +2,7 @@ package com.example.backend.report;
 
 import com.example.backend.community.domain.CommunityBoard;
 import com.example.backend.community.domain.CommunityComment;
+import com.example.backend.image.domain.ImageBoard;
 import com.example.backend.user.domain.User;
 import lombok.Builder;
 import lombok.Data;
@@ -22,6 +23,10 @@ public class Report {
     @ManyToOne
     @JoinColumn(name = "community_board_id")
     private CommunityBoard communityBoard;
+
+    @ManyToOne
+    @JoinColumn(name = "image_board_id")
+    private ImageBoard imageBoard;
 
     //하나의 사용자가 여러개의 신고 가능
     @ManyToOne

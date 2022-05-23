@@ -2,6 +2,7 @@ package com.example.backend.report;
 
 import com.example.backend.community.domain.CommunityBoard;
 import com.example.backend.community.domain.CommunityComment;
+import com.example.backend.image.domain.ImageBoard;
 import com.example.backend.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.embedded.undertow.UndertowServletWebServer;
@@ -23,6 +24,11 @@ public class ReportService {
 
     public Boolean checkReportExistence(User user, CommunityBoard communityBoard){
         Report report = reportRepository.findByUserAndCommunityBoard(user, communityBoard);
+        return report!=null;
+    }
+
+    public Boolean imageBoardCheckReportExistence(User user, ImageBoard imageBoard){
+        Report report = reportRepository.findByUserAndImageBoard(user, imageBoard);
         return report!=null;
     }
 
