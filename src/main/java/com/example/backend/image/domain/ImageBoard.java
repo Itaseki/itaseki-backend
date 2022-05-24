@@ -39,11 +39,14 @@ public class ImageBoard {
     @Column(nullable = false)
     private Integer viewCount=0;
 
+    @Column(nullable=false, name = "boardStatus")
+    private Boolean status=true;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
     private User user;
 
-    @OneToMany(mappedBy = "communityBoard",targetEntity = Report.class)
+    @OneToMany(mappedBy = "imageBoard",targetEntity = Report.class)
     private List<Report> reports=new ArrayList<>();
 
     @Builder

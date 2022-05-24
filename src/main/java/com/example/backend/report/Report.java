@@ -2,6 +2,7 @@ package com.example.backend.report;
 
 import com.example.backend.community.domain.CommunityBoard;
 import com.example.backend.community.domain.CommunityComment;
+import com.example.backend.image.domain.ImageBoard;
 import com.example.backend.user.domain.User;
 import com.example.backend.video.domain.Video;
 import com.example.backend.video.domain.VideoComment;
@@ -25,6 +26,10 @@ public class Report {
     @JoinColumn(name = "community_board_id")
     private CommunityBoard communityBoard;
 
+    @ManyToOne
+    @JoinColumn(name = "image_board_id")
+    private ImageBoard imageBoard;
+
     //하나의 사용자가 여러개의 신고 가능
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -44,7 +49,8 @@ public class Report {
 
     //신고사유는 어떻게 하기로 했더라
     @Builder
-    public Report (CommunityBoard communityBoard,User user,CommunityComment communityComment,Video video, VideoComment videoComment){
+    public Report (CommunityBoard communityBoard,User user,CommunityComment communityComment,Video video, VideoComment videoComment, ImageBoard imageBoard){
+        this.imageBoard = imageBoard;
         this.communityBoard=communityBoard;
         this.user=user;
         this.communityComment=communityComment;
