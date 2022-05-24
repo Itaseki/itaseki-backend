@@ -34,6 +34,7 @@ public class Like {
     @JoinColumn(name = "imageBoardId")
     private ImageBoard imageBoard;
 
+    @ManyToOne
     @JoinColumn(name = "videoId")
     private Video video;
 
