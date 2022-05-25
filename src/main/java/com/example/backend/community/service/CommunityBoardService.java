@@ -82,7 +82,7 @@ public class CommunityBoardService {
                         .collect(Collectors.toList());
         List<CommunityCommentsResponse> comments=commentService.getCommentsResponses(parentComments,loginId,boardWriterId);
         List<String> images=this.getImageUrlsInPost(communityBoard);
-        return DetailCommunityBoardResponse.fromEntity(communityBoard,comments,images,loginId,allComments.size());
+        return DetailCommunityBoardResponse.fromEntity(communityBoard,comments,images,loginId,commentService.getAllCommentsOnBoard(communityBoard).size());
     }
 
     public void updateCommunityBoardViewCount(CommunityBoard board){
