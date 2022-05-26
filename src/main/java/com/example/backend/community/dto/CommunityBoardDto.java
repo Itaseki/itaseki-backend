@@ -11,5 +11,5 @@ import java.util.List;
 public class CommunityBoardDto {
     private String title;
     private String content;
-    private List<MultipartFile> files;
+//    private List<MultipartFile> files;
 }

@@ -16,8 +16,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,15 +34,17 @@ public class CommunityController {
     private final UserService userService;
     private final ReportService reportService;
 
-    @PostMapping("")
-    public ResponseEntity<String> createCommunityPost(CommunityBoardDto communityBoardDto){
+    @PostMapping(value = "",consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<String> createCommunityPost(@RequestPart CommunityBoardDto communityBoardDto,
+                                                      @RequestPart List<MultipartFile> files){
         //principal 로 유저 정보 받아오는 부분 추가 (회원가입, 로그인 구현 후)
         Long loginId=1L;
         User user=userService.findUserById(loginId);
+        System.out.println("board content: "+communityBoardDto.getContent());
         CommunityBoard post= CommunityBoard.builder()
                 .title(communityBoardDto.getTitle()).content(communityBoardDto.getContent()).createdTime(LocalDateTime.now()).user(user)
                 .build();
-        communityBoardService.savePost(post,communityBoardDto.getFiles());
+        communityBoardService.savePost(post,files);
         return new ResponseEntity<>("잡담 게시글 등록 성공", HttpStatus.CREATED);
     }
 
