@@ -1,5 +1,6 @@
 package com.example.backend.reservation;
 
+import com.example.backend.reservation.domain.Reservation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

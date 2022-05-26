@@ -1,6 +1,7 @@
 package com.example.backend.reservation;
 
-import com.example.backend.reservation.dto.ReservationDto;
+import com.example.backend.reservation.domain.Reservation;
+import com.example.backend.video.domain.Video;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

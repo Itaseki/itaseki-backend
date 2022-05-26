@@ -1,5 +1,6 @@
 package com.example.backend.reservation;
 
+import com.example.backend.reservation.domain.Reservation;
 import com.example.backend.reservation.dto.ReservationDto;
 import com.example.backend.user.UserService;
 import com.example.backend.user.domain.User;

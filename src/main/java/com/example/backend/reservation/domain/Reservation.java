@@ -1,4 +1,4 @@
-package com.example.backend.reservation;
+package com.example.backend.reservation.domain;
 
 import com.example.backend.user.domain.User;
 import com.example.backend.video.domain.Video;
