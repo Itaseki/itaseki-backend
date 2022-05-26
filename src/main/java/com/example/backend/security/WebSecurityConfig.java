@@ -15,6 +15,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             ,"/test","/test-db","/test-db/**" //s3, rds 연동 테스트때 사용한 url 들 일단 접근 허가
             ,"/boards/community","/boards/community/**" //로그인 구현 전 잡담게시판 구현 위해 임시 허가
             ,"/boards/video","/boards/video/**" //로그인 구현 전 영상게시판 구현 위해 임시허가
+            ,"/run/reservations","/run/reservations/**" //로그인 구현 전 영상 달리기 예약 위해 임시허가
     };
 
     @Override

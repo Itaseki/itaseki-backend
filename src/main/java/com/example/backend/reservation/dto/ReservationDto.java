@@ -9,9 +9,7 @@ import java.time.LocalDate;
 @Setter
 public class ReservationDto {
     private Long id;
-    private LocalDate reservationDate;
-    private Integer startTime;
-    private Integer startMin;
-    private Integer endTime;
-    private Integer endMin;
+    private String reservationDate;
+    private String startTime;
+    private String endTime;
 }
