@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
+
 @RestController
 @RequestMapping("/run/reservations")
 @RequiredArgsConstructor
@@ -31,9 +33,9 @@ public class ReservationController {
             return new ResponseEntity<>("잘못된 영상에 대한 예약 요청", HttpStatus.NOT_FOUND);
         Reservation reservation = Reservation.builder()
                 .user(user).video(video)
-                .sHour(reservationDto.getStartTime()).sMin(reservationDto.getStartMin())
-                .eHour(reservationDto.getEndTime()).eMin(reservationDto.getEndMin())
-                .date(reservationDto.getReservationDate())
+                .sTime(reservationDto.getStartTime())
+                .eTime(reservationDto.getEndTime())
+                .date(LocalDate.parse(reservationDto.getReservationDate()))
                 .build();
         reservationService.saveReservation(reservation);
         return new ResponseEntity<>("예약 등록 성공",HttpStatus.CREATED);

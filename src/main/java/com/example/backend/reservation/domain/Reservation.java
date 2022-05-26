@@ -27,16 +27,10 @@ public class Reservation {
     private LocalDate reservationDate;
 
     @Column(nullable = false)
-    private Integer startHour;
+    private String startTime;
 
     @Column(nullable = false)
-    private Integer startMin;
-
-    @Column(nullable = false)
-    private Integer endHour;
-
-    @Column(nullable = false)
-    private Integer endMin;
+    private String endTime;
 
     @CreatedDate
     @Column
@@ -53,13 +47,11 @@ public class Reservation {
     private Video video;
 
     @Builder
-    public Reservation(LocalDate date,Integer sHour, Integer sMin, Integer eHour, Integer eMin, User user, Video video){
+    public Reservation(LocalDate date,String sTime, String eTime, User user, Video video){
         this.createdTime=LocalDateTime.now();
         this.reservationDate=date;
-        this.startHour=sHour;
-        this.startMin=sMin;
-        this.endHour=eHour;
-        this.endMin=eMin;
+        this.startTime=sTime;
+        this.endTime=eTime;
         this.user=user;
         this.video=video;
     }
