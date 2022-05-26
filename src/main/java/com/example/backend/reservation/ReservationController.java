@@ -1,5 +1,6 @@
 package com.example.backend.reservation;
 
+import com.example.backend.reservation.domain.ConfirmedReservation;
 import com.example.backend.reservation.domain.Reservation;
 import com.example.backend.reservation.dto.ReservationDto;
 import com.example.backend.user.UserService;
@@ -37,7 +38,22 @@ public class ReservationController {
                 .eTime(reservationDto.getEndTime())
                 .date(LocalDate.parse(reservationDto.getReservationDate()))
                 .build();
-        reservationService.saveReservation(reservation);
-        return new ResponseEntity<>("예약 등록 성공",HttpStatus.CREATED);
+        Reservation saveReservation = reservationService.saveReservation(reservation);
+        if(saveReservation!=null)
+            return new ResponseEntity<>("예약 등록 성공",HttpStatus.CREATED);
+        return new ResponseEntity<>("선택 불가능한 예약시간",HttpStatus.CONFLICT);
+    }
+
+    @PostMapping("/test")
+    public void saveConfirm(@RequestBody ReservationDto reservationDto){
+        Video video = videoService.findVideoEntityById(reservationDto.getId());
+        ConfirmedReservation build = ConfirmedReservation.builder()
+                .video(video)
+                .startTime(reservationDto.getStartTime())
+                .endTime(reservationDto.getEndTime())
+                .date(LocalDate.parse(reservationDto.getReservationDate()))
+                .build();
+
+        reservationService.saveConfirm(build);
     }
 }
