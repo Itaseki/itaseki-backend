@@ -201,4 +201,9 @@ public class VideoService {
         return seriesRepository.findBySeriesNameContains(q);
     }
 
+    public List<Video> findVideoContainingTitle(String searchTitle,String order){
+        //order: id 라면? 최신순 / likeCount 라면? 좋아요순
+        return videoRepository.findTitleLike(searchTitle,order);
+    }
+
 }

@@ -2,7 +2,6 @@ package com.example.backend.video.repository;
 
 import com.example.backend.customHashtag.CustomHashtag;
 import com.example.backend.customHashtag.QCustomHashtag;
-import com.example.backend.video.domain.Hashtag;
 import com.example.backend.video.domain.QVideoHashtag;
 import com.example.backend.video.domain.Video;
 import com.example.backend.video.domain.VideoHashtag;
@@ -35,6 +34,18 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository{
                 .orderBy(video.likeCount.desc(), video.id.desc())
                 .limit(4)
                 .fetch();
+    }
+
+    @Override
+    public List<Video> findTitleLike(String searchTitle,String order) {
+        OrderSpecifier orderSpecifier = new OrderSpecifier(Order.DESC, video.id);
+        if(order.equals("id"))
+            orderSpecifier=new OrderSpecifier(Order.DESC,video.likeCount);
+        return jpaQueryFactory.selectFrom(video)
+                .where(video.status.eq(true), video.description.contains(searchTitle))
+                .orderBy(orderSpecifier) //좋아요순 정렬
+                .fetch();
+
     }
 
     @Override
