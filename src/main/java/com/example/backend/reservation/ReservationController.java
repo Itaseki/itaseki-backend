@@ -6,16 +6,16 @@ import com.example.backend.reservation.dto.ReservationDto;
 import com.example.backend.user.UserService;
 import com.example.backend.user.domain.User;
 import com.example.backend.video.domain.Video;
+import com.example.backend.reservation.dto.VideoTitleSearchResponse;
 import com.example.backend.video.service.VideoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/run/reservations")
@@ -69,5 +69,15 @@ public class ReservationController {
                 .build();
 
         reservationService.saveConfirm(build);
+    }
+
+    @GetMapping("/title/search")
+    public ResponseEntity<List<VideoTitleSearchResponse>> findVideoContainingTitle(@RequestParam String q){
+        List<Video> videos = videoService.findVideoContainingTitle(q, "likeCount");
+        List<VideoTitleSearchResponse> searchResponses = videos.stream()
+                .map(VideoTitleSearchResponse::fromEntity)
+                .limit(5)
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(searchResponses,HttpStatus.OK);
     }
 }
