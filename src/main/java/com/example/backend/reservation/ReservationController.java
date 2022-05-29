@@ -27,21 +27,35 @@ public class ReservationController {
 
     @PostMapping("")
     public ResponseEntity<String> registerVideoReservation(@RequestBody ReservationDto reservationDto){
-        Long loginId=1L;
+        Long loginId=2L;
         User user = userService.findUserById(loginId);
         Video video = videoService.findVideoEntityById(reservationDto.getId());
         if(video==null)
             return new ResponseEntity<>("잘못된 영상에 대한 예약 요청", HttpStatus.NOT_FOUND);
+        LocalDate date=LocalDate.parse(reservationDto.getReservationDate());
         Reservation reservation = Reservation.builder()
                 .user(user).video(video)
                 .sTime(reservationDto.getStartTime())
                 .eTime(reservationDto.getEndTime())
-                .date(LocalDate.parse(reservationDto.getReservationDate()))
+                .date(date)
                 .build();
-        Reservation saveReservation = reservationService.saveReservation(reservation);
-        if(saveReservation!=null)
-            return new ResponseEntity<>("예약 등록 성공",HttpStatus.CREATED);
-        return new ResponseEntity<>("선택 불가능한 예약시간",HttpStatus.CONFLICT);
+        boolean existence= reservationService.findReservationByDateAndVideoAndUser(date, video, user)!=null; //존재하면 true, 아니면 false
+        if(existence){
+            return new ResponseEntity<>("중복 예약 불가",HttpStatus.CONFLICT);
+        }
+
+        boolean hasConfirmed=reservationService.findConfirmedReservation(date,video,reservationDto.getStartTime(),reservationDto.getEndTime())!=null; //존재하면 true, 아니면 flase
+        if(hasConfirmed){
+            return new ResponseEntity<>("이미 해당 시간에 예약이 확정되어 있는 영상",HttpStatus.OK);
+        }
+
+        Boolean conflict = reservationService.checkReservationConflict(reservation);
+        if(conflict){
+            return new ResponseEntity<>("선택 불가능한 예약시간",HttpStatus.CONFLICT);
+        }
+
+        reservationService.saveReservation(reservation);
+        return new ResponseEntity<>("예약 등록 성공",HttpStatus.CREATED);
     }
 
     @PostMapping("/test")
