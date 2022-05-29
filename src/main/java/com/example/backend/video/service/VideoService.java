@@ -197,4 +197,8 @@ public class VideoService {
         videoRepository.save(video);
     }
 
+    public List<Series> findSeriesNameByQuery(String q){
+        return seriesRepository.findBySeriesNameContains(q);
+    }
+
 }
