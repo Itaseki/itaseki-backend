@@ -9,4 +9,5 @@ import java.util.List;
 public interface CustomVideoRepository {
     Page<Video> findAll(Pageable pageable, List<String> tags, String nickname, List<String> queries);
     List<Video> findBestVideos();
+    List<Video> findTitleLike(String searchTitle, String order);
 }

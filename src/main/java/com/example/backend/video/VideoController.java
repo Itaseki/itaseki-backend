@@ -6,6 +6,7 @@ import com.example.backend.report.Report;
 import com.example.backend.report.ReportService;
 import com.example.backend.user.UserService;
 import com.example.backend.user.domain.User;
+import com.example.backend.video.domain.Series;
 import com.example.backend.video.domain.Video;
 import com.example.backend.video.domain.VideoComment;
 import com.example.backend.video.dto.*;
@@ -158,6 +159,11 @@ public class VideoController {
             return new ResponseEntity<>("신고 5번 누적으로 삭제",HttpStatus.OK);
         }
         return new ResponseEntity<>("영상 댓글 신고 성공",HttpStatus.OK);
+    }
+
+    @GetMapping("/series/search")
+    public ResponseEntity<List<Series>> searchSeriesName(@RequestParam String q){
+        return new ResponseEntity<>(videoService.findSeriesNameByQuery(q),HttpStatus.OK);
     }
 
 
