@@ -27,7 +27,7 @@ public class ReservationController {
 
     @PostMapping("")
     public ResponseEntity<String> registerVideoReservation(@RequestBody ReservationDto reservationDto){
-        Long loginId=2L;
+        Long loginId=1L;
         User user = userService.findUserById(loginId);
         Video video = videoService.findVideoEntityById(reservationDto.getId());
         if(video==null)
@@ -40,13 +40,14 @@ public class ReservationController {
                 .date(date)
                 .build();
         boolean existence= reservationService.findReservationByDateAndVideoAndUser(date, video, user)!=null; //존재하면 true, 아니면 false
-        if(existence){
-            return new ResponseEntity<>("중복 예약 불가",HttpStatus.CONFLICT);
-        }
 
         boolean hasConfirmed=reservationService.findConfirmedReservation(date,video,reservationDto.getStartTime(),reservationDto.getEndTime())!=null; //존재하면 true, 아니면 flase
         if(hasConfirmed){
             return new ResponseEntity<>("이미 해당 시간에 예약이 확정되어 있는 영상",HttpStatus.OK);
+        }
+
+        if(existence){
+            return new ResponseEntity<>("중복 예약 불가",HttpStatus.CONFLICT);
         }
 
         Boolean conflict = reservationService.checkReservationConflict(reservation);
