@@ -7,18 +7,13 @@ import com.example.backend.reservation.repository.ReservationRepository;
 import com.example.backend.video.domain.Video;
 import com.example.backend.user.domain.User;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.jni.Local;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -28,10 +23,16 @@ public class ReservationService {
 
     public void saveReservation(Reservation reservation){
         reservationRepository.save(reservation);
+//        String date="2022-05-26";
+//        LocalDate localDate = LocalDate.parse(date);
+        LocalDate localDate = reservation.getReservationDate();
+        Long criteria=2L;
+        makeNewConfirms(localDate,criteria);
     }
 
     public void saveConfirm(ConfirmedReservation confirm){
-        confirmedRepository.save(confirm);
+        ConfirmedReservation save = confirmedRepository.save(confirm);
+        System.out.println("save = " + save.getId());
     }
 
     public Boolean checkReservationConflict(Reservation reservation){
@@ -61,19 +62,6 @@ public class ReservationService {
 
         //compareTo: 같으면 0, 이후 날짜면 양수, 이전 날짜면 음수
 
-//        Optional<ConfirmedReservation> match = confirms.stream()
-//                .filter(confirm -> {
-//                    try {
-//                        return (finalStart.before(toDate(confirm.getReservationDate(), confirm.getEndTime()))&&(finalStart.after(toDate(confirm.getReservationDate(), confirm.getStartTime()))||finalStart.equals(toDate(confirm.getReservationDate(),confirm.getStartTime()))))
-//                                || ((finalEnd.before((toDate(confirm.getReservationDate(), confirm.getEndTime())))||finalEnd.equals(toDate(confirm.getReservationDate(),confirm.getEndTime())))&&finalEnd.after(toDate(confirm.getReservationDate(), confirm.getStartTime())))
-//                                || (finalStart.before(toDate(confirm.getReservationDate(), confirm.getStartTime()))&&finalEnd.after(toDate(confirm.getReservationDate(), confirm.getEndTime())));
-//                    } catch (ParseException e) {
-//                        e.printStackTrace();
-//                    }
-//                    return false;
-//                })
-//                .findFirst();
-
         Optional<ConfirmedReservation> match = confirms.stream()
                 .filter(confirm -> {
                     try {
@@ -90,6 +78,7 @@ public class ReservationService {
 
     }
 
+    //날짜, 사용자, 영상으로 예약 찾기 -> 당일 중복 예약 막기
     public Reservation findReservationByDateAndVideoAndUser(LocalDate date, Video video, User user){
         List<Reservation> reservations = reservationRepository.findByReservationDateAndVideo(date, video);
         Optional<Reservation> foundReservation = reservations.stream()
@@ -112,6 +101,16 @@ public class ReservationService {
         String confirmTime=timeOption.equals("start")?confirm.getStartTime():confirm.getEndTime();
         Date confirmedDate=toDate(confirm.getReservationDate(), confirmTime);
         return option.equals("before")?reservationTime.before(confirmedDate):reservationTime.after(confirmedDate);
+    }
+
+    public void makeNewConfirms(LocalDate date, Long criteria){
+//        List<Reservation> confirmNeeded = reservationRepository.getReservationsConfirmNeeded(date, criteria);
+        reservationRepository.getReservationsConfirmNeeded(date, criteria)
+                .stream()
+                .filter(reservation -> findConfirmedReservation(reservation.getReservationDate(), reservation.getVideo(), reservation.getStartTime(), reservation.getEndTime()) == null)
+                .map(ConfirmedReservation::new)
+                .forEach(this::saveConfirm);
+
     }
 
 }
