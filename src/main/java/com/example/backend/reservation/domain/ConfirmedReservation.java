@@ -31,12 +31,13 @@ public class ConfirmedReservation {
     @Column(nullable = false)
     private String endTime;
 
-    @Builder
-    public ConfirmedReservation(LocalDate date, String startTime, String endTime,Video video){
-        this.reservationDate=date;
-        this.startTime=startTime;
-        this.endTime=endTime;
-        this.video=video;
+    public ConfirmedReservation(Reservation reservation){
+        this.reservationDate=reservation.getReservationDate();
+        this.startTime=reservation.getStartTime();
+        this.endTime=reservation.getEndTime();
+        this.video=reservation.getVideo();
     }
+
+
 
 }
