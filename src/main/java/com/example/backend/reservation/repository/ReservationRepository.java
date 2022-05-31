@@ -10,6 +10,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Repository
-public interface ReservationRepository extends JpaRepository<Reservation, Long> {
+public interface ReservationRepository extends JpaRepository<Reservation, Long>,CustomReservationRepository {
     List<Reservation> findByReservationDateAndVideo(LocalDate date, Video video);
 }
