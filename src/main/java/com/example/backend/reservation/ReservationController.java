@@ -59,18 +59,6 @@ public class ReservationController {
         return new ResponseEntity<>("예약 등록 성공",HttpStatus.CREATED);
     }
 
-    @PostMapping("/test")
-    public void saveConfirm(@RequestBody ReservationDto reservationDto){
-        Video video = videoService.findVideoEntityById(reservationDto.getId());
-        ConfirmedReservation build = ConfirmedReservation.builder()
-                .video(video)
-                .startTime(reservationDto.getStartTime())
-                .endTime(reservationDto.getEndTime())
-                .date(LocalDate.parse(reservationDto.getReservationDate()))
-                .build();
-
-        reservationService.saveConfirm(build);
-    }
 
     @GetMapping("/title/search")
     public ResponseEntity<List<VideoTitleSearchResponse>> findVideoContainingTitle(@RequestParam String q){
