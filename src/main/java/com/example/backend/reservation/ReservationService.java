@@ -2,6 +2,8 @@ package com.example.backend.reservation;
 
 import com.example.backend.reservation.domain.ConfirmedReservation;
 import com.example.backend.reservation.domain.Reservation;
+import com.example.backend.reservation.dto.TestDto;
+import com.example.backend.reservation.dto.TimetableResponse;
 import com.example.backend.reservation.repository.ConfirmedReservationRepository;
 import com.example.backend.reservation.repository.ReservationRepository;
 import com.example.backend.video.domain.Video;
@@ -14,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,8 +26,6 @@ public class ReservationService {
 
     public void saveReservation(Reservation reservation){
         reservationRepository.save(reservation);
-//        String date="2022-05-26";
-//        LocalDate localDate = LocalDate.parse(date);
         LocalDate localDate = reservation.getReservationDate();
         Long criteria=2L;
         makeNewConfirms(localDate,criteria);
@@ -97,10 +98,16 @@ public class ReservationService {
         return form.parse(reservationDate+time);
     }
 
-    private Boolean checkDatetimeAvailability(String option,ConfirmedReservation confirm, Date reservationTime, String timeOption) throws ParseException {
-        String confirmTime=timeOption.equals("start")?confirm.getStartTime():confirm.getEndTime();
-        Date confirmedDate=toDate(confirm.getReservationDate(), confirmTime);
-        return option.equals("before")?reservationTime.before(confirmedDate):reservationTime.after(confirmedDate);
+    private Date toDate(String time){
+        SimpleDateFormat form=new SimpleDateFormat("HH mm");
+        if(time.contains(":"))
+            form=new SimpleDateFormat("HH:mm");
+        try {
+            return form.parse(time);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public void makeNewConfirms(LocalDate date, Long criteria){
@@ -111,6 +118,35 @@ public class ReservationService {
                 .map(ConfirmedReservation::new)
                 .forEach(this::saveConfirm);
 
+    }
+
+    public List<TimetableResponse> test(String start, String end, String select, String date){
+        LocalDate localDate = LocalDate.parse(date);
+        Date startT=toDate(start);
+        Date endT=toDate(end);
+        List<Date> selects = Arrays.stream(select.split(","))
+                .map(this::toDate)
+                .collect(Collectors.toList());
+
+        List<TestDto> groupVideo = reservationRepository.getDateReservationGroupVideo(localDate);
+
+        return groupVideo
+                .stream()
+                .filter(g -> toDate(g.getReservation().getStartTime()).compareTo(startT) >= 0 && toDate(g.getReservation().getEndTime()).compareTo(endT) <= 0)
+                .filter(g -> filterSelection(selects, toDate(g.getReservation().getStartTime()), toDate(g.getReservation().getEndTime())))
+                .sorted(Comparator.comparing(g->toDate(g.getReservation().getStartTime())))
+                .map(g->TimetableResponse.of(g.getReservation(),g.getCount()))
+                .collect(Collectors.toList());
+
+//        finals.stream()
+//                .forEach(v-> System.out.println("v = " + v.getReservation().getId()+", "+v.getCount()));
+
+    }
+
+
+    private Boolean filterSelection(List<Date> selects, Date start, Date end){
+        return selects.stream()
+                .anyMatch(select->start.compareTo(select)<=0&&end.compareTo(select)>=0);
     }
 
 }
