@@ -2,6 +2,7 @@ package com.example.backend.reservation;
 
 import com.example.backend.reservation.domain.ConfirmedReservation;
 import com.example.backend.reservation.domain.Reservation;
+import com.example.backend.reservation.dto.BestReservationResponse;
 import com.example.backend.reservation.dto.TestDto;
 import com.example.backend.reservation.dto.TimetableResponse;
 import com.example.backend.reservation.repository.ConfirmedReservationRepository;
@@ -147,6 +148,18 @@ public class ReservationService {
     private Boolean filterSelection(List<Date> selects, Date start, Date end){
         return selects.stream()
                 .anyMatch(select->start.compareTo(select)<=0&&end.compareTo(select)>=0);
+    }
+
+    public List<BestReservationResponse> getBestReservations(){
+        LocalDate now = LocalDate.now();
+//        String s="2022-05-26";
+//        now = LocalDate.parse(s);
+        return reservationRepository.getDateReservationGroupVideo(now)
+                .stream()
+                .sorted(Comparator.comparing(TestDto::getCount).reversed())
+                .limit(3)
+                .map(g -> BestReservationResponse.of(g.getReservation(), g.getCount()))
+                .collect(Collectors.toList());
     }
 
 }
