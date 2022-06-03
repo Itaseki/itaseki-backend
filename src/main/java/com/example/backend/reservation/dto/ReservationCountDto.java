@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TestDto {
+public class ReservationCountDto {
     private Reservation reservation;
     private Long count;
 }

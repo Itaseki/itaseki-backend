@@ -3,7 +3,7 @@ package com.example.backend.reservation;
 import com.example.backend.reservation.domain.ConfirmedReservation;
 import com.example.backend.reservation.domain.Reservation;
 import com.example.backend.reservation.dto.BestReservationResponse;
-import com.example.backend.reservation.dto.TestDto;
+import com.example.backend.reservation.dto.ReservationCountDto;
 import com.example.backend.reservation.dto.TimetableResponse;
 import com.example.backend.reservation.repository.ConfirmedReservationRepository;
 import com.example.backend.reservation.repository.ReservationRepository;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -129,7 +128,7 @@ public class ReservationService {
                 .map(this::toDate)
                 .collect(Collectors.toList());
 
-        List<TestDto> groupVideo = reservationRepository.getDateReservationGroupVideo(localDate);
+        List<ReservationCountDto> groupVideo = reservationRepository.getDateReservationGroupVideo(localDate);
 
         return groupVideo
                 .stream()
@@ -156,7 +155,7 @@ public class ReservationService {
 //        now = LocalDate.parse(s);
         return reservationRepository.getDateReservationGroupVideo(now)
                 .stream()
-                .sorted(Comparator.comparing(TestDto::getCount).reversed())
+                .sorted(Comparator.comparing(ReservationCountDto::getCount).reversed())
                 .limit(3)
                 .map(g -> BestReservationResponse.of(g.getReservation(), g.getCount()))
                 .collect(Collectors.toList());
