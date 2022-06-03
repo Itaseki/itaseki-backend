@@ -42,9 +42,7 @@ public class CommunityBoardService {
         if(files==null){
             return;
         }
-        if(files!=null&&!files.isEmpty()){
-            return;
-        }
+
         for(int i=0;i<files.size();i++){
             MultipartFile file=files.get(i);
             String originName=file.getOriginalFilename();
