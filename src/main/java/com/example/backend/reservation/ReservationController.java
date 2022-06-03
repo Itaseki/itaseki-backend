@@ -3,6 +3,7 @@ package com.example.backend.reservation;
 import com.example.backend.reservation.domain.ConfirmedReservation;
 import com.example.backend.reservation.domain.Reservation;
 import com.example.backend.reservation.dto.ReservationDto;
+import com.example.backend.reservation.dto.TimetableResponse;
 import com.example.backend.user.UserService;
 import com.example.backend.user.domain.User;
 import com.example.backend.video.domain.Video;
@@ -68,5 +69,13 @@ public class ReservationController {
                 .limit(5)
                 .collect(Collectors.toList());
         return new ResponseEntity<>(searchResponses,HttpStatus.OK);
+    }
+
+    @GetMapping("")
+    public ResponseEntity<List<TimetableResponse>> getReservationTimetable(@RequestParam String start, @RequestParam String end,
+                                                                           @RequestParam String select, @RequestParam String date){
+//        System.out.println("start = " + start + ", end = " + end + ", select = " + select+", date = "+date);
+        //시간 순 정렬
+        return new ResponseEntity<>(reservationService.test(start, end, select, date),HttpStatus.OK);
     }
 }
