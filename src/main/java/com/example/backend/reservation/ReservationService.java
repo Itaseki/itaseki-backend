@@ -122,7 +122,7 @@ public class ReservationService {
 //        List<Reservation> confirmNeeded = reservationRepository.getReservationsConfirmNeeded(date, criteria);
         reservationRepository.getReservationsConfirmNeeded(date, criteria)
                 .stream()
-                .filter(reservation -> findConfirmedReservation(reservation.getReservationDate(), reservation.getVideo(), reservation.getStartTime(), reservation.getEndTime()) == null)
+                .filter(r -> findConfirmedReservation(r.getReservation().getReservationDate(), r.getReservation().getVideo(), r.getReservation().getStartTime(), r.getReservation().getEndTime()) == null)
                 .map(ConfirmedReservation::new)
                 .forEach(this::saveConfirm);
 

@@ -17,9 +17,10 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
 
 
     @Override
-    public List<Reservation> getReservationsConfirmNeeded(LocalDate criteriaDate, Long confirmCount) {
+    public List<ReservationCountDto> getReservationsConfirmNeeded(LocalDate criteriaDate, Long confirmCount) {
         return jpaQueryFactory
-                .selectFrom(reservation)
+                .select(Projections.fields(ReservationCountDto.class, reservation.as("reservation"), reservation.count().as("count")))
+                .from(reservation)
                 .where(reservation.reservationDate.goe(criteriaDate)) //날짜가 오늘 날짜 이후 (이전 날짜는 업데이트 필요 없음)
                 .groupBy(reservation.reservationDate, reservation.video, reservation.startTime, reservation.endTime)
                 .having(reservation.count().goe(confirmCount))
