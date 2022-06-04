@@ -2,12 +2,10 @@ package com.example.backend.reservation;
 
 import com.example.backend.reservation.domain.ConfirmedReservation;
 import com.example.backend.reservation.domain.Reservation;
-import com.example.backend.reservation.dto.ReservationDto;
-import com.example.backend.reservation.dto.TimetableResponse;
+import com.example.backend.reservation.dto.*;
 import com.example.backend.user.UserService;
 import com.example.backend.user.domain.User;
 import com.example.backend.video.domain.Video;
-import com.example.backend.reservation.dto.VideoTitleSearchResponse;
 import com.example.backend.video.service.VideoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -77,5 +75,21 @@ public class ReservationController {
 //        System.out.println("start = " + start + ", end = " + end + ", select = " + select+", date = "+date);
         //시간 순 정렬
         return new ResponseEntity<>(reservationService.test(start, end, select, date),HttpStatus.OK);
+    }
+
+    @GetMapping("/best")
+    public ResponseEntity<List<BestReservationResponse>> getBest3Reservations(){
+        //오늘 날짜 -> group by 해서 예약 수 기준으로 정렬 -> limit 3
+        return new ResponseEntity<>(reservationService.getBestReservations(),HttpStatus.OK);
+    }
+
+    @GetMapping("/confirm")
+    public ResponseEntity<List<ConfirmedReservationResponse>> getConfirmedReservation(@RequestParam String date){
+        return new ResponseEntity<>(reservationService.findAllConfirmedReservationsByDate(LocalDate.parse(date)),HttpStatus.OK);
+    }
+
+    @GetMapping("/next")
+    public ResponseEntity<NextRunResponse> getNextRunReservation(){
+        return new ResponseEntity<>(reservationService.findNextConfirm(),HttpStatus.OK);
     }
 }

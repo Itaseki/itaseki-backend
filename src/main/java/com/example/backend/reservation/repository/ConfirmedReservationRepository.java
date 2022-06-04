@@ -12,4 +12,5 @@ import java.util.List;
 public interface ConfirmedReservationRepository extends JpaRepository<ConfirmedReservation, Long> {
     List<ConfirmedReservation> findAllByReservationDate(LocalDate date);
     ConfirmedReservation findByReservationDateAndStartTimeAndEndTimeAndVideo(LocalDate date, String startTime, String endTime, Video video);
+    List<ConfirmedReservation> findAllByReservationDateGreaterThanEqual(LocalDate date);
 }

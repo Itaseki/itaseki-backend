@@ -2,8 +2,7 @@ package com.example.backend.reservation;
 
 import com.example.backend.reservation.domain.ConfirmedReservation;
 import com.example.backend.reservation.domain.Reservation;
-import com.example.backend.reservation.dto.TestDto;
-import com.example.backend.reservation.dto.TimetableResponse;
+import com.example.backend.reservation.dto.*;
 import com.example.backend.reservation.repository.ConfirmedReservationRepository;
 import com.example.backend.reservation.repository.ReservationRepository;
 import com.example.backend.video.domain.Video;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -44,36 +42,17 @@ public class ReservationService {
 
         Date start;
         Date end;
-        try {
-            start = toDate(date,sTime);
-            end=toDate(date,eTime);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return false;
-        }
+
+        start = toDate(date,sTime);
+        end=toDate(date,eTime);
+
         List<ConfirmedReservation> confirms = confirmedRepository.findAllByReservationDate(date);
         //시작시간이 둘 사이 / 종료시간이 둘 사이
 
-        Date finalStart = start;
-        Date finalEnd = end;
-
-        //예약 확정 내역들 -> 각각 startTime, endTime 으로 mapping
-        //그 값들에 대해 filter 적용
-        //forEach -> filter 되나?
-
-        //compareTo: 같으면 0, 이후 날짜면 양수, 이전 날짜면 음수
-
         Optional<ConfirmedReservation> match = confirms.stream()
-                .filter(confirm -> {
-                    try {
-                        return (finalStart.before(toDate(confirm.getReservationDate(), confirm.getEndTime())) && (finalStart.compareTo(toDate(confirm.getReservationDate(), confirm.getStartTime())) >= 0))
-                                || (finalEnd.compareTo(toDate(confirm.getReservationDate(), confirm.getEndTime())) <= 0 && finalEnd.after(toDate(confirm.getReservationDate(), confirm.getStartTime())))
-                                || (finalStart.before(toDate(confirm.getReservationDate(), confirm.getStartTime())) && finalEnd.after(toDate(confirm.getReservationDate(), confirm.getEndTime())));
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                    return false;
-                })
+                .filter(confirm -> (start.before(toDate(confirm.getReservationDate(), confirm.getEndTime())) && (start.compareTo(toDate(confirm.getReservationDate(), confirm.getStartTime())) >= 0))
+                               || (end.compareTo(toDate(confirm.getReservationDate(), confirm.getEndTime())) <= 0 && end.after(toDate(confirm.getReservationDate(), confirm.getStartTime())))
+                               || (start.before(toDate(confirm.getReservationDate(), confirm.getStartTime())) && end.after(toDate(confirm.getReservationDate(), confirm.getEndTime()))))
                 .findFirst();
         return match.isPresent(); //충돌되는거 있으면 true, 아니면 false 반환
 
@@ -92,10 +71,23 @@ public class ReservationService {
         return confirmedRepository.findByReservationDateAndStartTimeAndEndTimeAndVideo(date, start, end, video);
     }
 
-    private Date toDate(LocalDate date, String time) throws ParseException{
+    public List<ConfirmedReservationResponse> findAllConfirmedReservationsByDate(LocalDate date){
+        return confirmedRepository.findAllByReservationDate(date)
+                .stream()
+                .map(ConfirmedReservationResponse::of)
+                .collect(Collectors.toList());
+    }
+
+    private Date toDate(LocalDate date, String time){
         SimpleDateFormat form=new SimpleDateFormat("yy-MM-ddHH:mm");
         String reservationDate=date.toString();
-        return form.parse(reservationDate+time);
+        try{
+            return form.parse(reservationDate+time);
+        }catch (ParseException e){
+            //잘못된 문자열 type 이라고 exception handling
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private Date toDate(String time){
@@ -105,6 +97,7 @@ public class ReservationService {
         try {
             return form.parse(time);
         } catch (ParseException e) {
+            //잘못된 문자열 type 이라고 exception handling
             e.printStackTrace();
             return null;
         }
@@ -114,7 +107,7 @@ public class ReservationService {
 //        List<Reservation> confirmNeeded = reservationRepository.getReservationsConfirmNeeded(date, criteria);
         reservationRepository.getReservationsConfirmNeeded(date, criteria)
                 .stream()
-                .filter(reservation -> findConfirmedReservation(reservation.getReservationDate(), reservation.getVideo(), reservation.getStartTime(), reservation.getEndTime()) == null)
+                .filter(r -> findConfirmedReservation(r.getReservation().getReservationDate(), r.getReservation().getVideo(), r.getReservation().getStartTime(), r.getReservation().getEndTime()) == null)
                 .map(ConfirmedReservation::new)
                 .forEach(this::saveConfirm);
 
@@ -128,7 +121,7 @@ public class ReservationService {
                 .map(this::toDate)
                 .collect(Collectors.toList());
 
-        List<TestDto> groupVideo = reservationRepository.getDateReservationGroupVideo(localDate);
+        List<ReservationCountDto> groupVideo = reservationRepository.getDateReservationGroupVideo(localDate);
 
         return groupVideo
                 .stream()
@@ -147,6 +140,50 @@ public class ReservationService {
     private Boolean filterSelection(List<Date> selects, Date start, Date end){
         return selects.stream()
                 .anyMatch(select->start.compareTo(select)<=0&&end.compareTo(select)>=0);
+    }
+
+    public List<BestReservationResponse> getBestReservations(){
+        LocalDate now = LocalDate.now();
+//        String s="2022-05-26";
+//        now = LocalDate.parse(s);
+        return reservationRepository.getDateReservationGroupVideo(now)
+                .stream()
+                .sorted(Comparator.comparing(ReservationCountDto::getCount).reversed())
+                .limit(3)
+                .map(g -> BestReservationResponse.of(g.getReservation(), g.getCount()))
+                .collect(Collectors.toList());
+    }
+
+    public NextRunResponse findNextConfirm() {
+        List<ConfirmedReservation> all = confirmedRepository.findAllByReservationDateGreaterThanEqual(LocalDate.now());
+        Date today = new Date();
+
+        if (all.isEmpty())
+            return null;
+
+        //1. 현재 재생중인 영상 찾고, 있으면 그거 return
+        //2. 다음 재생 예정 영상 찾고, 있으면 return
+        //1,2 다 없으면 null return
+
+        //시작시간 >= 지금시간 -> 대기중 / 시작시간 <= 지금시간 <=종료시간
+
+        ConfirmedReservation confirmedReservation = all.stream()
+                .filter(c->toDate(c.getReservationDate(),c.getStartTime()).compareTo(today)<=0&&today.compareTo(toDate(c.getReservationDate(),c.getEndTime()))<=0)
+                .findAny()
+                .orElse(null);
+
+        if(confirmedReservation!=null)
+            return NextRunResponse.of(confirmedReservation);
+
+        ConfirmedReservation nextReservation = all.stream()
+                .filter(c -> toDate(c.getReservationDate(), c.getStartTime()).compareTo(today) >= 0).min(Comparator.comparing(c -> toDate(c.getReservationDate(), c.getStartTime())))
+                .orElse(null);
+
+        if(nextReservation!=null)
+            return NextRunResponse.of(nextReservation);
+
+        return null;
+
     }
 
 }

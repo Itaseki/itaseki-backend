@@ -1,7 +1,7 @@
 package com.example.backend.reservation.repository;
 
 import com.example.backend.reservation.domain.Reservation;
-import com.example.backend.reservation.dto.TestDto;
+import com.example.backend.reservation.dto.ReservationCountDto;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +17,10 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
 
 
     @Override
-    public List<Reservation> getReservationsConfirmNeeded(LocalDate criteriaDate, Long confirmCount) {
+    public List<ReservationCountDto> getReservationsConfirmNeeded(LocalDate criteriaDate, Long confirmCount) {
         return jpaQueryFactory
-                .selectFrom(reservation)
+                .select(Projections.fields(ReservationCountDto.class, reservation.as("reservation"), reservation.count().as("count")))
+                .from(reservation)
                 .where(reservation.reservationDate.goe(criteriaDate)) //날짜가 오늘 날짜 이후 (이전 날짜는 업데이트 필요 없음)
                 .groupBy(reservation.reservationDate, reservation.video, reservation.startTime, reservation.endTime)
                 .having(reservation.count().goe(confirmCount))
@@ -27,10 +28,10 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
     }
 
     @Override
-    public List<TestDto> getDateReservationGroupVideo(LocalDate date) {
+    public List<ReservationCountDto> getDateReservationGroupVideo(LocalDate date) {
         //여기서 날짜, 시작시간, 종료시간, 영상으로 같은 비디오 다 groupBy 해주고 그 결과에서 startTIme, endTime 비교해서 선택시간만 반환
         return jpaQueryFactory
-                .select(Projections.fields(TestDto.class, reservation.as("reservation"), reservation.count().as("count")))
+                .select(Projections.fields(ReservationCountDto.class, reservation.as("reservation"), reservation.count().as("count")))
                 .from(reservation)
                 .where(reservation.reservationDate.eq(date))
                 .groupBy(reservation.reservationDate, reservation.video, reservation.startTime, reservation.endTime)
