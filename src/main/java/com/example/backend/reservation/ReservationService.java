@@ -3,6 +3,7 @@ package com.example.backend.reservation;
 import com.example.backend.reservation.domain.ConfirmedReservation;
 import com.example.backend.reservation.domain.Reservation;
 import com.example.backend.reservation.dto.BestReservationResponse;
+import com.example.backend.reservation.dto.ConfirmedReservationResponse;
 import com.example.backend.reservation.dto.ReservationCountDto;
 import com.example.backend.reservation.dto.TimetableResponse;
 import com.example.backend.reservation.repository.ConfirmedReservationRepository;
@@ -90,6 +91,13 @@ public class ReservationService {
 
     public ConfirmedReservation findConfirmedReservation(LocalDate date, Video video, String start, String end){
         return confirmedRepository.findByReservationDateAndStartTimeAndEndTimeAndVideo(date, start, end, video);
+    }
+
+    public List<ConfirmedReservationResponse> findAllConfirmedReservationsByDate(LocalDate date){
+        return confirmedRepository.findAllByReservationDate(date)
+                .stream()
+                .map(ConfirmedReservationResponse::of)
+                .collect(Collectors.toList());
     }
 
     private Date toDate(LocalDate date, String time) throws ParseException{
