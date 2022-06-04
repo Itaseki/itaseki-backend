@@ -87,4 +87,9 @@ public class ReservationController {
     public ResponseEntity<List<ConfirmedReservationResponse>> getConfirmedReservation(@RequestParam String date){
         return new ResponseEntity<>(reservationService.findAllConfirmedReservationsByDate(LocalDate.parse(date)),HttpStatus.OK);
     }
+
+    @GetMapping("/next")
+    public ResponseEntity<NextRunResponse> getNextRunReservation(){
+        return new ResponseEntity<>(reservationService.findNextConfirm(),HttpStatus.OK);
+    }
 }
