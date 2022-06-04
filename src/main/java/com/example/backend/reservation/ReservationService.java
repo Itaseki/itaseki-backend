@@ -144,10 +144,9 @@ public class ReservationService {
 
     public List<BestReservationResponse> getBestReservations(){
         LocalDate now = LocalDate.now();
-//        String s="2022-05-26";
-//        now = LocalDate.parse(s);
         return reservationRepository.getDateReservationGroupVideo(now)
                 .stream()
+                .filter(g->findConfirmedReservation(g.getReservation().getReservationDate(), g.getReservation().getVideo(), g.getReservation().getStartTime(),g.getReservation().getEndTime())==null)
                 .sorted(Comparator.comparing(ReservationCountDto::getCount).reversed())
                 .limit(3)
                 .map(g -> BestReservationResponse.of(g.getReservation(), g.getCount()))
