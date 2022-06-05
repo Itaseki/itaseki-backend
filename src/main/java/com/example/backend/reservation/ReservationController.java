@@ -38,7 +38,7 @@ public class ReservationController {
                 .eTime(reservationDto.getEndTime())
                 .date(date)
                 .build();
-        boolean existence= reservationService.findReservationByDateAndVideoAndUser(date, video, user)!=null; //존재하면 true, 아니면 false
+        boolean existence= reservationService.findReservationByDateAndUser(date, user)!=null; //존재하면 true, 아니면 false
 
         boolean hasConfirmed=reservationService.findConfirmedReservation(date,video,reservationDto.getStartTime(),reservationDto.getEndTime())!=null; //존재하면 true, 아니면 flase
         if(hasConfirmed){
