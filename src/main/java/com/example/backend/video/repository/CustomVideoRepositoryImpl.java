@@ -39,7 +39,7 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository{
     @Override
     public List<Video> findTitleLike(String searchTitle,String order) {
         OrderSpecifier orderSpecifier = new OrderSpecifier(Order.DESC, video.id);
-        if(order.equals("id"))
+        if(order.equals("likeCount"))
             orderSpecifier=new OrderSpecifier(Order.DESC,video.likeCount);
         return jpaQueryFactory.selectFrom(video)
                 .where(video.status.eq(true), video.description.contains(searchTitle))

@@ -59,12 +59,9 @@ public class ReservationService {
     }
 
     //날짜, 사용자, 영상으로 예약 찾기 -> 당일 중복 예약 막기
-    public Reservation findReservationByDateAndVideoAndUser(LocalDate date, Video video, User user){
-        List<Reservation> reservations = reservationRepository.findByReservationDateAndVideo(date, video);
-        Optional<Reservation> foundReservation = reservations.stream()
-                .filter(reservation -> reservation.getUser().equals(user))
-                .findFirst();
-        return foundReservation.orElse(null);
+    //한 사용자 - 하루에 하나의 영상만 예약! => findReservationByDateAndUser 로 변경
+    public Reservation findReservationByDateAndUser(LocalDate date, User user){
+        return reservationRepository.findByReservationDateAndUser(date, user).orElse(null);
     }
 
     public ConfirmedReservation findConfirmedReservation(LocalDate date, Video video, String start, String end){
