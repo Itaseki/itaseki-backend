@@ -61,7 +61,7 @@ public class ReservationController {
 
     @GetMapping("/title/search")
     public ResponseEntity<List<VideoTitleSearchResponse>> findVideoContainingTitle(@RequestParam String q){
-        List<Video> videos = videoService.findVideoContainingTitle(q, "likeCount");
+        List<Video> videos = videoService.findVideoContainingTitle(q, "id");
         List<VideoTitleSearchResponse> searchResponses = videos.stream()
                 .map(VideoTitleSearchResponse::fromEntity)
                 .limit(5)
@@ -90,6 +90,8 @@ public class ReservationController {
 
     @GetMapping("/next")
     public ResponseEntity<NextRunResponse> getNextRunReservation(){
+        //오늘 저녁 ~ 다음날 새벽 가능하던가?
+        //이게 되면 if(todate(startTime) > toDate(endTime) -> (startTime의 date + 하루),endTime 을 toDate 로 변환!
         return new ResponseEntity<>(reservationService.findNextConfirm(),HttpStatus.OK);
     }
 }
