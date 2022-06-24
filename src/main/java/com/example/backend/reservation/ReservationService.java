@@ -110,7 +110,7 @@ public class ReservationService {
 
     }
 
-    public List<TimetableResponse> test(String start, String end, String select, String date){
+    public List<TimetableResponse> getTimeTable(String start, String end, String select, String date){
         LocalDate localDate = LocalDate.parse(date);
         Date startT=toDate(start);
         Date endT=toDate(end);
@@ -118,7 +118,8 @@ public class ReservationService {
                 .map(this::toDate)
                 .collect(Collectors.toList());
 
-        List<ReservationCountDto> groupVideo = reservationRepository.getDateReservationGroupVideo(localDate);
+        //파라미터롤 넘어온 날짜에 예약된 모든 예약 내역 그룹 (시작시간, 종료시간, 영상 id) 으로 반환
+        List<ReservationCountDto> groupVideo = reservationRepository.getVideoGroupByDate(localDate);
 
         return groupVideo
                 .stream()
@@ -141,10 +142,10 @@ public class ReservationService {
 
     public List<BestReservationResponse> getBestReservations(){
         LocalDate now = LocalDate.now();
-        return reservationRepository.getDateReservationGroupVideo(now)
+        return reservationRepository.getVideoGroupByDate(now)
                 .stream()
                 .filter(g->findConfirmedReservation(g.getReservation().getReservationDate(), g.getReservation().getVideo(), g.getReservation().getStartTime(),g.getReservation().getEndTime())==null)
-                .sorted(Comparator.comparing(ReservationCountDto::getCount).reversed())
+                .sorted(Comparator.comparing(ReservationCountDto::getCount).reversed()) //예약 많은 순 정렬
                 .limit(3)
                 .map(g -> BestReservationResponse.of(g.getReservation(), g.getCount()))
                 .collect(Collectors.toList());

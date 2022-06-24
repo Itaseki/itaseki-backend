@@ -74,7 +74,7 @@ public class ReservationController {
                                                                            @RequestParam String select, @RequestParam String date){
 //        System.out.println("start = " + start + ", end = " + end + ", select = " + select+", date = "+date);
         //시간 순 정렬
-        return new ResponseEntity<>(reservationService.test(start, end, select, date),HttpStatus.OK);
+        return new ResponseEntity<>(reservationService.getTimeTable(start, end, select, date),HttpStatus.OK);
     }
 
     @GetMapping("/best")
