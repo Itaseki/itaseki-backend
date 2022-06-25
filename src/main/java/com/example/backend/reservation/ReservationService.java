@@ -58,6 +58,10 @@ public class ReservationService {
 
     }
 
+    public Boolean checkEndTimeValidate(Reservation reservation){
+        return toDate(reservation.getStartTime()).compareTo(toDate(reservation.getEndTime())) < 0;
+    }
+
     //날짜, 사용자, 영상으로 예약 찾기 -> 당일 중복 예약 막기
     //한 사용자 - 하루에 하나의 영상만 예약! => findReservationByDateAndUser 로 변경
     public Reservation findReservationByDateAndUser(LocalDate date, User user){

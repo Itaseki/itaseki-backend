@@ -38,6 +38,11 @@ public class ReservationController {
                 .eTime(reservationDto.getEndTime())
                 .date(date)
                 .build();
+
+        boolean endTimeValidate = reservationService.checkEndTimeValidate(reservation);
+        if(!endTimeValidate){
+            return new ResponseEntity<>("잘못된 예약 종료시간 입니다.",HttpStatus.BAD_REQUEST);
+        }
         boolean existence= reservationService.findReservationByDateAndUser(date, user)!=null; //존재하면 true, 아니면 false
 
         boolean hasConfirmed=reservationService.findConfirmedReservation(date,video,reservationDto.getStartTime(),reservationDto.getEndTime())!=null; //존재하면 true, 아니면 flase
