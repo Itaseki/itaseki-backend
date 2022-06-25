@@ -3,6 +3,7 @@ package com.example.backend.reservation;
 import com.example.backend.reservation.domain.ConfirmedReservation;
 import com.example.backend.reservation.domain.Reservation;
 import com.example.backend.reservation.dto.*;
+import com.example.backend.reservation.exception.WrongDateFormatException;
 import com.example.backend.reservation.repository.ConfirmedReservationRepository;
 import com.example.backend.reservation.repository.ReservationRepository;
 import com.example.backend.video.domain.Video;
@@ -86,8 +87,7 @@ public class ReservationService {
             return form.parse(reservationDate+time);
         }catch (ParseException e){
             //잘못된 문자열 type 이라고 exception handling
-            e.printStackTrace();
-            return null;
+            throw new WrongDateFormatException();
         }
     }
 
@@ -99,8 +99,7 @@ public class ReservationService {
             return form.parse(time);
         } catch (ParseException e) {
             //잘못된 문자열 type 이라고 exception handling
-            e.printStackTrace();
-            return null;
+            throw new WrongDateFormatException();
         }
     }
 
