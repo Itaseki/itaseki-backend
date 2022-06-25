@@ -3,6 +3,7 @@ package com.example.backend.reservation;
 import com.example.backend.reservation.domain.ConfirmedReservation;
 import com.example.backend.reservation.domain.Reservation;
 import com.example.backend.reservation.dto.*;
+import com.example.backend.reservation.exception.WrongDateFormatException;
 import com.example.backend.user.UserService;
 import com.example.backend.user.domain.User;
 import com.example.backend.video.domain.Video;
@@ -38,6 +39,11 @@ public class ReservationController {
                 .eTime(reservationDto.getEndTime())
                 .date(date)
                 .build();
+
+        boolean endTimeValidate = reservationService.checkEndTimeValidate(reservation);
+        if(!endTimeValidate){
+            return new ResponseEntity<>("잘못된 예약 종료시간 입니다.",HttpStatus.BAD_REQUEST);
+        }
         boolean existence= reservationService.findReservationByDateAndUser(date, user)!=null; //존재하면 true, 아니면 false
 
         boolean hasConfirmed=reservationService.findConfirmedReservation(date,video,reservationDto.getStartTime(),reservationDto.getEndTime())!=null; //존재하면 true, 아니면 flase
@@ -74,7 +80,7 @@ public class ReservationController {
                                                                            @RequestParam String select, @RequestParam String date){
 //        System.out.println("start = " + start + ", end = " + end + ", select = " + select+", date = "+date);
         //시간 순 정렬
-        return new ResponseEntity<>(reservationService.test(start, end, select, date),HttpStatus.OK);
+        return new ResponseEntity<>(reservationService.getTimeTable(start, end, select, date),HttpStatus.OK);
     }
 
     @GetMapping("/best")
@@ -93,5 +99,10 @@ public class ReservationController {
         //오늘 저녁 ~ 다음날 새벽 가능하던가?
         //이게 되면 if(todate(startTime) > toDate(endTime) -> (startTime의 date + 하루),endTime 을 toDate 로 변환!
         return new ResponseEntity<>(reservationService.findNextConfirm(),HttpStatus.OK);
+    }
+
+    @ExceptionHandler(WrongDateFormatException.class)
+    ResponseEntity<String> handleWrongDateFormat(WrongDateFormatException e){
+        return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
     }
 }

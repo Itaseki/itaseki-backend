@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface CustomReservationRepository {
     List<ReservationCountDto> getReservationsConfirmNeeded(LocalDate criteriaDate, Long confirmCriteria);
-    List<ReservationCountDto> getDateReservationGroupVideo(LocalDate date);
+    List<ReservationCountDto> getVideoGroupByDate(LocalDate date);
 }
