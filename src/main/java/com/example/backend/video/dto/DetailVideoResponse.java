@@ -17,6 +17,7 @@ public class DetailVideoResponse {
     private  String description;
     private String videoTitle;
     private String url;
+    private String videoUploader;
     private String series;
     private Integer episode;
     private List<String> hashtags;
@@ -37,6 +38,7 @@ public class DetailVideoResponse {
                 .comments(comments).series(video.getSeries().getSeriesName()).url(video.getVideoUrl())
                 .episode(video.getEpisodeNumber()).hashtags(hashtags)
                 .writerId(boardWriter.getUserId()).writerNickname(boardWriter.getNickname()).isThisUserWriter(boardWriter.getUserId().equals(loginId))
+                .videoUploader(video.getVideoUploader())
                 .build();
     }
 

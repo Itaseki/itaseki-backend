@@ -40,6 +40,8 @@ public class VideoService {
                 .videoUrl(videoDto.getUrl()).description(videoDto.getDescription())
                 .originTitle(videoDto.getTitle()).series(series)
                 .episodeNumber(videoDto.getEpisode()).user(user)
+                .thumbnailUrl(videoDto.getThumbnailUrl())
+                .uploader(videoDto.getVideoUploader())
                 .build();
         int[] times = toHourMinSec(video, videoDto.getRuntime());
         video.setVideoRuntime(times);
@@ -105,7 +107,19 @@ public class VideoService {
     }
 
     public String checkVideoUrlExistence(String url){
-        Video video = videoRepository.findByVideoUrl(url);
+        String videoId;
+        if(url.contains("watch?v")){
+            int index = url.indexOf("watch?v=");
+            videoId=url.substring(index + 8);
+            if(videoId.contains("&")){
+                index = videoId.indexOf("&");
+                videoId=videoId.substring(0,index);
+            }
+        }else{
+            int index=url.indexOf("youtu.be/");
+            videoId=url.substring(index + 9);
+        }
+        Video video = videoRepository.findByVideoUrlContains(videoId);
         if(video==null)
             return "등록 가능";
         return "등록 불가능";
@@ -197,8 +211,11 @@ public class VideoService {
         videoRepository.save(video);
     }
 
-    public List<Series> findSeriesNameByQuery(String q){
-        return seriesRepository.findBySeriesNameContains(q);
+    public List<InnerInfoResponse> findSeriesNameByQuery(String q){
+        return seriesRepository.findBySeriesNameContainsIgnoreCase(q)
+                .stream()
+                .map(InnerInfoResponse::new)
+                .collect(Collectors.toList());
     }
 
     public List<Video> findVideoContainingTitle(String searchTitle,String order){

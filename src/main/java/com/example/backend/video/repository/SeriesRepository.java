@@ -10,5 +10,5 @@ import java.util.List;
 @Repository
 public interface SeriesRepository extends JpaRepository<Series, Long> {
     //param 을 안붙이고 하면 Parameter value [\] match type error 발생 -> hibernate 오류라고 함 (spring boot 2.6.8 에서 해결)
-    List<Series> findBySeriesNameContains(@Param("nameSearch") String nameSearch);
+    List<Series> findBySeriesNameContainsIgnoreCase(@Param("nameSearch") String nameSearch);
 }
