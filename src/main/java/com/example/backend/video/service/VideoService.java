@@ -40,6 +40,8 @@ public class VideoService {
                 .videoUrl(videoDto.getUrl()).description(videoDto.getDescription())
                 .originTitle(videoDto.getTitle()).series(series)
                 .episodeNumber(videoDto.getEpisode()).user(user)
+                .thumbnailUrl(videoDto.getThumbnailUrl())
+                .uploader(videoDto.getVideoUploader())
                 .build();
         int[] times = toHourMinSec(video, videoDto.getRuntime());
         video.setVideoRuntime(times);

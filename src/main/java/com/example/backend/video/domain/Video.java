@@ -28,6 +28,9 @@ public class Video {
     @Column
     private String description;
 
+    @Column(columnDefinition = "TEXT")
+    private String thumbnailUrl;
+
     //1 영상 - 1 시리즈 / 1 시리즈 - N 영상
     @ManyToOne
     @JoinColumn(name = "series_id")
@@ -41,6 +44,9 @@ public class Video {
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String videoUrl;
+
+    @Column(length=25)
+    private String videoUploader;
 
     @Column
     private Integer episodeNumber;
@@ -83,7 +89,7 @@ public class Video {
     private List<Report> reports;
 
     @Builder
-    public Video (String originTitle, String description, String videoUrl, Integer episodeNumber, Series series,User user){
+    public Video (String originTitle, String description, String videoUrl, Integer episodeNumber, Series series,User user, String thumbnailUrl, String uploader){
         this.originVideoTitle=originTitle;
         this.description=description;
         this.videoUrl=videoUrl;
@@ -91,6 +97,8 @@ public class Video {
         this.series=series;
         this.createdTime=LocalDateTime.now();
         this.user=user;
+        this.thumbnailUrl=thumbnailUrl;
+        this.videoUploader=uploader;
     }
 
     public void setVideoRuntime(int[] times){

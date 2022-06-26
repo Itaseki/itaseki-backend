@@ -17,4 +17,6 @@ public class VideoDto {
     private List<Long> hashtags;
     private List<String> keywords;
     private List<Long> playlists;
+    private String thumbnailUrl;
+    private String videoUploader;
 }
