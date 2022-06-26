@@ -42,7 +42,7 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository{
         if(order.equals("likeCount"))
             orderSpecifier=new OrderSpecifier(Order.DESC,video.likeCount);
         return jpaQueryFactory.selectFrom(video)
-                .where(video.status.eq(true), video.description.contains(searchTitle))
+                .where(video.status.eq(true), video.description.containsIgnoreCase(searchTitle))
                 .orderBy(orderSpecifier) //좋아요순 정렬
                 .fetch();
 

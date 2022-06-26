@@ -212,7 +212,7 @@ public class VideoService {
     }
 
     public List<InnerInfoResponse> findSeriesNameByQuery(String q){
-        return seriesRepository.findBySeriesNameContains(q)
+        return seriesRepository.findBySeriesNameContainsIgnoreCase(q)
                 .stream()
                 .map(InnerInfoResponse::new)
                 .collect(Collectors.toList());
