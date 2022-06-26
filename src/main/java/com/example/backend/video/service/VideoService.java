@@ -107,7 +107,19 @@ public class VideoService {
     }
 
     public String checkVideoUrlExistence(String url){
-        Video video = videoRepository.findByVideoUrl(url);
+        String videoId;
+        if(url.contains("watch?v")){
+            int index = url.indexOf("watch?v=");
+            videoId=url.substring(index + 8);
+            if(videoId.contains("&")){
+                index = videoId.indexOf("&");
+                videoId=videoId.substring(0,index);
+            }
+        }else{
+            int index=url.indexOf("youtu.be/");
+            videoId=url.substring(index + 9);
+        }
+        Video video = videoRepository.findByVideoUrlContains(videoId);
         if(video==null)
             return "등록 가능";
         return "등록 불가능";
