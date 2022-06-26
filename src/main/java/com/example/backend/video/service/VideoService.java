@@ -197,8 +197,11 @@ public class VideoService {
         videoRepository.save(video);
     }
 
-    public List<Series> findSeriesNameByQuery(String q){
-        return seriesRepository.findBySeriesNameContains(q);
+    public List<InnerInfoResponse> findSeriesNameByQuery(String q){
+        return seriesRepository.findBySeriesNameContains(q)
+                .stream()
+                .map(InnerInfoResponse::new)
+                .collect(Collectors.toList());
     }
 
     public List<Video> findVideoContainingTitle(String searchTitle,String order){

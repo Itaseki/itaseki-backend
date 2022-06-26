@@ -162,7 +162,7 @@ public class VideoController {
     }
 
     @GetMapping("/series/search")
-    public ResponseEntity<List<Series>> searchSeriesName(@RequestParam String q){
+    public ResponseEntity<List<InnerInfoResponse>> searchSeriesName(@RequestParam String q){
         return new ResponseEntity<>(videoService.findSeriesNameByQuery(q),HttpStatus.OK);
     }
 
