@@ -1,5 +1,6 @@
 package com.example.backend.playlist;
 
+import com.example.backend.playlist.dto.AddVideoDto;
 import com.example.backend.playlist.dto.MyPlaylistResponse;
 import com.example.backend.playlist.dto.NewEmptyPlaylistDto;
 import com.example.backend.user.UserService;
@@ -23,6 +24,12 @@ public class PlaylistController {
         Long loginId=1L;
         User user = userService.findUserById(loginId);
         return new ResponseEntity<>(playlistService.saveEmptyPlaylist(playlistDto,user), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/{playlistId}")
+    public ResponseEntity<String> addVideoToPlaylist(@PathVariable Long playlistId, @RequestBody AddVideoDto dto){
+        playlistService.addVideoToPlaylist(dto.getVideoId(),playlistId);
+        return new ResponseEntity<>("영상 추가 성공",HttpStatus.CREATED);
     }
 
 }
