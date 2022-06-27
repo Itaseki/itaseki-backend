@@ -1,0 +1,16 @@
+package com.example.backend.user;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequiredArgsConstructor
+public class UserController {
+
+    @RequestMapping(value="/member/resetPassword", method = RequestMethod.POST)
+    public String kakaoLogin(){
+        return null;
+    }
+}
