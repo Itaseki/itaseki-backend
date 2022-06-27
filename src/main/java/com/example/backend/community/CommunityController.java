@@ -36,7 +36,7 @@ public class CommunityController {
 
     @PostMapping(value = "",consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<String> createCommunityPost(@RequestPart CommunityBoardDto communityBoardDto,
-                                                      @RequestPart List<MultipartFile> files){
+                                                      @RequestPart(required = false) List<MultipartFile> files){
         //principal 로 유저 정보 받아오는 부분 추가 (회원가입, 로그인 구현 후)
         Long loginId=1L;
         User user=userService.findUserById(loginId);

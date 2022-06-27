@@ -1,5 +1,6 @@
 package com.example.backend.reservation.domain;
 
+import com.example.backend.reservation.dto.ReservationCountDto;
 import com.example.backend.video.domain.Video;
 import lombok.Builder;
 import lombok.Data;
@@ -31,12 +32,19 @@ public class ConfirmedReservation {
     @Column(nullable = false)
     private String endTime;
 
-    @Builder
-    public ConfirmedReservation(LocalDate date, String startTime, String endTime,Video video){
-        this.reservationDate=date;
-        this.startTime=startTime;
-        this.endTime=endTime;
-        this.video=video;
+    @Column
+    private Long reservationCount;
+
+    public ConfirmedReservation(ReservationCountDto dto){
+        Reservation reservation = dto.getReservation();
+        Long count = dto.getCount();
+        this.reservationDate=reservation.getReservationDate();
+        this.startTime=reservation.getStartTime();
+        this.endTime=reservation.getEndTime();
+        this.video=reservation.getVideo();
+        this.reservationCount=count;
     }
+
+
 
 }
