@@ -3,6 +3,9 @@ package com.example.backend.image.service;
 import com.example.backend.community.domain.CommunityBoard;
 import com.example.backend.community.domain.CommunityBoardImage;
 import com.example.backend.community.dto.AllBoardResponseWithPageCount;
+import com.example.backend.customHashtag.CustomHashtag;
+import com.example.backend.customHashtag.CustomHashtagRepository;
+import com.example.backend.customHashtag.QCustomHashtag;
 import com.example.backend.image.domain.ImageBoard;
 import com.example.backend.image.dto.AllImageBoardsResponse;
 import com.example.backend.image.dto.AllImageResponseWithPageCount;
@@ -27,8 +30,9 @@ import java.util.stream.Collectors;
 public class ImageBoardService {
     private final ImageBoardRepository imageBoardRepository;
     private final AwsS3Service awsS3Service;
+    private final CustomHashtagRepository customHashtagRepository;
 
-    public void savePost(ImageBoard imageBoard){
+    public void savePost(ImageBoard imageBoard, List<MultipartFile> files){
         imageBoardRepository.save(imageBoard);
     }
 
@@ -78,6 +82,14 @@ public class ImageBoardService {
         Page<ImageBoard> imageBoardPage = imageBoardRepository.findAll(pageable,queryList);
         List<AllImageBoardsResponse> imageBoardsResponses = toAllImageBoardResponse(imageBoardPage.getContent());
         return new AllImageResponseWithPageCount(imageBoardPage.getTotalPages(),imageBoardsResponses);
+    }
+
+    public void saveImageBoardHashtag(List<String> hashtags, ImageBoard imageBoard){
+        int order = 1;
+        for(String hashtag : hashtags){
+            CustomHashtag imageBoardHashtag = CustomHashtag.builder().imageBoard(imageBoard).name(hashtag).order(order++).build();
+            customHashtagRepository.save(imageBoardHashtag);
+        }
     }
 
 }

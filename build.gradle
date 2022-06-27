@@ -50,6 +50,7 @@ dependencies {
 //			"com.querydsl:querydsl-apt:${queryDslVersion}:jpa")
 
 	implementation 'org.jsoup:jsoup:1.14.2'
+	compile("org.springframework.book:spring-boot-starter-tomcat")
 
 }
 

@@ -1,5 +1,6 @@
 package com.example.backend.customHashtag;
 
+import com.example.backend.image.domain.ImageBoard;
 import com.example.backend.video.domain.Video;
 import lombok.Builder;
 import lombok.Data;
@@ -25,13 +26,18 @@ public class CustomHashtag {
     @JoinColumn(name = "video_id")
     private Video video;
 
+    @ManyToOne
+    @JoinColumn(name = "imageBoardId")
+    private ImageBoard imageBoard;
+
     @Column(nullable = false)
     private Integer tagOrder;
 
     @Builder
-    public CustomHashtag(Video video, String name, int order){
+    public CustomHashtag(Video video, String name, int order, ImageBoard imageBoard){
         this.video=video;
         this.customHashtagName=name;
         this.tagOrder=order;
+        this.imageBoard = imageBoard;
     }
 }

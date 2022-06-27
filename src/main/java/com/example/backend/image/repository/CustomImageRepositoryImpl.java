@@ -15,14 +15,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static com.example.backend.community.domain.QCommunityBoard.communityBoard;
 import static com.example.backend.image.domain.QImageBoard.imageBoard;
-
 
 @Repository
 @RequiredArgsConstructor
@@ -57,7 +53,7 @@ public class CustomImageRepositoryImpl implements CustomImageRepository{
     }
 
     private BooleanExpression checkTitleAndContent(String q){
-        return communityBoard.title.contains(q).or(communityBoard.content.contains(q));
+        return imageBoard.imageBoardTitle.contains(q).or(imageBoard.imageUrl.contains(q));
     }
 
     private List<OrderSpecifier> getOrders(Sort sort) {
