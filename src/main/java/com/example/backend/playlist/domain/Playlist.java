@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table
@@ -42,6 +43,9 @@ public class Playlist {
 
     @Column(nullable = false, name = "playlist_status")
     private Boolean status=true;
+
+    @OneToMany(mappedBy = "playlist")
+    private List<PlaylistVideo> videos;
 
     //영상 자체는 playlistVideo 에 따로 저장
     @Builder
