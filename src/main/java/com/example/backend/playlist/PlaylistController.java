@@ -1,5 +1,8 @@
 package com.example.backend.playlist;
 
+import com.example.backend.playlist.domain.Playlist;
+import com.example.backend.playlist.domain.UserSavedPlaylist;
+import com.example.backend.playlist.dto.AddPlaylistDto;
 import com.example.backend.playlist.dto.AddVideoDto;
 import com.example.backend.playlist.dto.MyPlaylistResponse;
 import com.example.backend.playlist.dto.NewEmptyPlaylistDto;
@@ -36,6 +39,18 @@ public class PlaylistController {
     public ResponseEntity<List<MyPlaylistResponse>> getMyPlaylists(@PathVariable Long userId){
         User user = userService.findUserById(userId);
         return new ResponseEntity<>(playlistService.getMyPlaylist(user),HttpStatus.OK);
+    }
+
+    @PostMapping("/saved")
+    public ResponseEntity<String> saveOtherUserPlaylist(@RequestBody AddPlaylistDto dto){
+        Long loginId=1L;
+        User user = userService.findUserById(loginId);
+        Playlist playlist = playlistService.findPlaylistEntity(dto.getPlaylistId());
+        UserSavedPlaylist savedPlaylist = playlistService.findExistingSavedPlaylist(user, playlist);
+        if(savedPlaylist!=null)
+            return new ResponseEntity<>("이미 저장된 플레이리스트",HttpStatus.CONFLICT);
+        playlistService.userPlaylistSave(playlist,user);
+        return new ResponseEntity<>("플레이리스트 저장 성공",HttpStatus.CREATED);
     }
 
 }
