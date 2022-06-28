@@ -32,4 +32,10 @@ public class PlaylistController {
         return new ResponseEntity<>("영상 추가 성공",HttpStatus.CREATED);
     }
 
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<MyPlaylistResponse>> getMyPlaylists(@PathVariable Long userId){
+        User user = userService.findUserById(userId);
+        return new ResponseEntity<>(playlistService.getMyPlaylist(user),HttpStatus.OK);
+    }
+
 }

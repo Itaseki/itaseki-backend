@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -46,6 +47,20 @@ public class PlaylistService {
                 .order(lastVideoOrder != null ? ++lastVideoOrder : 1)
                 .build();
         pvRepository.save(playlistVideo);
+    }
+
+    private List<Playlist> findAllUserPlaylist(User user){
+        return playlistRepository.findAllByUser(user)
+                .stream()
+                .filter(Playlist::getStatus)
+                .collect(Collectors.toList());
+    }
+
+    public List<MyPlaylistResponse> getMyPlaylist(User user){
+        return findAllUserPlaylist(user)
+                .stream()
+                .map(MyPlaylistResponse::fromEntity)
+                .collect(Collectors.toList());
     }
 
 }
