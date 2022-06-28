@@ -67,7 +67,10 @@ public class PlaylistService {
     }
 
     public UserSavedPlaylist findExistingSavedPlaylist(User user, Playlist playlist){
-        return savedPlaylistRepository.findByUserAndPlaylist(user, playlist);
+        UserSavedPlaylist savedPlaylist = savedPlaylistRepository.findByUserAndPlaylist(user, playlist);
+        if(savedPlaylist!=null)
+            return savedPlaylist.getStatus()?savedPlaylist:null;
+        return null;
     }
 
     public Playlist findPlaylistEntity(Long playlistId){
