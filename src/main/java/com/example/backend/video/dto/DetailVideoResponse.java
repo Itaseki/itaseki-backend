@@ -27,6 +27,7 @@ public class DetailVideoResponse {
     private Long writerId;
     private String writerNickname;
     private Boolean isThisUserWriter;
+    private Integer commentCount;
     private List<VideoCommentsResponse> comments;
 
     public static DetailVideoResponse fromEntity(Video video, List<VideoCommentsResponse> comments, Long loginId, List<String> hashtags){
@@ -39,7 +40,20 @@ public class DetailVideoResponse {
                 .episode(video.getEpisodeNumber()).hashtags(hashtags)
                 .writerId(boardWriter.getUserId()).writerNickname(boardWriter.getNickname()).isThisUserWriter(boardWriter.getUserId().equals(loginId))
                 .videoUploader(video.getVideoUploader())
+                .commentCount(getVideoCommentCount(comments))
                 .build();
+    }
+
+    private static Integer getVideoCommentCount(List<VideoCommentsResponse> comments){
+        if(comments==null)
+            return 0;
+        int count=comments.size();
+        for(VideoCommentsResponse r: comments){
+            if(r.getNestedComments()==null)
+                continue;
+            count+=r.getNestedComments().size();
+        }
+        return count;
     }
 
 }
