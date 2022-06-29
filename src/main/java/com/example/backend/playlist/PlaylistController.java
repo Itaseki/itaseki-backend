@@ -2,10 +2,7 @@ package com.example.backend.playlist;
 
 import com.example.backend.playlist.domain.Playlist;
 import com.example.backend.playlist.domain.UserSavedPlaylist;
-import com.example.backend.playlist.dto.AddPlaylistDto;
-import com.example.backend.playlist.dto.AddVideoDto;
-import com.example.backend.playlist.dto.MyPlaylistResponse;
-import com.example.backend.playlist.dto.NewEmptyPlaylistDto;
+import com.example.backend.playlist.dto.*;
 import com.example.backend.user.UserService;
 import com.example.backend.user.domain.User;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +48,14 @@ public class PlaylistController {
             return new ResponseEntity<>("이미 저장된 플레이리스트",HttpStatus.CONFLICT);
         playlistService.userPlaylistSave(playlist,user);
         return new ResponseEntity<>("플레이리스트 저장 성공",HttpStatus.CREATED);
+    }
+
+    @GetMapping("/saved")
+    public ResponseEntity<List<PlaylistTitleResponse>> getSavedPlaylists(){
+        Long loginId=1L;
+        User user = userService.findUserById(loginId);
+        return new ResponseEntity<>(playlistService.getUserSavedPlaylists(user),HttpStatus.OK);
+
     }
 
 }

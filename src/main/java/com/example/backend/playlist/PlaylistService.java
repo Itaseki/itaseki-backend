@@ -5,6 +5,7 @@ import com.example.backend.playlist.domain.PlaylistVideo;
 import com.example.backend.playlist.domain.UserSavedPlaylist;
 import com.example.backend.playlist.dto.MyPlaylistResponse;
 import com.example.backend.playlist.dto.NewEmptyPlaylistDto;
+import com.example.backend.playlist.dto.PlaylistTitleResponse;
 import com.example.backend.playlist.repository.PlaylistRepository;
 import com.example.backend.playlist.repository.PlaylistVideoRepository;
 import com.example.backend.playlist.repository.UserSavedPlaylistRepository;
@@ -89,6 +90,20 @@ public class PlaylistService {
                 .status(true)
                 .build();
         savedPlaylistRepository.save(userSavedPlaylist);
+    }
+
+    private List<UserSavedPlaylist> findAllSavedPlaylistByUser(User user){
+        return savedPlaylistRepository.findAllByUser(user)
+                .stream()
+                .filter(UserSavedPlaylist::getStatus)
+                .collect(Collectors.toList());
+    }
+
+    public List<PlaylistTitleResponse> getUserSavedPlaylists(User user){
+        return findAllSavedPlaylistByUser(user)
+                .stream()
+                .map(PlaylistTitleResponse::fromSavedPlaylist)
+                .collect(Collectors.toList());
     }
 
 }
