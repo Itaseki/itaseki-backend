@@ -69,7 +69,7 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: aws deploy create-deployment 
         --application-name ittasekki-backend 
-        --deployment-group-name ittasekki-teleina 
+        --deployment-group-name ittasekki-teleina-group
         --file-exists-behavior OVERWRITE 
         --s3-location bucket=ittasekki-deploy,bundleType=zip,key=ittasekki-backend-build.zip 
         --region ap-northeast-2
