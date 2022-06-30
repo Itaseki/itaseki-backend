@@ -33,4 +33,4 @@ chmod +x $JAR_NAME
 
 echo "> $JAR_NAME 실행"
 
-nohup java -jar -Dspring.config.location=classpath:/applications.properties,file:///home/ubuntu/backend-enc/application-oauth.properties, file:///home/ubuntu/backend-enc/application-mysql.properties -Duser.timezone=Asia/Seoul $JAR_NAME >> $REPOSITORY/nohup.out 2>&1 &
+nohup java -jar -Dspring.config.location=classpath:/applications.properties,file:///home/ubuntu/backend-enc/application-s3.properties, file:///home/ubuntu/backend-enc/application-mysql.properties -Duser.timezone=Asia/Seoul $JAR_NAME >> $REPOSITORY/nohup.out 2>&1 &
