@@ -1,5 +1,6 @@
 package com.example.backend.image.domain;
 
+import com.example.backend.customHashtag.CustomHashtag;
 import com.example.backend.report.Report;
 import com.example.backend.user.domain.User;
 import lombok.Builder;
@@ -49,6 +50,9 @@ public class ImageBoard {
     @OneToMany(mappedBy = "imageBoard",targetEntity = Report.class)
     private List<Report> reports=new ArrayList<>();
 
+    @OneToMany(mappedBy = "imageBoard",targetEntity = CustomHashtag.class)
+    private List<CustomHashtag> customHashtags;
+
     @Builder
     public ImageBoard(String imageBoardTitle, String imageUrl, LocalDateTime createdTime, User user){
         this.imageBoardTitle = imageBoardTitle;
@@ -60,5 +64,8 @@ public class ImageBoard {
     public void updateViewCount(){
         this.viewCount++;
     }
-    public void updateLikeCount(int likeCount){this.likeCount+=likeCount;}
+    public Integer updateLikeCount(int likeCount){
+        this.likeCount+=likeCount;
+        return this.likeCount;
+    }
 }

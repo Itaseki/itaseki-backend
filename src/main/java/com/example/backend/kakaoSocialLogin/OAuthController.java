@@ -23,7 +23,7 @@ import java.util.Date;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/oauth")
+@RequestMapping("localhost:3000/oauth/")
 public class OAuthController {
 
     private final OAuthService oAuthService;
@@ -39,6 +39,7 @@ public class OAuthController {
     public void kakaoCallback(@RequestParam String code, HttpServletResponse response) {
 
         JsonNode userInfo = oAuthService.getKakaoUserInfo(code);
+        System.out.println(userInfo);
 
         JsonNode userEmail = userInfo.get("kakao_account").get("email");
         JsonNode userNickname = userInfo.get("properties").get("nickname");
