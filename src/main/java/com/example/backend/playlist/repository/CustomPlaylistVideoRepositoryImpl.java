@@ -18,4 +18,13 @@ public class CustomPlaylistVideoRepositoryImpl implements CustomPlaylistVideoRep
                 .orderBy(playlistVideo.videoOrder.desc())
                 .fetchFirst();
     }
+
+    @Override
+    public String findFirstThumbnailUrl(Playlist playlist) {
+        return jpaQueryFactory.select(playlistVideo.video.thumbnailUrl)
+                .from(playlistVideo)
+                .where(playlistVideo.playlist.eq(playlist),playlistVideo.status.eq(true))
+                .orderBy(playlistVideo.videoOrder.asc())
+                .fetchFirst();
+    }
 }

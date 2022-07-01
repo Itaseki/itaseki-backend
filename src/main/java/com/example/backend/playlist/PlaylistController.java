@@ -6,6 +6,9 @@ import com.example.backend.playlist.dto.*;
 import com.example.backend.user.UserService;
 import com.example.backend.user.domain.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -73,7 +76,13 @@ public class PlaylistController {
             return new ResponseEntity<>("권한 없음",HttpStatus.FORBIDDEN);
         Boolean changedStatus = playlistService.modifyPublicStatus(playlist);
         return new ResponseEntity<>(changedStatus?"공개":"비공개",HttpStatus.OK);
+    }
 
+    @GetMapping("")
+    public ResponseEntity<AllPlaylistResponseWithPageCount> getAllPlaylists(@PageableDefault(size=12, sort="id",direction = Sort.Direction.DESC) Pageable pageable,
+                                                                            @RequestParam(required = false) String title,
+                                                                            @RequestParam(required = false) String video){
+        return new ResponseEntity<>(playlistService.getAllPlaylists(pageable, title, video),HttpStatus.OK);
     }
 
 }

@@ -149,4 +149,33 @@ public class PlaylistService {
         pvRepository.save(playlistVideo);
     }
 
+
+    public AllPlaylistResponseWithPageCount getAllPlaylists(Pageable pageable, String title, String video){
+        Page<AllPlaylistsResponse> pageResponses = playlistRepository.findAllPlaylistsWithPageable(pageable, title, video);
+        int totalPages = this.getTotalPageCount(pageResponses.getTotalElements());
+        pageResponses.stream()
+                .forEach(pr->pr.updateData(getFirstVideoThumbnail(pr.getId()),findAllVideosInPlaylist(pr.getId()).size()));
+        return new AllPlaylistResponseWithPageCount(totalPages, pageResponses.getContent());
+    }
+
+    private String getFirstVideoThumbnail(Long playlistId){
+        Playlist playlist = this.findPlaylistEntity(playlistId);
+        return pvRepository.findFirstThumbnailUrl(playlist);
+    }
+
+    private int getTotalPageCount(long totalPlaylistsCount){
+        if(totalPlaylistsCount<=8)
+            return 1;
+        return (int) (1+Math.ceil((totalPlaylistsCount-8)/(double)12));
+    }
+
+    private List<PlaylistVideo> findAllVideosInPlaylist(Long playlistId){
+        Playlist playlist = this.findPlaylistEntity(playlistId);
+        return playlist.getVideos()
+                .stream()
+                .filter(PlaylistVideo::getStatus)
+                .sorted(Comparator.comparing(PlaylistVideo::getVideoOrder))
+                .collect(Collectors.toList());
+    }
+
 }
