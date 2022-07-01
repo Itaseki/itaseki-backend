@@ -3,20 +3,22 @@ package com.example.backend.playlist;
 import com.example.backend.playlist.domain.Playlist;
 import com.example.backend.playlist.domain.PlaylistVideo;
 import com.example.backend.playlist.domain.UserSavedPlaylist;
-import com.example.backend.playlist.dto.MyPlaylistResponse;
-import com.example.backend.playlist.dto.NewEmptyPlaylistDto;
-import com.example.backend.playlist.dto.PlaylistTitleResponse;
+import com.example.backend.playlist.dto.*;
 import com.example.backend.playlist.repository.PlaylistRepository;
 import com.example.backend.playlist.repository.PlaylistVideoRepository;
 import com.example.backend.playlist.repository.UserSavedPlaylistRepository;
 import com.example.backend.user.domain.User;
 import com.example.backend.video.domain.Video;
+import com.example.backend.video.repository.VideoRepository;
 import com.example.backend.video.service.VideoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,8 +29,16 @@ import java.util.stream.Collectors;
 public class PlaylistService {
     private final PlaylistRepository playlistRepository;
     private final PlaylistVideoRepository pvRepository;
-    private final VideoService videoService;
+    private final VideoRepository videoRepository;
     private final UserSavedPlaylistRepository savedPlaylistRepository;
+
+    private Video findVideoEntityById(Long videoId){
+        Optional<Video> video = videoRepository.findById(videoId);
+        if(video.isPresent()&&video.get().getStatus()){
+            return video.get();
+        }
+        return null;
+    }
 
     public MyPlaylistResponse saveEmptyPlaylist(NewEmptyPlaylistDto emptyDto, User user){
         String title = emptyDto.getTitle();
@@ -41,9 +51,8 @@ public class PlaylistService {
         return MyPlaylistResponse.fromEntity(saved);
     }
 
-    public void addVideoToPlaylist(Long videoId, Long playlistId){
-        Playlist playlist = playlistRepository.findById(playlistId).orElse(null);
-        Video video = videoService.findVideoEntityById(videoId);
+    public void addVideoToPlaylist(Long videoId, Playlist playlist){
+        Video video = this.findVideoEntityById(videoId);
         Integer lastVideoOrder = pvRepository.findLastVideoOrder(playlist);
         PlaylistVideo playlistVideo = PlaylistVideo.builder()
                 .playlist(playlist)
@@ -51,6 +60,18 @@ public class PlaylistService {
                 .order(lastVideoOrder != null ? ++lastVideoOrder : 1)
                 .build();
         pvRepository.save(playlistVideo);
+    }
+
+    public Boolean checkVideoPlaylistExistence(Long videoId, Playlist playlist){
+        Video video = this.findVideoEntityById(videoId);
+        return findExistingPlaylistVideo(video,playlist)!=null;
+    }
+
+    private PlaylistVideo findExistingPlaylistVideo(Video video, Playlist playlist){
+        PlaylistVideo playlistVideo = pvRepository.findByVideoAndPlaylist(video, playlist).orElse(null);
+        if(playlistVideo!=null&&playlistVideo.getStatus())
+            return playlistVideo;
+        return null;
     }
 
     private List<Playlist> findAllUserPlaylist(User user){
@@ -90,6 +111,7 @@ public class PlaylistService {
                 .status(true)
                 .build();
         savedPlaylistRepository.save(userSavedPlaylist);
+        playlist.updateSaveCount();
     }
 
     private List<UserSavedPlaylist> findAllSavedPlaylistByUser(User user){
@@ -103,6 +125,56 @@ public class PlaylistService {
         return findAllSavedPlaylistByUser(user)
                 .stream()
                 .map(PlaylistTitleResponse::fromSavedPlaylist)
+                .collect(Collectors.toList());
+    }
+
+    public Boolean modifyPublicStatus(Playlist playlist){
+        playlist.modifyPlaylistPublicStatus();
+        Playlist changedPlaylist = playlistRepository.save(playlist);
+        return changedPlaylist.getIsPublic();
+    }
+
+    public Boolean checkUserPlaylistAuthority(User user, Playlist playlist){
+        return playlist.getUser().equals(user);
+    }
+
+    public void deleteVideoInPlaylist(Video video, Long playlistId){
+        Playlist playlist = findPlaylistEntity(playlistId);
+        if(playlist==null)
+            return;
+        PlaylistVideo playlistVideo = this.findExistingPlaylistVideo(video, playlist);
+        if(playlistVideo==null)
+            return;
+        playlistVideo.setStatus(false);
+        pvRepository.save(playlistVideo);
+    }
+
+
+    public AllPlaylistResponseWithPageCount getAllPlaylists(Pageable pageable, String title, String video){
+        Page<AllPlaylistsResponse> pageResponses = playlistRepository.findAllPlaylistsWithPageable(pageable, title, video);
+        int totalPages = this.getTotalPageCount(pageResponses.getTotalElements());
+        pageResponses.stream()
+                .forEach(pr->pr.updateData(getFirstVideoThumbnail(pr.getId()),findAllVideosInPlaylist(pr.getId()).size()));
+        return new AllPlaylistResponseWithPageCount(totalPages, pageResponses.getContent());
+    }
+
+    private String getFirstVideoThumbnail(Long playlistId){
+        Playlist playlist = this.findPlaylistEntity(playlistId);
+        return pvRepository.findFirstThumbnailUrl(playlist);
+    }
+
+    private int getTotalPageCount(long totalPlaylistsCount){
+        if(totalPlaylistsCount<=8)
+            return 1;
+        return (int) (1+Math.ceil((totalPlaylistsCount-8)/(double)12));
+    }
+
+    private List<PlaylistVideo> findAllVideosInPlaylist(Long playlistId){
+        Playlist playlist = this.findPlaylistEntity(playlistId);
+        return playlist.getVideos()
+                .stream()
+                .filter(PlaylistVideo::getStatus)
+                .sorted(Comparator.comparing(PlaylistVideo::getVideoOrder))
                 .collect(Collectors.toList());
     }
 

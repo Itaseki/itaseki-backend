@@ -16,6 +16,15 @@ public class CustomPlaylistVideoRepositoryImpl implements CustomPlaylistVideoRep
                 .from(playlistVideo)
                 .where(playlistVideo.playlist.eq(playlist),playlistVideo.status.eq(true))
                 .orderBy(playlistVideo.videoOrder.desc())
-                .fetchOne();
+                .fetchFirst();
+    }
+
+    @Override
+    public String findFirstThumbnailUrl(Playlist playlist) {
+        return jpaQueryFactory.select(playlistVideo.video.thumbnailUrl)
+                .from(playlistVideo)
+                .where(playlistVideo.playlist.eq(playlist),playlistVideo.status.eq(true))
+                .orderBy(playlistVideo.videoOrder.asc())
+                .fetchFirst();
     }
 }

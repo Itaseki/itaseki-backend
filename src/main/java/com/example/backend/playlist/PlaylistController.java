@@ -6,6 +6,9 @@ import com.example.backend.playlist.dto.*;
 import com.example.backend.user.UserService;
 import com.example.backend.user.domain.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +31,14 @@ public class PlaylistController {
 
     @PostMapping("/{playlistId}")
     public ResponseEntity<String> addVideoToPlaylist(@PathVariable Long playlistId, @RequestBody AddVideoDto dto){
-        playlistService.addVideoToPlaylist(dto.getVideoId(),playlistId);
+        Long loginId=1L;
+        User user = userService.findUserById(loginId);
+        Playlist playlist = playlistService.findPlaylistEntity(playlistId);
+        if(!playlistService.checkUserPlaylistAuthority(user,playlist))
+            return new ResponseEntity<>("권한 없음",HttpStatus.FORBIDDEN);
+        if(playlistService.checkVideoPlaylistExistence(dto.getVideoId(),playlist))
+            return new ResponseEntity<>("이미 해당 플레이리스트에 추가된 영상",HttpStatus.CONFLICT);
+        playlistService.addVideoToPlaylist(dto.getVideoId(),playlist);
         return new ResponseEntity<>("영상 추가 성공",HttpStatus.CREATED);
     }
 
@@ -55,7 +65,24 @@ public class PlaylistController {
         Long loginId=1L;
         User user = userService.findUserById(loginId);
         return new ResponseEntity<>(playlistService.getUserSavedPlaylists(user),HttpStatus.OK);
+    }
 
+    @PatchMapping("/{playlistId}")
+    public ResponseEntity<String> changePlaylistPublic(@PathVariable Long playlistId){
+        Long loginId=1L;
+        User user = userService.findUserById(loginId);
+        Playlist playlist = playlistService.findPlaylistEntity(playlistId);
+        if(!playlistService.checkUserPlaylistAuthority(user,playlist))
+            return new ResponseEntity<>("권한 없음",HttpStatus.FORBIDDEN);
+        Boolean changedStatus = playlistService.modifyPublicStatus(playlist);
+        return new ResponseEntity<>(changedStatus?"공개":"비공개",HttpStatus.OK);
+    }
+
+    @GetMapping("")
+    public ResponseEntity<AllPlaylistResponseWithPageCount> getAllPlaylists(@PageableDefault(size=12, sort="id",direction = Sort.Direction.DESC) Pageable pageable,
+                                                                            @RequestParam(required = false) String title,
+                                                                            @RequestParam(required = false) String video){
+        return new ResponseEntity<>(playlistService.getAllPlaylists(pageable, title, video),HttpStatus.OK);
     }
 
 }

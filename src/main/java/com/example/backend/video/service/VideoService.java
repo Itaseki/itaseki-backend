@@ -2,6 +2,7 @@ package com.example.backend.video.service;
 
 import com.example.backend.customHashtag.CustomHashtag;
 import com.example.backend.customHashtag.CustomHashtagRepository;
+import com.example.backend.playlist.PlaylistService;
 import com.example.backend.user.domain.User;
 import com.example.backend.video.domain.*;
 import com.example.backend.video.dto.*;
@@ -32,6 +33,7 @@ public class VideoService {
     private final VideoHashtagRepository videoTagRepository;
     private final CustomHashtagRepository customHashtagRepository;
     private final VideoCommentService videoCommentService;
+    private final PlaylistService playlistService;
 
     public void saveVideo(VideoDto videoDto, User user){
         //플레이리스트에 영상 저장하는 부분 추가
@@ -209,6 +211,8 @@ public class VideoService {
     public void deleteVideo(Video video){
         video.setStatus(false);
         videoRepository.save(video);
+        video.getPlaylistVideos()
+                .forEach(pv->playlistService.deleteVideoInPlaylist(video,pv.getPlaylist().getId()));
     }
 
     public List<InnerInfoResponse> findSeriesNameByQuery(String q){
