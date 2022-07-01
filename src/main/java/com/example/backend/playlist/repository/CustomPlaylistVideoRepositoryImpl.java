@@ -16,6 +16,6 @@ public class CustomPlaylistVideoRepositoryImpl implements CustomPlaylistVideoRep
                 .from(playlistVideo)
                 .where(playlistVideo.playlist.eq(playlist),playlistVideo.status.eq(true))
                 .orderBy(playlistVideo.videoOrder.desc())
-                .fetchOne();
+                .fetchFirst();
     }
 }

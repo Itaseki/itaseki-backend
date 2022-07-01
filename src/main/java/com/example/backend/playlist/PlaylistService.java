@@ -41,8 +41,7 @@ public class PlaylistService {
         return MyPlaylistResponse.fromEntity(saved);
     }
 
-    public void addVideoToPlaylist(Long videoId, Long playlistId){
-        Playlist playlist = playlistRepository.findById(playlistId).orElse(null);
+    public void addVideoToPlaylist(Long videoId, Playlist playlist){
         Video video = videoService.findVideoEntityById(videoId);
         Integer lastVideoOrder = pvRepository.findLastVideoOrder(playlist);
         PlaylistVideo playlistVideo = PlaylistVideo.builder()
@@ -51,6 +50,12 @@ public class PlaylistService {
                 .order(lastVideoOrder != null ? ++lastVideoOrder : 1)
                 .build();
         pvRepository.save(playlistVideo);
+    }
+
+    public Boolean checkVideoPlaylistExistence(Long videoId, Playlist playlist){
+        Video video = videoService.findVideoEntityById(videoId);
+        PlaylistVideo playlistVideo = pvRepository.findByVideoAndPlaylist(video, playlist).orElse(null);
+        return playlistVideo!=null&&playlistVideo.getStatus();
     }
 
     private List<Playlist> findAllUserPlaylist(User user){

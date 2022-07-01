@@ -28,7 +28,14 @@ public class PlaylistController {
 
     @PostMapping("/{playlistId}")
     public ResponseEntity<String> addVideoToPlaylist(@PathVariable Long playlistId, @RequestBody AddVideoDto dto){
-        playlistService.addVideoToPlaylist(dto.getVideoId(),playlistId);
+        Long loginId=1L;
+        User user = userService.findUserById(loginId);
+        Playlist playlist = playlistService.findPlaylistEntity(playlistId);
+        if(!playlistService.checkUserPlaylistAuthority(user,playlist))
+            return new ResponseEntity<>("권한 없음",HttpStatus.FORBIDDEN);
+        if(playlistService.checkVideoPlaylistExistence(dto.getVideoId(),playlist))
+            return new ResponseEntity<>("이미 해당 플레이리스트에 추가된 영상",HttpStatus.CONFLICT);
+        playlistService.addVideoToPlaylist(dto.getVideoId(),playlist);
         return new ResponseEntity<>("영상 추가 성공",HttpStatus.CREATED);
     }
 
@@ -55,7 +62,6 @@ public class PlaylistController {
         Long loginId=1L;
         User user = userService.findUserById(loginId);
         return new ResponseEntity<>(playlistService.getUserSavedPlaylists(user),HttpStatus.OK);
-
     }
 
     @PatchMapping("/{playlistId}")
