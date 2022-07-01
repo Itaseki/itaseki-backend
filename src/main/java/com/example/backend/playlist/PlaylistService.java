@@ -11,6 +11,7 @@ import com.example.backend.playlist.repository.PlaylistVideoRepository;
 import com.example.backend.playlist.repository.UserSavedPlaylistRepository;
 import com.example.backend.user.domain.User;
 import com.example.backend.video.domain.Video;
+import com.example.backend.video.repository.VideoRepository;
 import com.example.backend.video.service.VideoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,8 +28,16 @@ import java.util.stream.Collectors;
 public class PlaylistService {
     private final PlaylistRepository playlistRepository;
     private final PlaylistVideoRepository pvRepository;
-    private final VideoService videoService;
+    private final VideoRepository videoRepository;
     private final UserSavedPlaylistRepository savedPlaylistRepository;
+
+    private Video findVideoEntityById(Long videoId){
+        Optional<Video> video = videoRepository.findById(videoId);
+        if(video.isPresent()&&video.get().getStatus()){
+            return video.get();
+        }
+        return null;
+    }
 
     public MyPlaylistResponse saveEmptyPlaylist(NewEmptyPlaylistDto emptyDto, User user){
         String title = emptyDto.getTitle();
@@ -42,7 +51,7 @@ public class PlaylistService {
     }
 
     public void addVideoToPlaylist(Long videoId, Playlist playlist){
-        Video video = videoService.findVideoEntityById(videoId);
+        Video video = this.findVideoEntityById(videoId);
         Integer lastVideoOrder = pvRepository.findLastVideoOrder(playlist);
         PlaylistVideo playlistVideo = PlaylistVideo.builder()
                 .playlist(playlist)
@@ -53,9 +62,15 @@ public class PlaylistService {
     }
 
     public Boolean checkVideoPlaylistExistence(Long videoId, Playlist playlist){
-        Video video = videoService.findVideoEntityById(videoId);
+        Video video = this.findVideoEntityById(videoId);
+        return findExistingPlaylistVideo(video,playlist)!=null;
+    }
+
+    private PlaylistVideo findExistingPlaylistVideo(Video video, Playlist playlist){
         PlaylistVideo playlistVideo = pvRepository.findByVideoAndPlaylist(video, playlist).orElse(null);
-        return playlistVideo!=null&&playlistVideo.getStatus();
+        if(playlistVideo!=null&&playlistVideo.getStatus())
+            return playlistVideo;
+        return null;
     }
 
     private List<Playlist> findAllUserPlaylist(User user){
@@ -119,6 +134,17 @@ public class PlaylistService {
 
     public Boolean checkUserPlaylistAuthority(User user, Playlist playlist){
         return playlist.getUser().equals(user);
+    }
+
+    public void deleteVideoInPlaylist(Video video, Long playlistId){
+        Playlist playlist = findPlaylistEntity(playlistId);
+        if(playlist==null)
+            return;
+        PlaylistVideo playlistVideo = this.findExistingPlaylistVideo(video, playlist);
+        if(playlistVideo==null)
+            return;
+        playlistVideo.setStatus(false);
+        pvRepository.save(playlistVideo);
     }
 
 }
