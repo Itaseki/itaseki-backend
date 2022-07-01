@@ -58,4 +58,16 @@ public class PlaylistController {
 
     }
 
+    @PatchMapping("/{playlistId}")
+    public ResponseEntity<String> changePlaylistPublic(@PathVariable Long playlistId){
+        Long loginId=1L;
+        User user = userService.findUserById(loginId);
+        Playlist playlist = playlistService.findPlaylistEntity(playlistId);
+        if(!playlistService.checkUserPlaylistAuthority(user,playlist))
+            return new ResponseEntity<>("권한 없음",HttpStatus.FORBIDDEN);
+        Boolean changedStatus = playlistService.modifyPublicStatus(playlist);
+        return new ResponseEntity<>(changedStatus?"공개":"비공개",HttpStatus.OK);
+
+    }
+
 }

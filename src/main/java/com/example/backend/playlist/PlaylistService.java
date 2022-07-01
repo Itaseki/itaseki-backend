@@ -106,4 +106,14 @@ public class PlaylistService {
                 .collect(Collectors.toList());
     }
 
+    public Boolean modifyPublicStatus(Playlist playlist){
+        playlist.modifyPlaylistPublicStatus();
+        Playlist changedPlaylist = playlistRepository.save(playlist);
+        return changedPlaylist.getIsPublic();
+    }
+
+    public Boolean checkUserPlaylistAuthority(User user, Playlist playlist){
+        return playlist.getUser().equals(user);
+    }
+
 }

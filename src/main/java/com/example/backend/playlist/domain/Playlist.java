@@ -56,5 +56,9 @@ public class Playlist {
         this.title=title;
     }
 
+    public void modifyPlaylistPublicStatus(){
+        this.isPublic=!this.isPublic;
+    }
+
 
 }
