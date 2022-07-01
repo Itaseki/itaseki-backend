@@ -41,6 +41,9 @@ public class Playlist {
     @Column(nullable = false)
     private int viewCount=0;
 
+    @Column(nullable = false)
+    private int saveCount=0;
+
     @Column(nullable = false, name = "playlist_status")
     private Boolean status=true;
 
@@ -59,6 +62,8 @@ public class Playlist {
     public void modifyPlaylistPublicStatus(){
         this.isPublic=!this.isPublic;
     }
+
+    public void updateSaveCount(){this.saveCount++;}
 
 
 }

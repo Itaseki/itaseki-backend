@@ -3,9 +3,7 @@ package com.example.backend.playlist;
 import com.example.backend.playlist.domain.Playlist;
 import com.example.backend.playlist.domain.PlaylistVideo;
 import com.example.backend.playlist.domain.UserSavedPlaylist;
-import com.example.backend.playlist.dto.MyPlaylistResponse;
-import com.example.backend.playlist.dto.NewEmptyPlaylistDto;
-import com.example.backend.playlist.dto.PlaylistTitleResponse;
+import com.example.backend.playlist.dto.*;
 import com.example.backend.playlist.repository.PlaylistRepository;
 import com.example.backend.playlist.repository.PlaylistVideoRepository;
 import com.example.backend.playlist.repository.UserSavedPlaylistRepository;
@@ -15,9 +13,12 @@ import com.example.backend.video.repository.VideoRepository;
 import com.example.backend.video.service.VideoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -110,6 +111,7 @@ public class PlaylistService {
                 .status(true)
                 .build();
         savedPlaylistRepository.save(userSavedPlaylist);
+        playlist.updateSaveCount();
     }
 
     private List<UserSavedPlaylist> findAllSavedPlaylistByUser(User user){
