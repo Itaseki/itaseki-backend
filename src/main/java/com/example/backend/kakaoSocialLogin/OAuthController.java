@@ -23,7 +23,7 @@ import java.util.Date;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/oauth")
+@RequestMapping("localhost:3000/oauth/")
 public class OAuthController {
 
     private final OAuthService oAuthService;

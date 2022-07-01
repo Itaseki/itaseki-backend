@@ -50,7 +50,19 @@ dependencies {
 //			"com.querydsl:querydsl-apt:${queryDslVersion}:jpa")
 
 	implementation 'org.jsoup:jsoup:1.14.2'
-	compile("org.springframework.book:spring-boot-starter-tomcat")
+
+	// chat 기능 구현
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+	implementation 'org.springframework.boot:spring-boot-starter-freemarker'
+	implementation 'org.springframework.boot:spring-boot-devtools'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'it.ozimov:embedded-redis:0.7.2'
+	implementation 'org.webjars.bower:bootstrap:4.3.1'
+	implementation 'org.webjars.bower:vue:2.5.16'
+	implementation 'org.webjars.bower:axios:0.17.1'
+	implementation 'org.webjars:sockjs-client:1.1.2'
+	implementation 'org.webjars:stomp-websocket:2.3.3-1'
+	implementation 'com.google.code.gson:gson:2.8.0'
 
 }
 
