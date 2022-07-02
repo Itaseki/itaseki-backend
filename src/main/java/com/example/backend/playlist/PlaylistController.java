@@ -56,7 +56,7 @@ public class PlaylistController {
         UserSavedPlaylist savedPlaylist = playlistService.findExistingSavedPlaylist(user, playlist);
         if(savedPlaylist!=null)
             return new ResponseEntity<>("이미 저장된 플레이리스트",HttpStatus.CONFLICT);
-        playlistService.userPlaylistSave(playlist,user);
+        playlistService.saveOthersPlaylist(playlist,user);
         return new ResponseEntity<>("플레이리스트 저장 성공",HttpStatus.CREATED);
     }
 
@@ -82,7 +82,7 @@ public class PlaylistController {
     public ResponseEntity<AllPlaylistResponseWithPageCount> getAllPlaylists(@PageableDefault(size=12, sort="id",direction = Sort.Direction.DESC) Pageable pageable,
                                                                             @RequestParam(required = false) String title,
                                                                             @RequestParam(required = false) String video){
-        return new ResponseEntity<>(playlistService.getAllPlaylists(pageable, title, video),HttpStatus.OK);
+        return new ResponseEntity<>(playlistService.getAllPlaylistsResponse(pageable, title, video),HttpStatus.OK);
     }
 
 }

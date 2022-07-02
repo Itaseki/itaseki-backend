@@ -74,7 +74,7 @@ public class PlaylistService {
         return null;
     }
 
-    private List<Playlist> findAllUserPlaylist(User user){
+    private List<Playlist> findAllPlaylistByUser(User user){
         return playlistRepository.findAllByUser(user)
                 .stream()
                 .filter(Playlist::getStatus)
@@ -82,7 +82,7 @@ public class PlaylistService {
     }
 
     public List<MyPlaylistResponse> getMyPlaylist(User user){
-        return findAllUserPlaylist(user)
+        return findAllPlaylistByUser(user)
                 .stream()
                 .map(MyPlaylistResponse::fromEntity)
                 .collect(Collectors.toList());
@@ -104,13 +104,13 @@ public class PlaylistService {
         return null;
     }
 
-    public void userPlaylistSave(Playlist playlist, User user){
+    public void saveOthersPlaylist(Playlist playlist, User user){
         UserSavedPlaylist userSavedPlaylist = UserSavedPlaylist.builder()
                 .playlist(playlist)
                 .user(user)
                 .status(true)
                 .build();
-        savedPlaylistRepository.save(userSavedPlaylist);
+        savedPlaylistRepository.save(userSavedPlaylist); //saveCount 도 변경
         playlist.updateSaveCount();
     }
 
@@ -150,15 +150,15 @@ public class PlaylistService {
     }
 
 
-    public AllPlaylistResponseWithPageCount getAllPlaylists(Pageable pageable, String title, String video){
+    public AllPlaylistResponseWithPageCount getAllPlaylistsResponse(Pageable pageable, String title, String video){
         Page<AllPlaylistsResponse> pageResponses = playlistRepository.findAllPlaylistsWithPageable(pageable, title, video);
         int totalPages = this.getTotalPageCount(pageResponses.getTotalElements());
         pageResponses.stream()
-                .forEach(pr->pr.updateData(getFirstVideoThumbnail(pr.getId()),findAllVideosInPlaylist(pr.getId()).size()));
+                .forEach(pr->pr.updateData(getFirstThumbnailInPlaylist(pr.getId()),findAllVideosInPlaylist(pr.getId()).size()));
         return new AllPlaylistResponseWithPageCount(totalPages, pageResponses.getContent());
     }
 
-    private String getFirstVideoThumbnail(Long playlistId){
+    private String getFirstThumbnailInPlaylist(Long playlistId){
         Playlist playlist = this.findPlaylistEntity(playlistId);
         return pvRepository.findFirstThumbnailUrl(playlist);
     }
