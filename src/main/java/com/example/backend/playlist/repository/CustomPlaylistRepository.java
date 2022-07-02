@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface CustomPlaylistRepository {
     Page<AllPlaylistsResponse> findAllPlaylistsWithPageable(Pageable pageable, String title, String videoTitle);
+    List<AllPlaylistsResponse> findBestPlaylists();
 }

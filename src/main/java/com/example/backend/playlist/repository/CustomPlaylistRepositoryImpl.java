@@ -44,6 +44,18 @@ public class CustomPlaylistRepositoryImpl implements CustomPlaylistRepository {
         return new PageImpl<>(results.getResults(),pageable, results.getTotal());
     }
 
+    @Override
+    public List<AllPlaylistsResponse> findBestPlaylists() {
+        return jpaQueryFactory.select(Projections.fields(AllPlaylistsResponse.class,
+                playlist.id.as("id"), playlist.title.as("title"),
+                playlist.user.nickname.as("writerNickname"), playlist.likeCount.as("likeCount"), playlist.saveCount.as("saveCount")))
+                .from(playlist)
+                .where(playlist.status.eq(true),playlist.isPublic.eq(true))
+                .orderBy(playlist.likeCount.desc(),playlist.id.desc())
+                .limit(4)
+                .fetch();
+    }
+
     private BooleanExpression containsTitle(String title){
         if(title==null||title.isEmpty())
             return null;

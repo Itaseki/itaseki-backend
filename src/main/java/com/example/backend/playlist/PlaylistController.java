@@ -85,4 +85,9 @@ public class PlaylistController {
         return new ResponseEntity<>(playlistService.getAllPlaylistsResponse(pageable, title, video),HttpStatus.OK);
     }
 
+    @GetMapping("/best")
+    public ResponseEntity<List<AllPlaylistsResponse>> getBestPlaylists(){
+        return new ResponseEntity<>(playlistService.getBestPlaylistsResponse(),HttpStatus.OK);
+    }
+
 }

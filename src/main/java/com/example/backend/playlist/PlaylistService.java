@@ -178,4 +178,10 @@ public class PlaylistService {
                 .collect(Collectors.toList());
     }
 
+    public List<AllPlaylistsResponse> getBestPlaylistsResponse(){
+        List<AllPlaylistsResponse> bestPlaylists = playlistRepository.findBestPlaylists();
+        bestPlaylists.forEach(r->r.updateData(getFirstThumbnailInPlaylist(r.getId()),findAllVideosInPlaylist(r.getId()).size()));
+        return bestPlaylists;
+    }
+
 }
