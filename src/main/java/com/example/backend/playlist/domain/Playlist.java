@@ -68,5 +68,7 @@ public class Playlist {
 
     public void updateSaveCount(){this.saveCount++;}
 
+    public void updateViewCount(){this.viewCount++;}
+
 
 }

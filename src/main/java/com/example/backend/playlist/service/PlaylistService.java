@@ -1,6 +1,7 @@
 package com.example.backend.playlist.service;
 
 import com.example.backend.playlist.domain.Playlist;
+import com.example.backend.playlist.domain.PlaylistComment;
 import com.example.backend.playlist.domain.PlaylistVideo;
 import com.example.backend.playlist.domain.UserSavedPlaylist;
 import com.example.backend.playlist.dto.*;
@@ -9,6 +10,10 @@ import com.example.backend.playlist.repository.PlaylistVideoRepository;
 import com.example.backend.playlist.repository.UserSavedPlaylistRepository;
 import com.example.backend.user.domain.User;
 import com.example.backend.video.domain.Video;
+import com.example.backend.video.domain.VideoComment;
+import com.example.backend.video.dto.DetailVideoResponse;
+import com.example.backend.video.dto.PlaylistVideoResponse;
+import com.example.backend.video.dto.VideoCommentsResponse;
 import com.example.backend.video.repository.VideoRepository;
 import com.example.backend.video.service.VideoService;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +36,7 @@ public class PlaylistService {
     private final PlaylistVideoRepository pvRepository;
     private final VideoRepository videoRepository;
     private final UserSavedPlaylistRepository savedPlaylistRepository;
+    private final PlaylistCommentService commentService;
 
     private Video findVideoEntityById(Long videoId){
         Optional<Video> video = videoRepository.findById(videoId);
@@ -182,6 +188,24 @@ public class PlaylistService {
         List<AllPlaylistsResponse> bestPlaylists = playlistRepository.findBestPlaylists();
         bestPlaylists.forEach(r->r.updateData(getFirstThumbnailInPlaylist(r.getId()),findAllVideosInPlaylist(r.getId()).size()));
         return bestPlaylists;
+    }
+
+    public DetailPlaylistResponse getDetailVideoResponse(Playlist playlist, Long loginId){
+        playlist.updateViewCount();
+        playlistRepository.save(playlist);
+        User playlistWriter = playlist.getUser();
+        Long playlistWriterId=playlistWriter.getUserId();
+        List<PlaylistComment> parentComments = playlist.getComments()
+                .stream()
+                .filter(comment -> comment.getIsParentComment().equals(true)) //부모댓글만 넘김
+                .collect(Collectors.toList());
+        List<PlaylistCommentsResponse> playlistCommentResponses = commentService.getPlaylistCommentResponses(parentComments, loginId, playlistWriterId);
+        List<PlaylistVideoResponse> videos = this.findAllVideosInPlaylist(playlist.getId())
+                .stream()
+                .map(pv-> PlaylistVideoResponse.fromEntity(pv.getVideo()))
+                .collect(Collectors.toList());
+        return DetailPlaylistResponse.fromEntity(playlist,playlistCommentResponses,videos,loginId);
+
     }
 
 }

@@ -43,7 +43,7 @@ public class PlaylistController {
         return new ResponseEntity<>("영상 추가 성공",HttpStatus.CREATED);
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping("/user/{userId}")
     public ResponseEntity<List<MyPlaylistResponse>> getMyPlaylists(@PathVariable Long userId){
         User user = userService.findUserById(userId);
         return new ResponseEntity<>(playlistService.getMyPlaylist(user),HttpStatus.OK);
@@ -89,6 +89,13 @@ public class PlaylistController {
     @GetMapping("/best")
     public ResponseEntity<List<AllPlaylistsResponse>> getBestPlaylists(){
         return new ResponseEntity<>(playlistService.getBestPlaylistsResponse(),HttpStatus.OK);
+    }
+
+    @GetMapping("/{playlistId}")
+    public ResponseEntity<DetailPlaylistResponse> getDetailPlaylist(@PathVariable Long playlistId){
+        Long loginId=2L;
+        Playlist playlist = playlistService.findPlaylistEntity(playlistId);
+        return new ResponseEntity<>(playlistService.getDetailVideoResponse(playlist,loginId),HttpStatus.OK);
     }
 
 }
