@@ -1,4 +1,4 @@
-package com.example.backend.playlist;
+package com.example.backend.playlist.service;
 
 import com.example.backend.playlist.domain.Playlist;
 import com.example.backend.playlist.domain.PlaylistVideo;

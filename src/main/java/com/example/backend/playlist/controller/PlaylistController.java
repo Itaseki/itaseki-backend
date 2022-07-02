@@ -1,5 +1,6 @@
-package com.example.backend.playlist;
+package com.example.backend.playlist.controller;
 
+import com.example.backend.playlist.service.PlaylistService;
 import com.example.backend.playlist.domain.Playlist;
 import com.example.backend.playlist.domain.UserSavedPlaylist;
 import com.example.backend.playlist.dto.*;
