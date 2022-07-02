@@ -37,6 +37,7 @@ public class VideoService {
     public void saveVideo(VideoDto videoDto, User user){
         //플레이리스트에 영상 저장하는 부분 추가
         Series series=getSeries(videoDto.getSeries());
+        List<Long> playlists=videoDto.getPlaylists();
         Video video=Video.builder()
                 .videoUrl(videoDto.getUrl()).description(videoDto.getDescription())
                 .originTitle(videoDto.getTitle()).series(series)
@@ -53,8 +54,15 @@ public class VideoService {
         if(videoDto.getKeywords()!=null){
             saveVideoKeywords(videoDto.getKeywords(),video);
         }
-        videoRepository.save(video);
+        Video savedVideo = videoRepository.save(video);
+        if(playlists!=null&&!playlists.isEmpty()){
+            playlists.stream()
+                    .map(playlistService::findPlaylistEntity)
+                    .forEach(p->playlistService.addVideoToPlaylist(savedVideo.getId(),p));
+
+        }
     }
+
 
     private List<Hashtag> getHashtagsByIds(List<Long> ids){
         if(ids==null){
@@ -140,7 +148,10 @@ public class VideoService {
     }
 
     private List<InnerInfoResponse> findAllPlayListsOfUser(User user){
-        return new ArrayList<>();
+        return playlistService.findAllPlaylistByUser(user)
+                .stream()
+                .map(InnerInfoResponse::new)
+                .collect(Collectors.toList());
     }
 
     public VideoUploadInfoResponse getPreInfoForVideoUpload(User user){

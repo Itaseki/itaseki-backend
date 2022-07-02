@@ -74,7 +74,7 @@ public class PlaylistService {
         return null;
     }
 
-    private List<Playlist> findAllPlaylistByUser(User user){
+    public List<Playlist> findAllPlaylistByUser(User user){
         return playlistRepository.findAllByUser(user)
                 .stream()
                 .filter(Playlist::getStatus)
