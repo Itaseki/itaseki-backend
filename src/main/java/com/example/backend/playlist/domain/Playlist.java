@@ -50,6 +50,9 @@ public class Playlist {
     @OneToMany(mappedBy = "playlist")
     private List<PlaylistVideo> videos;
 
+    @OneToMany(mappedBy = "playlist", targetEntity = PlaylistComment.class)
+    private List<PlaylistComment> comments;
+
     //영상 자체는 playlistVideo 에 따로 저장
     @Builder
     public Playlist(LocalDateTime now, User user, String title, Boolean isPublic){
@@ -64,6 +67,8 @@ public class Playlist {
     }
 
     public void updateSaveCount(){this.saveCount++;}
+
+    public void updateViewCount(){this.viewCount++;}
 
 
 }

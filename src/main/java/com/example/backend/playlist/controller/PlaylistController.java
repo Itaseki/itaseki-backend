@@ -1,5 +1,6 @@
-package com.example.backend.playlist;
+package com.example.backend.playlist.controller;
 
+import com.example.backend.playlist.service.PlaylistService;
 import com.example.backend.playlist.domain.Playlist;
 import com.example.backend.playlist.domain.UserSavedPlaylist;
 import com.example.backend.playlist.dto.*;
@@ -42,7 +43,7 @@ public class PlaylistController {
         return new ResponseEntity<>("영상 추가 성공",HttpStatus.CREATED);
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping("/user/{userId}")
     public ResponseEntity<List<MyPlaylistResponse>> getMyPlaylists(@PathVariable Long userId){
         User user = userService.findUserById(userId);
         return new ResponseEntity<>(playlistService.getMyPlaylist(user),HttpStatus.OK);
@@ -56,7 +57,7 @@ public class PlaylistController {
         UserSavedPlaylist savedPlaylist = playlistService.findExistingSavedPlaylist(user, playlist);
         if(savedPlaylist!=null)
             return new ResponseEntity<>("이미 저장된 플레이리스트",HttpStatus.CONFLICT);
-        playlistService.userPlaylistSave(playlist,user);
+        playlistService.saveOthersPlaylist(playlist,user);
         return new ResponseEntity<>("플레이리스트 저장 성공",HttpStatus.CREATED);
     }
 
@@ -82,7 +83,33 @@ public class PlaylistController {
     public ResponseEntity<AllPlaylistResponseWithPageCount> getAllPlaylists(@PageableDefault(size=12, sort="id",direction = Sort.Direction.DESC) Pageable pageable,
                                                                             @RequestParam(required = false) String title,
                                                                             @RequestParam(required = false) String video){
-        return new ResponseEntity<>(playlistService.getAllPlaylists(pageable, title, video),HttpStatus.OK);
+        return new ResponseEntity<>(playlistService.getAllPlaylistsResponse(pageable, title, video),HttpStatus.OK);
     }
+
+    @GetMapping("/best")
+    public ResponseEntity<List<AllPlaylistsResponse>> getBestPlaylists(){
+        return new ResponseEntity<>(playlistService.getBestPlaylistsResponse(),HttpStatus.OK);
+    }
+
+    @GetMapping("/{playlistId}")
+    public ResponseEntity<DetailPlaylistResponse> getDetailPlaylist(@PathVariable Long playlistId){
+        Long loginId=2L;
+        Playlist playlist = playlistService.findPlaylistEntity(playlistId);
+        return new ResponseEntity<>(playlistService.getDetailVideoResponse(playlist,loginId),HttpStatus.OK);
+    }
+
+    @GetMapping("/subscribe")
+    public ResponseEntity<SubscribePlaylistResponseWithPageCount> getSubscribePlaylists(@RequestParam int page, @RequestParam String sort){
+        User user = userService.findUserById(3L);
+        return new ResponseEntity<>(playlistService.getSubscribingPlaylists(user,page, sort),HttpStatus.OK);
+    }
+
+//    @PostMapping("/subscribe/{userId}")
+//    public ResponseEntity<String> subscribe(@PathVariable Long userId){
+//        User user = userService.findUserById(3L);
+//        User target = userService.findUserById(userId);
+//        userService.saveSubscribe(user,target);
+//        return new ResponseEntity<>("success",HttpStatus.OK);
+//    }
 
 }

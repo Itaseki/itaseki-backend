@@ -1,5 +1,6 @@
 package com.example.backend.video.dto;
 
+import com.example.backend.playlist.domain.Playlist;
 import com.example.backend.video.domain.Hashtag;
 import com.example.backend.video.domain.Series;
 import lombok.Builder;
@@ -20,5 +21,10 @@ public class InnerInfoResponse {
     public InnerInfoResponse(Hashtag hashtag){
         this.id=hashtag.getId();
         this.name=hashtag.getHashtagName();
+    }
+
+    public InnerInfoResponse(Playlist playlist){
+        this.id=playlist.getId();
+        this.name=playlist.getTitle();
     }
 }
