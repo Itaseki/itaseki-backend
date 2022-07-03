@@ -8,14 +8,12 @@ import com.example.backend.playlist.dto.*;
 import com.example.backend.playlist.repository.PlaylistRepository;
 import com.example.backend.playlist.repository.PlaylistVideoRepository;
 import com.example.backend.playlist.repository.UserSavedPlaylistRepository;
+import com.example.backend.user.UserService;
+import com.example.backend.user.domain.Subscribe;
 import com.example.backend.user.domain.User;
 import com.example.backend.video.domain.Video;
-import com.example.backend.video.domain.VideoComment;
-import com.example.backend.video.dto.DetailVideoResponse;
 import com.example.backend.video.dto.PlaylistVideoResponse;
-import com.example.backend.video.dto.VideoCommentsResponse;
 import com.example.backend.video.repository.VideoRepository;
-import com.example.backend.video.service.VideoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -23,9 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,6 +33,7 @@ public class PlaylistService {
     private final VideoRepository videoRepository;
     private final UserSavedPlaylistRepository savedPlaylistRepository;
     private final PlaylistCommentService commentService;
+    private final UserService userService;
 
     private Video findVideoEntityById(Long videoId){
         Optional<Video> video = videoRepository.findById(videoId);
@@ -205,6 +202,68 @@ public class PlaylistService {
                 .map(pv-> PlaylistVideoResponse.fromEntity(pv.getVideo()))
                 .collect(Collectors.toList());
         return DetailPlaylistResponse.fromEntity(playlist,playlistCommentResponses,videos,loginId);
+
+    }
+
+    public List<Playlist> findAllPublicPlaylistsByUserDesc(User user){
+        return this.findAllPlaylistByUser(user)
+                .stream()
+                .filter(Playlist::getIsPublic)
+                .sorted(Comparator.comparing(Playlist::getId).reversed())
+                .collect(Collectors.toList());
+    }
+
+    public SubscribePlaylistResponseWithPageCount getSubscribingPlaylists(User user, int page, String sort){
+        int userCount=4;
+        int pageNumber = page;
+        int offset=userCount*pageNumber;
+
+        List<SubscribePlaylistResponse> responses=new ArrayList<>();
+        List<Subscribe> targets = userService.findAllSubscribingTargets(user);
+        List<User> subscribers=sort.contains("id")?this.getSubscribedPlaylistsByTime(targets):this.getSubscribeUserByLikeCount(targets);
+//        List<User> subscribers = this.getSubscribedPlaylistsByTime(targets);
+        List<List<Playlist>> collect = subscribers.stream()
+                .map(this::findAllPublicPlaylistsByUserDesc)
+                .collect(Collectors.toList());
+
+
+        for(int i=0;i<collect.size();i++){
+            List<Playlist> p=collect.get(i);
+            if(p.isEmpty())
+                continue;
+            User writer = subscribers.get(i);
+            List<AllPlaylistsResponse> res = p.stream().map(AllPlaylistsResponse::new).collect(Collectors.toList());
+            res.forEach(r->r.updateData(getFirstThumbnailInPlaylist(r.getId()),findAllVideosInPlaylist(r.getId()).size()));
+            responses.add(new SubscribePlaylistResponse(writer.getNickname(),res));
+        }
+
+        int pageCount= (int) Math.ceil(responses.size()/(double)4);
+        System.out.println("pageCount = " + pageCount);
+
+        List<SubscribePlaylistResponse> collect1 = responses.stream().skip(offset).limit(userCount).collect(Collectors.toList());
+        return new SubscribePlaylistResponseWithPageCount(pageCount,collect1);
+
+    }
+
+    private List<User> getSubscribeUserByLikeCount(List<Subscribe> targets){
+        return targets.stream()
+                .sorted((p1, p2) -> this.totalLikeCountOnUserPlaylists(p2.getUser()).compareTo(this.totalLikeCountOnUserPlaylists(p1.getUser())))
+                .map(Subscribe::getSubscribeTarget)
+                .collect(Collectors.toList());
+
+    }
+
+    private Integer totalLikeCountOnUserPlaylists(User user){
+        return this.findAllPlaylistByUser(user)
+                .stream()
+                .mapToInt(Playlist::getLikeCount).sum();
+    }
+
+    private List<User> getSubscribedPlaylistsByTime(List<Subscribe> targets){
+        return targets.stream()
+                .sorted(Comparator.comparing(Subscribe::getLastModified).reversed())
+                .map(Subscribe::getSubscribeTarget)
+                .collect(Collectors.toList());
 
     }
 

@@ -98,4 +98,18 @@ public class PlaylistController {
         return new ResponseEntity<>(playlistService.getDetailVideoResponse(playlist,loginId),HttpStatus.OK);
     }
 
+    @GetMapping("/subscribe")
+    public ResponseEntity<SubscribePlaylistResponseWithPageCount> getSubscribePlaylists(@RequestParam int page, @RequestParam String sort){
+        User user = userService.findUserById(3L);
+        return new ResponseEntity<>(playlistService.getSubscribingPlaylists(user,page, sort),HttpStatus.OK);
+    }
+
+//    @PostMapping("/subscribe/{userId}")
+//    public ResponseEntity<String> subscribe(@PathVariable Long userId){
+//        User user = userService.findUserById(3L);
+//        User target = userService.findUserById(userId);
+//        userService.saveSubscribe(user,target);
+//        return new ResponseEntity<>("success",HttpStatus.OK);
+//    }
+
 }
