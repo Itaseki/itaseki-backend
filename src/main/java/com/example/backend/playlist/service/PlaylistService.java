@@ -156,6 +156,8 @@ public class PlaylistService {
     public AllPlaylistResponseWithPageCount getAllPlaylistsResponse(Pageable pageable, String title, String video){
         Page<AllPlaylistsResponse> pageResponses = playlistRepository.findAllPlaylistsWithPageable(pageable, title, video);
         int totalPages = this.getTotalPageCount(pageResponses.getTotalElements());
+        if(totalPages<=1)
+            totalPages=1;
         pageResponses.stream()
                 .forEach(pr->pr.updateData(getFirstThumbnailInPlaylist(pr.getId()),findAllVideosInPlaylist(pr.getId()).size()));
         return new AllPlaylistResponseWithPageCount(totalPages, pageResponses.getContent());
@@ -167,8 +169,6 @@ public class PlaylistService {
     }
 
     private int getTotalPageCount(long totalPlaylistsCount){
-        if(totalPlaylistsCount<=8)
-            return 1;
         return (int) (1+Math.ceil((totalPlaylistsCount-8)/(double)12));
     }
 
