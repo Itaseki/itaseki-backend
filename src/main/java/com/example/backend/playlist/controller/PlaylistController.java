@@ -1,9 +1,13 @@
 package com.example.backend.playlist.controller;
 
+import com.example.backend.like.Like;
+import com.example.backend.like.LikeService;
 import com.example.backend.playlist.service.PlaylistService;
 import com.example.backend.playlist.domain.Playlist;
 import com.example.backend.playlist.domain.UserSavedPlaylist;
 import com.example.backend.playlist.dto.*;
+import com.example.backend.report.Report;
+import com.example.backend.report.ReportService;
 import com.example.backend.user.UserService;
 import com.example.backend.user.domain.User;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +26,8 @@ import java.util.List;
 public class PlaylistController {
     private final PlaylistService playlistService;
     private final UserService userService;
+    private final LikeService likeService;
+    private final ReportService reportService;
 
     @PostMapping("")
     public ResponseEntity<MyPlaylistResponse> createNewPlaylist(@RequestBody NewEmptyPlaylistDto playlistDto){
@@ -93,7 +99,7 @@ public class PlaylistController {
 
     @GetMapping("/{playlistId}")
     public ResponseEntity<DetailPlaylistResponse> getDetailPlaylist(@PathVariable Long playlistId){
-        Long loginId=2L;
+        Long loginId=1L;
         Playlist playlist = playlistService.findPlaylistEntity(playlistId);
         return new ResponseEntity<>(playlistService.getDetailVideoResponse(playlist,loginId),HttpStatus.OK);
     }
@@ -103,6 +109,57 @@ public class PlaylistController {
         User user = userService.findUserById(3L);
         return new ResponseEntity<>(playlistService.getSubscribingPlaylists(user,page, sort),HttpStatus.OK);
     }
+
+    @PostMapping("/{playlistId}/likes")
+    public ResponseEntity<Integer> likeOnVideo(@PathVariable Long playlistId) {
+        Long loginId = 1L;
+        Playlist playlist = playlistService.findPlaylistEntity(playlistId);
+        User user = userService.findUserById(loginId);
+        Like like = likeService.findExistingLike(playlist, user);
+        Integer likeCount;
+        if(like==null){
+            like=Like.builder()
+                    .playlist(playlist).user(user).build();
+            likeCount = playlist.updateLikeCount(1);
+        }else{
+            Boolean likeStatus = like.modifyLikeStatus();
+            likeCount = playlist.updateLikeCount(likeStatus?1:-1);
+        }
+        likeService.saveLike(like);
+        return new ResponseEntity<>(likeCount,HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{playlistId}")
+    public ResponseEntity<String> deleteVideo(@PathVariable Long playlistId){
+        //권한 확인
+        Long loginId=1L;
+        User user = userService.findUserById(loginId);
+        Playlist playlist = playlistService.findPlaylistEntity(playlistId);
+        if(!playlistService.checkUserPlaylistAuthority(user, playlist))
+            return new ResponseEntity<>("권한 없음",HttpStatus.FORBIDDEN);
+        playlistService.deletePlaylist(playlist);
+        return new ResponseEntity<>("플레이리스트 삭제 성공",HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping("/{playlistId}/reports")
+    public ResponseEntity<String> reportVideo(@PathVariable Long playlistId){
+        Long loginId=1L;
+        Playlist playlist = playlistService.findPlaylistEntity(playlistId);
+        User user = userService.findUserById(loginId);
+        Boolean existence = reportService.checkReportExistence(user, playlist);
+        if(existence)
+            return new ResponseEntity<>("해당 사용자가 이미 신고한 플레이리스트",HttpStatus.OK);
+        Report report = Report.builder()
+                .user(user).playlist(playlist).build();
+        reportService.saveReport(report);
+        if(playlist.getReports().size()>=5){
+            playlistService.deletePlaylist(playlist);
+            return new ResponseEntity<>("신고 5번 누적으로 삭제",HttpStatus.OK);
+        }
+        return new ResponseEntity<>("플레이리스트 신고 성공",HttpStatus.OK);
+    }
+
+
 
 //    @PostMapping("/subscribe/{userId}")
 //    public ResponseEntity<String> subscribe(@PathVariable Long userId){

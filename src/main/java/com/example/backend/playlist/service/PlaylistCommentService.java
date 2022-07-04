@@ -60,4 +60,19 @@ public class PlaylistCommentService {
         }
         return response;
     }
+
+    public PlaylistComment findPlaylistCommentById(Long id){
+        Optional<PlaylistComment> comment = commentRepository.findById(id);
+        if(comment.isPresent()&&comment.get().getStatus()){
+            return comment.get();
+        }
+        return null;
+    }
+
+    public void deletePlaylistComment(PlaylistComment comment){
+        comment.setStatus(false);
+        commentRepository.save(comment);
+    }
+
+
 }

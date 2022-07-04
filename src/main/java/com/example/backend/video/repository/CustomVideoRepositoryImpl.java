@@ -5,6 +5,7 @@ import com.example.backend.customHashtag.QCustomHashtag;
 import com.example.backend.video.domain.QVideoHashtag;
 import com.example.backend.video.domain.Video;
 import com.example.backend.video.domain.VideoHashtag;
+import com.example.backend.video.dto.TempVideoDto;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -49,21 +50,26 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository{
     }
 
     @Override
-    public Page<Video> findAll(Pageable pageable, List<String> tags, String nickname, List<String> queries) {
+    public TempVideoDto findAll(Pageable pageable, List<String> tags, String nickname, List<String> queries) {
         long pageOffset= pageable.getOffset()-4;
         int pageSize = pageable.getPageSize();
         if(pageable.getPageNumber()==0){
             pageOffset=0;
             pageSize=4;
         }
-        QueryResults<Video> results = jpaQueryFactory.selectFrom(video)
+        List<Video> videos = jpaQueryFactory.selectFrom(video)
                 .where(video.status.eq(true), predicate(tags, nickname, queries))
                 .orderBy(order(pageable.getSort()).toArray(OrderSpecifier[]::new))
                 .offset(pageOffset)
                 .limit(pageSize)
-                .fetchResults();
+                .fetch();
 
-        return new PageImpl<>(results.getResults(),pageable,results.getTotal());
+        Long totalCount = jpaQueryFactory.select(video.count())
+                .from(video)
+                .where(video.status.eq(true), predicate(tags, nickname, queries))
+                .fetchOne();
+
+        return new TempVideoDto(totalCount,videos);
     }
 
     private BooleanExpression predicate(List<String> tags, String nickname, List<String> queries){

@@ -1,6 +1,7 @@
 package com.example.backend.playlist.repository;
 
 import com.example.backend.playlist.dto.AllPlaylistsResponse;
+import com.example.backend.playlist.dto.TempPlaylistDto;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.example.backend.playlist.domain.QPlaylist.playlist;
 import static com.example.backend.playlist.domain.QPlaylistVideo.playlistVideo;
@@ -24,24 +26,26 @@ public class CustomPlaylistRepositoryImpl implements CustomPlaylistRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Page<AllPlaylistsResponse> findAllPlaylistsWithPageable(Pageable pageable, String title, String videoTitle) {
+    public TempPlaylistDto findAllPlaylistsWithPageable(Pageable pageable, String title, String videoTitle) {
         long pageOffset= pageable.getOffset()-4; //첫 페이지: 8개, 다음 페이지: 12개
         int pageSize = pageable.getPageSize();
         if(pageable.getPageNumber()==0){
             pageOffset=0;
             pageSize=8; //첫 페이지만 8개 조회
         }
-        QueryResults<AllPlaylistsResponse> results = jpaQueryFactory.select(Projections.fields(AllPlaylistsResponse.class,
+        List<AllPlaylistsResponse> responses = jpaQueryFactory.select(Projections.fields(AllPlaylistsResponse.class,
                         playlist.id.as("id"), playlist.title.as("title"),
                         playlist.user.nickname.as("writerNickname"), playlist.likeCount.as("likeCount"), playlist.saveCount.as("saveCount")))
                 .from(playlist)
                 .where(containsTitle(title), containsVideo(videoTitle), playlist.status.eq(true), playlist.isPublic.eq(true))
                 .orderBy(order(pageable.getSort()).toArray(OrderSpecifier[]::new))
-                .offset(pageOffset)
-                .limit(pageSize)
-                .fetchResults();
+                .fetch();
 
-        return new PageImpl<>(results.getResults(),pageable, results.getTotal());
+        long totalCount=responses.size();
+        List<AllPlaylistsResponse> finalResponses = responses.stream().skip(pageOffset).limit(pageSize).collect(Collectors.toList());
+
+
+        return new TempPlaylistDto(totalCount,finalResponses);
     }
 
     @Override
