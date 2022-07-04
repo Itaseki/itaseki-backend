@@ -99,7 +99,7 @@ public class PlaylistController {
 
     @GetMapping("/{playlistId}")
     public ResponseEntity<DetailPlaylistResponse> getDetailPlaylist(@PathVariable Long playlistId){
-        Long loginId=2L;
+        Long loginId=1L;
         Playlist playlist = playlistService.findPlaylistEntity(playlistId);
         return new ResponseEntity<>(playlistService.getDetailVideoResponse(playlist,loginId),HttpStatus.OK);
     }
@@ -148,7 +148,7 @@ public class PlaylistController {
         User user = userService.findUserById(loginId);
         Boolean existence = reportService.checkReportExistence(user, playlist);
         if(existence)
-            return new ResponseEntity<>("해당 사용자가 이미 신고한 영상",HttpStatus.OK);
+            return new ResponseEntity<>("해당 사용자가 이미 신고한 플레이리스트",HttpStatus.OK);
         Report report = Report.builder()
                 .user(user).playlist(playlist).build();
         reportService.saveReport(report);
@@ -156,7 +156,7 @@ public class PlaylistController {
             playlistService.deletePlaylist(playlist);
             return new ResponseEntity<>("신고 5번 누적으로 삭제",HttpStatus.OK);
         }
-        return new ResponseEntity<>("영상 신고 성공",HttpStatus.OK);
+        return new ResponseEntity<>("플레이리스트 신고 성공",HttpStatus.OK);
     }
 
 

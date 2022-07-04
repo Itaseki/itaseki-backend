@@ -154,13 +154,16 @@ public class PlaylistService {
 
 
     public AllPlaylistResponseWithPageCount getAllPlaylistsResponse(Pageable pageable, String title, String video){
-        Page<AllPlaylistsResponse> pageResponses = playlistRepository.findAllPlaylistsWithPageable(pageable, title, video);
-        int totalPages = this.getTotalPageCount(pageResponses.getTotalElements());
+        TempPlaylistDto fetchResult = playlistRepository.findAllPlaylistsWithPageable(pageable, title, video);
+        int totalPages = getTotalPageCount(fetchResult.getTotalCount());
+        List<AllPlaylistsResponse> responses = fetchResult.getPlaylists();
+
         if(totalPages<=1)
             totalPages=1;
-        pageResponses.stream()
+
+        responses.stream()
                 .forEach(pr->pr.updateData(getFirstThumbnailInPlaylist(pr.getId()),findAllVideosInPlaylist(pr.getId()).size()));
-        return new AllPlaylistResponseWithPageCount(totalPages, pageResponses.getContent());
+        return new AllPlaylistResponseWithPageCount(totalPages, responses);
     }
 
     private String getFirstThumbnailInPlaylist(Long playlistId){
@@ -169,6 +172,7 @@ public class PlaylistService {
     }
 
     private int getTotalPageCount(long totalPlaylistsCount){
+        System.out.println("totalPlaylistsCount = " + totalPlaylistsCount);
         return (int) (1+Math.ceil((totalPlaylistsCount-8)/(double)12));
     }
 
@@ -213,9 +217,8 @@ public class PlaylistService {
                 .collect(Collectors.toList());
     }
 
-    public SubscribePlaylistResponseWithPageCount getSubscribingPlaylists(User user, int page, String sort){
+    public SubscribePlaylistResponseWithPageCount getSubscribingPlaylists(User user, int pageNumber, String sort){
         int userCount=4;
-        int pageNumber = page;
         int offset=userCount*pageNumber;
 
         List<SubscribePlaylistResponse> responses=new ArrayList<>();
@@ -228,7 +231,7 @@ public class PlaylistService {
 
 
         for(int i=0;i<collect.size();i++){
-            List<Playlist> p=collect.get(i);
+            List<Playlist> p=collect.get(i); //p=각 구독대상 별 플리
             if(p.isEmpty())
                 continue;
             User writer = subscribers.get(i);
