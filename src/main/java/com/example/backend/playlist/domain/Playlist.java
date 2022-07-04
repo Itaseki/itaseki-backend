@@ -1,5 +1,6 @@
 package com.example.backend.playlist.domain;
 
+import com.example.backend.report.Report;
 import com.example.backend.user.domain.User;
 import lombok.Builder;
 import lombok.Data;
@@ -52,6 +53,9 @@ public class Playlist {
 
     @OneToMany(mappedBy = "playlist", targetEntity = PlaylistComment.class)
     private List<PlaylistComment> comments;
+
+    @OneToMany(mappedBy = "playlist", targetEntity = Report.class)
+    private List<Report> reports;
 
     //영상 자체는 playlistVideo 에 따로 저장
     @Builder

@@ -6,6 +6,8 @@ import com.example.backend.playlist.service.PlaylistService;
 import com.example.backend.playlist.domain.Playlist;
 import com.example.backend.playlist.domain.UserSavedPlaylist;
 import com.example.backend.playlist.dto.*;
+import com.example.backend.report.Report;
+import com.example.backend.report.ReportService;
 import com.example.backend.user.UserService;
 import com.example.backend.user.domain.User;
 import com.example.backend.video.domain.Video;
@@ -26,6 +28,7 @@ public class PlaylistController {
     private final PlaylistService playlistService;
     private final UserService userService;
     private final LikeService likeService;
+    private final ReportService reportService;
 
     @PostMapping("")
     public ResponseEntity<MyPlaylistResponse> createNewPlaylist(@RequestBody NewEmptyPlaylistDto playlistDto){
@@ -137,6 +140,24 @@ public class PlaylistController {
             return new ResponseEntity<>("권한 없음",HttpStatus.FORBIDDEN);
         playlistService.deletePlaylist(playlist);
         return new ResponseEntity<>("플레이리스트 삭제 성공",HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping("/{playlistId}/reports")
+    public ResponseEntity<String> reportVideo(@PathVariable Long playlistId){
+        Long loginId=1L;
+        Playlist playlist = playlistService.findPlaylistEntity(playlistId);
+        User user = userService.findUserById(loginId);
+        Boolean existence = reportService.checkReportExistence(user, playlist);
+        if(existence)
+            return new ResponseEntity<>("해당 사용자가 이미 신고한 영상",HttpStatus.OK);
+        Report report = Report.builder()
+                .user(user).playlist(playlist).build();
+        reportService.saveReport(report);
+        if(playlist.getReports().size()>=5){
+            playlistService.deletePlaylist(playlist);
+            return new ResponseEntity<>("신고 5번 누적으로 삭제",HttpStatus.OK);
+        }
+        return new ResponseEntity<>("영상 신고 성공",HttpStatus.OK);
     }
 
 
