@@ -175,6 +175,11 @@ public class VideoService {
                 .collect(Collectors.toList());
     }
 
+    public List<String> getHashtagsStringByVideoId(Long videoId){
+        Video video = this.findVideoEntityById(videoId);
+        return this.getHashtagKeywordStringInVideo(video);
+    }
+
     public DetailVideoResponse getDetailVideoResponse(Video video, Long loginId){
         User videoWriter = video.getUser();
         Long videoWriterId=videoWriter.getUserId();
