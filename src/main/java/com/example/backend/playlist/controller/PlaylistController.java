@@ -10,7 +10,6 @@ import com.example.backend.report.Report;
 import com.example.backend.report.ReportService;
 import com.example.backend.user.UserService;
 import com.example.backend.user.domain.User;
-import com.example.backend.video.domain.Video;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -159,6 +158,7 @@ public class PlaylistController {
         }
         return new ResponseEntity<>("영상 신고 성공",HttpStatus.OK);
     }
+
 
 
 //    @PostMapping("/subscribe/{userId}")

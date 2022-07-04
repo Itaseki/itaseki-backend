@@ -1,5 +1,6 @@
 package com.example.backend.playlist.domain;
 
+import com.example.backend.report.Report;
 import com.example.backend.user.domain.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -50,6 +51,9 @@ public class PlaylistComment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(mappedBy = "playlistComment", targetEntity = Report.class)
+    private List<Report> reports;
 
     @Builder
     public PlaylistComment(String content, Long parentId,Playlist playlist, User user){

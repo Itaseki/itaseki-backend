@@ -4,6 +4,7 @@ import com.example.backend.community.domain.CommunityBoard;
 import com.example.backend.community.domain.CommunityComment;
 import com.example.backend.image.domain.ImageBoard;
 import com.example.backend.playlist.domain.Playlist;
+import com.example.backend.playlist.domain.PlaylistComment;
 import com.example.backend.user.domain.User;
 import com.example.backend.video.domain.Video;
 import com.example.backend.video.domain.VideoComment;
@@ -20,4 +21,5 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     Report findByUserAndVideo(User user, Video video);
     Report findByUserAndVideoComment(User user, VideoComment comment);
     Report findByUserAndPlaylist(User user, Playlist playlist);
+    Report findByUserAndPlaylistComment(User user, PlaylistComment comment);
 }

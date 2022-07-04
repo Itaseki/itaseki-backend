@@ -4,6 +4,7 @@ import com.example.backend.community.domain.CommunityBoard;
 import com.example.backend.community.domain.CommunityComment;
 import com.example.backend.image.domain.ImageBoard;
 import com.example.backend.playlist.domain.Playlist;
+import com.example.backend.playlist.domain.PlaylistComment;
 import com.example.backend.user.domain.User;
 import com.example.backend.video.domain.Video;
 import com.example.backend.video.domain.VideoComment;
@@ -52,9 +53,14 @@ public class Report {
     @JoinColumn(name = "playlist_id")
     private Playlist playlist;
 
+    @ManyToOne
+    @JoinColumn(name = "playlist_comment_id")
+    private PlaylistComment playlistComment;
+
     //신고사유는 어떻게 하기로 했더라
     @Builder
-    public Report (CommunityBoard communityBoard,User user,CommunityComment communityComment,Video video, VideoComment videoComment, ImageBoard imageBoard, Playlist playlist){
+    public Report (CommunityBoard communityBoard,User user,CommunityComment communityComment,Video video, VideoComment videoComment, ImageBoard imageBoard, Playlist playlist
+    ,PlaylistComment playlistComment){
         this.imageBoard = imageBoard;
         this.communityBoard=communityBoard;
         this.user=user;
@@ -62,5 +68,6 @@ public class Report {
         this.video=video;
         this.videoComment=videoComment;
         this.playlist=playlist;
+        this.playlistComment=playlistComment;
     }
 }
