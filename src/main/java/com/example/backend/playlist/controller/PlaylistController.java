@@ -127,6 +127,18 @@ public class PlaylistController {
         return new ResponseEntity<>(likeCount,HttpStatus.OK);
     }
 
+    @DeleteMapping("/{playlistId}")
+    public ResponseEntity<String> deleteVideo(@PathVariable Long playlistId){
+        //권한 확인
+        Long loginId=1L;
+        User user = userService.findUserById(loginId);
+        Playlist playlist = playlistService.findPlaylistEntity(playlistId);
+        if(!playlistService.checkUserPlaylistAuthority(user, playlist))
+            return new ResponseEntity<>("권한 없음",HttpStatus.FORBIDDEN);
+        playlistService.deletePlaylist(playlist);
+        return new ResponseEntity<>("플레이리스트 삭제 성공",HttpStatus.NO_CONTENT);
+    }
+
 
 //    @PostMapping("/subscribe/{userId}")
 //    public ResponseEntity<String> subscribe(@PathVariable Long userId){

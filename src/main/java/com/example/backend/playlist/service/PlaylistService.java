@@ -267,4 +267,9 @@ public class PlaylistService {
 
     }
 
+    public void deletePlaylist(Playlist playlist){
+        playlist.setStatus(false);
+        playlistRepository.save(playlist);
+    }
+
 }
