@@ -13,11 +13,13 @@ public class AllVideoResponse {
     private String title;
     private String writerNickname;
     private Integer likeCount;
+    private String thumbnailUrl;
 
     public static AllVideoResponse fromEntity(Video video){
         return AllVideoResponse.builder()
                 .id(video.getId()).title(video.getDescription())
                 .writerNickname(video.getUser().getNickname()).likeCount(video.getLikeCount())
+                .thumbnailUrl(video.getThumbnailUrl())
                 .build();
 
     }
