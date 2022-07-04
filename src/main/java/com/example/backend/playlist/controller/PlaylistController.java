@@ -1,11 +1,14 @@
 package com.example.backend.playlist.controller;
 
+import com.example.backend.like.Like;
+import com.example.backend.like.LikeService;
 import com.example.backend.playlist.service.PlaylistService;
 import com.example.backend.playlist.domain.Playlist;
 import com.example.backend.playlist.domain.UserSavedPlaylist;
 import com.example.backend.playlist.dto.*;
 import com.example.backend.user.UserService;
 import com.example.backend.user.domain.User;
+import com.example.backend.video.domain.Video;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -22,6 +25,7 @@ import java.util.List;
 public class PlaylistController {
     private final PlaylistService playlistService;
     private final UserService userService;
+    private final LikeService likeService;
 
     @PostMapping("")
     public ResponseEntity<MyPlaylistResponse> createNewPlaylist(@RequestBody NewEmptyPlaylistDto playlistDto){
@@ -103,6 +107,26 @@ public class PlaylistController {
         User user = userService.findUserById(3L);
         return new ResponseEntity<>(playlistService.getSubscribingPlaylists(user,page, sort),HttpStatus.OK);
     }
+
+    @PostMapping("/{playlistId}/likes")
+    public ResponseEntity<Integer> likeOnVideo(@PathVariable Long playlistId) {
+        Long loginId = 1L;
+        Playlist playlist = playlistService.findPlaylistEntity(playlistId);
+        User user = userService.findUserById(loginId);
+        Like like = likeService.findExistingLike(playlist, user);
+        Integer likeCount;
+        if(like==null){
+            like=Like.builder()
+                    .playlist(playlist).user(user).build();
+            likeCount = playlist.updateLikeCount(1);
+        }else{
+            Boolean likeStatus = like.modifyLikeStatus();
+            likeCount = playlist.updateLikeCount(likeStatus?1:-1);
+        }
+        likeService.saveLike(like);
+        return new ResponseEntity<>(likeCount,HttpStatus.OK);
+    }
+
 
 //    @PostMapping("/subscribe/{userId}")
 //    public ResponseEntity<String> subscribe(@PathVariable Long userId){
