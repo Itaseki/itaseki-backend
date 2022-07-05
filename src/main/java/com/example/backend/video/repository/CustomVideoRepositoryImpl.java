@@ -20,8 +20,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import static com.example.backend.community.domain.QCommunityBoard.communityBoard;
+import static com.example.backend.image.domain.QImageBoard.imageBoard;
 import static com.example.backend.video.domain.QVideo.video;
 
 @RequiredArgsConstructor
@@ -46,6 +49,22 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository{
                 .where(video.status.eq(true), video.description.containsIgnoreCase(searchTitle))
                 .orderBy(orderSpecifier) //좋아요순 정렬
                 .fetch();
+
+    }
+
+    @Override
+    public List<Video> findAllForSearch(List<String> tags, String nickname, List<String> queries, String sort) {
+        List<OrderSpecifier> orders=new ArrayList<>();
+        if(sort.contains("like")){
+            orders.add(new OrderSpecifier(Order.DESC, video.likeCount));
+        }
+        orders.add(new OrderSpecifier(Order.DESC, video.id));
+
+        return jpaQueryFactory.selectFrom(video)
+                    .where(video.status.eq(true), predicate(tags, nickname, queries))
+                    .orderBy(orders.toArray(OrderSpecifier[]::new))
+                    .limit(8)
+                    .fetch();
 
     }
 
@@ -76,6 +95,7 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository{
         //해시태그에 있거나 키워드 (커스텀 해시태그) 에 있거나
         BooleanExpression tagExpression=null;
         BooleanExpression nicknameExpression=null;
+        BooleanExpression queryExpressions=null;
         if(tags!=null){
             tagExpression = Expressions.anyOf(tags.stream()
                     .map(this::checkTag)
@@ -85,7 +105,18 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository{
             nicknameExpression = checkNickname(nickname);
         }
 
-        return Expressions.allOf(tagExpression,nicknameExpression);
+        if(queries!=null){
+            queryExpressions=checkQuery(queries);
+        }
+
+        return Expressions.allOf(tagExpression,nicknameExpression,queryExpressions);
+    }
+
+    private BooleanExpression checkQuery(List<String> queryList){
+        if(queryList==null)
+            return null;
+        return Expressions.anyOf(queryList.stream().map(video.description::contains).toArray(BooleanExpression[]::new));
+
     }
 
     //join 쿼리로 바꿀 수 있나?

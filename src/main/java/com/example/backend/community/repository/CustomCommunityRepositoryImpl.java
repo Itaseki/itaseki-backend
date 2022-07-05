@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.example.backend.community.domain.QCommunityBoard.communityBoard;
+import static com.example.backend.image.domain.QImageBoard.imageBoard;
 
 @Repository
 @RequiredArgsConstructor
@@ -46,6 +47,24 @@ public class CustomCommunityRepositoryImpl implements CustomCommunityRepository{
                 .fetchResults();
         return new PageImpl<>(queryResults.getResults(), pageable, queryResults.getTotal());
 
+    }
+
+    @Override
+    public List<CommunityBoard> findAllForSearch(String sort, String[] queryList) {
+        List<OrderSpecifier> orders=new ArrayList<>();
+        if(sort.contains("like")){
+            orders.add(new OrderSpecifier(Order.DESC, communityBoard.likeCount));
+        }else if(sort.contains("view")){
+            orders.add(new OrderSpecifier(Order.DESC, communityBoard.viewCount));
+        }
+        orders.add(new OrderSpecifier(Order.DESC, communityBoard.id));
+
+
+        return jpaQueryFactory.selectFrom(communityBoard)
+                .where(communityBoard.status.eq(true), getPredicate(queryList))
+                .orderBy(orders.toArray(OrderSpecifier[]::new))
+                .limit(10)
+                .fetch();
     }
 
 
