@@ -116,4 +116,12 @@ public class CommunityBoardService {
         board.setStatus(false);
         communityBoardRepository.save(board);
     }
+
+    public List<AllCommunityBoardsResponse> getSearchedCommunityBoards(String query, String sort){
+        String[] queryList=null;
+        if(query!=null){
+            queryList= query.split(" ");
+        }
+        return toAllCommunityBoardResponse(communityBoardRepository.findAllForSearch(sort,queryList));
+    }
 }

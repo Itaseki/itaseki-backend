@@ -9,4 +9,5 @@ import java.util.List;
 public interface CustomCommunityRepository {
     List<CommunityBoard> findBestBoards();
     Page<CommunityBoard> findAll(Pageable pageable, String[] queryList);
+    List<CommunityBoard> findAllForSearch(String sort, String[] queryList);
 }

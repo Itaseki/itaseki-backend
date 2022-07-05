@@ -15,6 +15,7 @@ public class MainVideoResponse {
     private String writerNickname;
     private Integer likeCount;
     private List<String> tags;
+    private String thumbnailUrl;
 
     public static MainVideoResponse fromAllResponse(AllVideoResponse v){
         return MainVideoResponse.builder()
@@ -22,6 +23,7 @@ public class MainVideoResponse {
                 .title(v.getTitle())
                 .writerNickname(v.getWriterNickname())
                 .likeCount(v.getLikeCount())
+                .thumbnailUrl(v.getThumbnailUrl())
                 .build();
     }
 

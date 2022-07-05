@@ -153,17 +153,30 @@ public class PlaylistService {
     }
 
 
-    public AllPlaylistResponseWithPageCount getAllPlaylistsResponse(Pageable pageable, String title, String video){
-        TempPlaylistDto fetchResult = playlistRepository.findAllPlaylistsWithPageable(pageable, title, video);
+    public AllPlaylistResponseWithPageCount getAllPlaylistsResponse(Pageable pageable, String q){
+        List<String> queries=null;
+        if(q!=null){
+            queries=Arrays.stream(q.split(" ")).collect(Collectors.toList());
+        }
+        TempPlaylistDto fetchResult = playlistRepository.findAllPlaylistsWithPageable(pageable, queries);
         int totalPages = getTotalPageCount(fetchResult.getTotalCount());
         List<AllPlaylistsResponse> responses = fetchResult.getPlaylists();
 
         if(totalPages<=1)
             totalPages=1;
 
-        responses.stream()
-                .forEach(pr->pr.updateData(getFirstThumbnailInPlaylist(pr.getId()),findAllVideosInPlaylist(pr.getId()).size()));
+        responses.forEach(pr->pr.updateData(getFirstThumbnailInPlaylist(pr.getId()),findAllVideosInPlaylist(pr.getId()).size()));
         return new AllPlaylistResponseWithPageCount(totalPages, responses);
+    }
+
+    public List<AllPlaylistsResponse> getAllPlaylistForSearch(String q, String sort, String nickname){
+        List<String> queries=null;
+        if(q!=null){
+            queries=Arrays.stream(q.split(" ")).collect(Collectors.toList());
+        }
+        List<AllPlaylistsResponse> search = playlistRepository.findAllForSearch(sort, nickname, queries);
+        search.forEach(pr->pr.updateData(getFirstThumbnailInPlaylist(pr.getId()),findAllVideosInPlaylist(pr.getId()).size()));
+        return search;
     }
 
     private String getFirstThumbnailInPlaylist(Long playlistId){
@@ -172,7 +185,6 @@ public class PlaylistService {
     }
 
     private int getTotalPageCount(long totalPlaylistsCount){
-        System.out.println("totalPlaylistsCount = " + totalPlaylistsCount);
         return (int) (1+Math.ceil((totalPlaylistsCount-8)/(double)12));
     }
 

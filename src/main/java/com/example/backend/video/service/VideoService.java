@@ -177,7 +177,8 @@ public class VideoService {
 
     public List<String> getHashtagsStringByVideoId(Long videoId){
         Video video = this.findVideoEntityById(videoId);
-        return this.getHashtagKeywordStringInVideo(video);
+        List<VideoHashtag> videoHashtags = video.getVideoHashtags();
+        return videoHashtags.stream().map(v->v.getHashtag().getHashtagName()).collect(Collectors.toList());
     }
 
     public DetailVideoResponse getDetailVideoResponse(Video video, Long loginId){
@@ -201,9 +202,25 @@ public class VideoService {
         if(tag!=null){
             tags = Arrays.stream(tag.split(",")).collect(Collectors.toList());
         }
-        TempVideoDto tempDto = videoRepository.findAll(pageable, tags, nickname, null);
+        List<String> queries=null;
+        if(q!=null){
+            queries=Arrays.stream(q.split(" ")).collect(Collectors.toList());
+        }
+        TempVideoDto tempDto = videoRepository.findAll(pageable, tags, nickname, queries);
         List<AllVideoResponse> allVideoResponses = toAllResponse(tempDto.getVideos());
         return new AllVideoResponseWithPageCount(allVideoResponses,getTotalPageCount(tempDto.getTotalCount()));
+    }
+
+    public List<AllVideoResponse> getAllVideoForSearch(String q, String tag, String nickname, String sort){
+        List<String> tags=null;
+        if(tag!=null){
+            tags = Arrays.stream(tag.split(",")).collect(Collectors.toList());
+        }
+        List<String> queries=null;
+        if(q!=null){
+            queries=Arrays.stream(q.split(" ")).collect(Collectors.toList());
+        }
+        return toAllResponse(videoRepository.findAllForSearch(tags,nickname,queries,sort));
     }
 
     private int getTotalPageCount(long pages){
