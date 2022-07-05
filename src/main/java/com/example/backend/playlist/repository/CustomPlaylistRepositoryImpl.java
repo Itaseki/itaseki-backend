@@ -31,7 +31,7 @@ public class CustomPlaylistRepositoryImpl implements CustomPlaylistRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public TempPlaylistDto findAllPlaylistsWithPageable(Pageable pageable, List<String> queries) {
+    public TempPlaylistDto findAllPlaylistsWithPageable(Pageable pageable, List<String> queries, String nickname) {
         long pageOffset= pageable.getOffset()-4; //첫 페이지: 8개, 다음 페이지: 12개
         int pageSize = pageable.getPageSize();
         if(pageable.getPageNumber()==0){
@@ -42,7 +42,7 @@ public class CustomPlaylistRepositoryImpl implements CustomPlaylistRepository {
                         playlist.id.as("id"), playlist.title.as("title"),
                         playlist.user.nickname.as("writerNickname"), playlist.likeCount.as("likeCount"), playlist.saveCount.as("saveCount")))
                 .from(playlist)
-                .where(predicate(queries,null), playlist.status.eq(true), playlist.isPublic.eq(true))
+                .where(predicate(queries,nickname), playlist.status.eq(true), playlist.isPublic.eq(true))
                 .orderBy(order(pageable.getSort()).toArray(OrderSpecifier[]::new))
                 .fetch();
 
