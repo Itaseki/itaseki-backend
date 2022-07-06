@@ -19,7 +19,14 @@ public class PlaylistVideoResponse {
                 .title(video.getOriginVideoTitle())
                 .videoUploader(video.getVideoUploader())
                 .thumbnailUrl(video.getThumbnailUrl())
-                .runtime(video.getRuntimeHour()+":"+video.getRuntimeMin()+":"+video.getRuntimeSec())
+                .runtime(getVideoRuntimeString(video))
                 .build();
+    }
+
+    private static String getVideoRuntimeString(Video video){
+        String h = video.getRuntimeHour()<10?"0"+video.getRuntimeHour():video.getRuntimeHour().toString();
+        String m = video.getRuntimeMin()<10?"0"+video.getRuntimeMin():video.getRuntimeMin().toString();
+        String s = video.getRuntimeSec()<10?"0"+video.getRuntimeSec():video.getRuntimeSec().toString();
+        return h+":"+m+":"+s;
     }
 }

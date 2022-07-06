@@ -26,9 +26,16 @@ public class TimetableResponse {
                 .reservationDate(reservation.getReservationDate().toString())
                 .startTime(reservation.getStartTime())
                 .endTime(reservation.getEndTime())
-                .runTime(video.getRuntimeHour()+":"+video.getRuntimeMin()+":"+video.getRuntimeSec())
+                .runTime(getVideoRuntimeString(video))
                 .count(count)
                 .build();
+    }
+
+    private static String getVideoRuntimeString(Video video){
+        String h = video.getRuntimeHour()<10?"0"+video.getRuntimeHour():video.getRuntimeHour().toString();
+        String m = video.getRuntimeMin()<10?"0"+video.getRuntimeMin():video.getRuntimeMin().toString();
+        String s = video.getRuntimeSec()<10?"0"+video.getRuntimeSec():video.getRuntimeSec().toString();
+        return h+":"+m+":"+s;
     }
 
 }
