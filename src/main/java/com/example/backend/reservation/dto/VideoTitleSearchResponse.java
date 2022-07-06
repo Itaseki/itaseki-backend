@@ -12,6 +12,7 @@ public class VideoTitleSearchResponse {
     private Long id;
     private String title;
     private String url;
+    private String thumbnailUrl;
     private Integer runtimeHour;
     private Integer runtimeMin;
     private Integer runtimeSec;
@@ -21,6 +22,7 @@ public class VideoTitleSearchResponse {
                 .id(video.getId())
                 .title(video.getDescription())
                 .url(video.getVideoUrl())
+                .thumbnailUrl(video.getThumbnailUrl())
                 .runtimeHour(video.getRuntimeHour())
                 .runtimeMin(video.getRuntimeMin())
                 .runtimeSec(video.getRuntimeSec())
