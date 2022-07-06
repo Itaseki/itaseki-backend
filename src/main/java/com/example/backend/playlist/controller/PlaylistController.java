@@ -87,8 +87,8 @@ public class PlaylistController {
 
     @GetMapping("")
     public ResponseEntity<AllPlaylistResponseWithPageCount> getAllPlaylists(@PageableDefault(size=12, sort="id",direction = Sort.Direction.DESC) Pageable pageable,
-                                                                            @RequestParam(required = false) String q){
-        return new ResponseEntity<>(playlistService.getAllPlaylistsResponse(pageable, q),HttpStatus.OK);
+                                                                            @RequestParam(required = false) String q, @RequestParam(required = false) String nickname){
+        return new ResponseEntity<>(playlistService.getAllPlaylistsResponse(pageable, q, nickname),HttpStatus.OK);
     }
 
     @GetMapping("/best")
