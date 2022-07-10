@@ -32,6 +32,11 @@ public class UserService implements UserDetailsService {
         return user.orElse(null);
     }
 
+    public User findUserByKakaoId(Long id){
+        Optional<User> user = userRepository.findByKakaoId(id);
+        return user.orElse(null);
+    }
+
     public void saveUser(User user){
         userRepository.save(user);
     }

@@ -23,7 +23,7 @@ import java.util.Date;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("localhost:3000/oauth/")
+@RequestMapping("/oauth/")
 public class OAuthController {
 
     private final OAuthService oAuthService;
@@ -39,25 +39,31 @@ public class OAuthController {
     public void kakaoCallback(@RequestParam String code, HttpServletResponse response) {
 
         JsonNode userInfo = oAuthService.getKakaoUserInfo(code);
-        System.out.println(userInfo);
+//        System.out.println(userInfo);
 
-        JsonNode userEmail = userInfo.get("kakao_account").get("email");
+        JsonNode kakaoId = userInfo.get("id");
+//        JsonNode userEmail = userInfo.get("kakao_account").get("email");
         JsonNode userNickname = userInfo.get("properties").get("nickname");
         JsonNode userProfileUrl = userInfo.get("properties").get("profile_image");
 
-        String email = userEmail.toString();
-        email = email.substring(1,email.length()-1);
+//        String email = userEmail.toString();
+//        email = email.substring(1,email.length()-1);
+
+        Long id = kakaoId.asLong();
+        System.out.println(id);
         String nickname = userNickname.toString();
         nickname = nickname.substring(1,nickname.length()-1);
         String name = nickname;
         String profileUrl = userProfileUrl.toString();
         profileUrl = profileUrl.substring(1,profileUrl.length()-1);
 
-        User user = userService.findUserByEmail(email);
+//        User user = userService.findUserByEmail(email);
+        User user = userService.findUserByKakaoId(id);
         User newUser = new User();
 
         if(user == null){
-            newUser.setEmail(email);
+//            newUser.setEmail(email);
+            newUser.setUserId(id);
             newUser.setName(name);
             newUser.setNickname(nickname);
             newUser.setProfileUrl(profileUrl);
@@ -65,7 +71,8 @@ public class OAuthController {
             userService.saveUser(newUser);
         }
 
-        String token = jwtAuthenticationProvider.createToken(newUser.getEmail(), newUser.getRoles());
+
+        String token = jwtAuthenticationProvider.createToken(newUser.getUserId(), newUser.getRoles());
         response.setHeader("ITASEKKI", token);
         Cookie cookie = new Cookie("ITASEKKI", token);
         cookie.setPath("/");
