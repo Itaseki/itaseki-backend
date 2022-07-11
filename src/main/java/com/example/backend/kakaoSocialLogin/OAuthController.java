@@ -58,18 +58,18 @@ public class OAuthController {
         profileUrl = profileUrl.substring(1,profileUrl.length()-1);
 
 //        User user = userService.findUserByEmail(email);
-        User user = userService.findUserByKakaoId(id);
+//        User user = userService.findUserByKakaoId(id);
         User newUser = new User();
 
-        if(user == null){
-//            newUser.setEmail(email);
-            newUser.setUserId(id);
-            newUser.setName(name);
-            newUser.setNickname(nickname);
-            newUser.setProfileUrl(profileUrl);
-            newUser.setUserDescription("");
-            userService.saveUser(newUser);
-        }
+//        if(user == null){
+////            newUser.setEmail(email);
+//            newUser.setUserId(id);
+//            newUser.setName(name);
+//            newUser.setNickname(nickname);
+//            newUser.setProfileUrl(profileUrl);
+//            newUser.setUserDescription("");
+//            userService.saveUser(newUser);
+//        }
 
 
         String token = jwtAuthenticationProvider.createToken(newUser.getUserId(), newUser.getRoles());
