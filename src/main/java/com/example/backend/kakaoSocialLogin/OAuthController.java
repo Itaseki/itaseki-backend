@@ -39,15 +39,11 @@ public class OAuthController {
     public void kakaoCallback(@RequestParam String code, HttpServletResponse response) {
 
         JsonNode userInfo = oAuthService.getKakaoUserInfo(code);
-//        System.out.println(userInfo);
 
         JsonNode kakaoId = userInfo.get("id");
-//        JsonNode userEmail = userInfo.get("kakao_account").get("email");
         JsonNode userNickname = userInfo.get("properties").get("nickname");
         JsonNode userProfileUrl = userInfo.get("properties").get("profile_image");
 
-//        String email = userEmail.toString();
-//        email = email.substring(1,email.length()-1);
 
         Long id = kakaoId.asLong();
         System.out.println(id);
@@ -57,19 +53,17 @@ public class OAuthController {
         String profileUrl = userProfileUrl.toString();
         profileUrl = profileUrl.substring(1,profileUrl.length()-1);
 
-//        User user = userService.findUserByEmail(email);
-//        User user = userService.findUserByKakaoId(id);
+        User user = userService.findUserById(id);
         User newUser = new User();
 
-//        if(user == null){
-////            newUser.setEmail(email);
-//            newUser.setUserId(id);
-//            newUser.setName(name);
-//            newUser.setNickname(nickname);
-//            newUser.setProfileUrl(profileUrl);
-//            newUser.setUserDescription("");
-//            userService.saveUser(newUser);
-//        }
+        if(user == null){
+            newUser.setUserId(id);
+            newUser.setName(name);
+            newUser.setNickname(nickname);
+            newUser.setProfileUrl(profileUrl);
+            newUser.setUserDescription("");
+            userService.saveUser(newUser);
+        }
 
 
         String token = jwtAuthenticationProvider.createToken(newUser.getUserId(), newUser.getRoles());
