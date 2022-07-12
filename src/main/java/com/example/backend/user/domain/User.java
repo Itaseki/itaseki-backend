@@ -35,10 +35,13 @@ public class User implements UserDetails{
     @Column(name = "user")
     private Long userId;
 
+    @Column(name = "kakaoId")
+    private Long kakaoId;
+
     @Column(nullable = false)
     private String nickname;
 
-    @Column(nullable = true)
+    @Column(nullable = false)
     private String email;
 
     @Column(nullable = false)
