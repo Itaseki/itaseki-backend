@@ -11,6 +11,7 @@ import lombok.Setter;
 public class VideoTitleSearchResponse {
     private Long id;
     private String title;
+    private String description;
     private String url;
     private String thumbnailUrl;
     private Integer runtimeHour;
@@ -20,7 +21,8 @@ public class VideoTitleSearchResponse {
     public static VideoTitleSearchResponse fromEntity(Video video){
         return VideoTitleSearchResponse.builder()
                 .id(video.getId())
-                .title(video.getDescription())
+                .title(video.getOriginVideoTitle())
+                .description(video.getDescription())
                 .url(video.getVideoUrl())
                 .thumbnailUrl(video.getThumbnailUrl())
                 .runtimeHour(video.getRuntimeHour())
