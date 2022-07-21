@@ -2,6 +2,7 @@ package com.example.backend.image.repository;
 
 import com.example.backend.customHashtag.CustomHashtag;
 import com.example.backend.image.domain.ImageBoard;
+import com.example.backend.image.dto.TempImageDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;

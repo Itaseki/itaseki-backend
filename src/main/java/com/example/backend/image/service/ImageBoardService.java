@@ -36,6 +36,7 @@ public class ImageBoardService {
         imageBoardRepository.save(imageBoard);
     }
 
+
     public void deleteImageBoard(ImageBoard imageBoard){
         imageBoard.setStatus(false);
         imageBoardRepository.save(imageBoard);
