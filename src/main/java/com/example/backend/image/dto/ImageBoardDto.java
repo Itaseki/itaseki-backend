@@ -9,6 +9,6 @@ import java.util.List;
 @Setter
 public class ImageBoardDto {
     private String imageBoardTitle;
-    private String imageUrl;
+//    private String imageUrl;
     private List<String> hashtags;
 }

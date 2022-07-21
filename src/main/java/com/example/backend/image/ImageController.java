@@ -11,6 +11,7 @@ import com.example.backend.like.Like;
 import com.example.backend.like.LikeService;
 import com.example.backend.report.Report;
 import com.example.backend.report.ReportService;
+import com.example.backend.s3Image.AwsS3Service;
 import com.example.backend.user.UserService;
 import com.example.backend.user.domain.User;
 import lombok.RequiredArgsConstructor;
@@ -35,15 +36,20 @@ public class ImageController {
     private final LikeService likeService;
     private final UserService userService;
     private final ReportService reportService;
+    private final AwsS3Service awsS3Service;
 
     @PostMapping(value = "",consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<String> createImagePost(@RequestPart ImageBoardDto imageBoardDto, @RequestPart List<MultipartFile> files){
         Long loginId = 1L;
         User user = userService.findUserById(loginId);
+
+        String url = awsS3Service.uploadFile(files.get(0));
+        List<String> hashtags = imageBoardDto.getHashtags();
         ImageBoard imageBoard = ImageBoard.builder()
-                .imageBoardTitle(imageBoardDto.getImageBoardTitle()).imageUrl(imageBoardDto.getImageUrl()).createdTime(LocalDateTime.now()).user(user)
+                .imageBoardTitle(imageBoardDto.getImageBoardTitle()).imageUrl(url).createdTime(LocalDateTime.now()).user(user)
                 .build();
         imageBoardService.savePost(imageBoard,files);
+        imageBoardService.saveImageBoardHashtag(hashtags, imageBoard);
         return new ResponseEntity<>("짤 게시판 등록 성공", HttpStatus.CREATED);
     }
 
@@ -61,7 +67,7 @@ public class ImageController {
 
     @GetMapping("")
     public ResponseEntity<AllImageResponseWithPageCount> getAllImageBoards(@PageableDefault(sort="id", direction = Sort.Direction.DESC) Pageable pageable,
-                                                                           @RequestParam(required = false) String q){
+                                                                           @RequestParam(required = false) String q, @RequestParam(required = false) String hashtag){
         return new ResponseEntity<>(imageBoardService.getAllResponseOfImageBoard(pageable,q), HttpStatus.OK);
     }
 
@@ -93,7 +99,7 @@ public class ImageController {
 
     @PostMapping("/{imageBoardId}/reports")
     public ResponseEntity<String> reportImageBoard(@PathVariable Long imageBoardId){
-        Long loginId = 1L;
+        Long loginId = 5L;
         ImageBoard imageBoard = imageBoardService.findImageBoardEntity(imageBoardId);
         User user = userService.findUserById(loginId);
         if(reportService.checkReportExistence(user,imageBoard)){
@@ -105,13 +111,13 @@ public class ImageController {
             imageBoardService.deleteImageBoard(imageBoard);
             return new ResponseEntity<>("신고 5번 누적으로 삭제",HttpStatus.OK);
         }
-        return new ResponseEntity<>("잡담글 신고 성공",HttpStatus.OK);
+        return new ResponseEntity<>("짤 게시글 신고 성공",HttpStatus.OK);
     }
 
     @DeleteMapping("/{imageBoardId}")
     public ResponseEntity<String> deleteImageBoard(@PathVariable Long imageBoardId){
         ImageBoard imageBoard = imageBoardService.findImageBoardEntity(imageBoardId);
         imageBoardService.deleteImageBoard(imageBoard);
-        return new ResponseEntity<>("잡담글 삭제 성공",HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>("짤 게시글 삭제 성공",HttpStatus.NO_CONTENT);
     }
 }

@@ -29,6 +29,7 @@ public class DetailImageBoardResponse {
                 .id(imageBoard.getId()).imageBoardTitle(imageBoard.getImageBoardTitle())
                 .createdTime(imageBoard.getCreatedTime()).viewCount(imageBoard.getViewCount()).likeCount(imageBoard.getLikeCount())
                 .writerId(imageWriter.getUserId()).writerNickname(imageWriter.getNickname()).isThisUserWriter(imageWriter.getUserId().equals(loginId))
+                .imageUrl(imageBoard.getImageUrl())
                 .build();
     }
 
