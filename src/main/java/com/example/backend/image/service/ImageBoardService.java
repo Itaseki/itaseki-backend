@@ -72,7 +72,7 @@ public class ImageBoardService {
 
     public DetailImageBoardResponse getDetailImageResponse(ImageBoard imageBoard, Long loginId){
         Long imageWriterId = imageBoard.getUser().getUserId();
-        return DetailImageBoardResponse.fromEntity(imageBoard, loginId);
+        return DetailImageBoardResponse.fromEntity(imageBoard, loginId, getHashtagKeywordStringInImageBoard(imageBoard));
     }
 
     public AllImageResponseWithPageCount getAllResponseOfImageBoard(Pageable pageable, String query){
@@ -91,6 +91,11 @@ public class ImageBoardService {
             CustomHashtag imageBoardHashtag = CustomHashtag.builder().imageBoard(imageBoard).name(hashtag).order(order++).build();
             customHashtagRepository.save(imageBoardHashtag);
         }
+    }
+
+    private List<String> getHashtagKeywordStringInImageBoard(ImageBoard imageBoard){
+        List<CustomHashtag> customHashtags = imageBoard.getCustomHashtags();
+        return customHashtags.stream().map(CustomHashtag::getCustomHashtagName).collect(Collectors.toList());
     }
 
 }

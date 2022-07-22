@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -22,14 +23,15 @@ public class DetailImageBoardResponse {
     private Long writerId;
     private String writerNickname;
     private Boolean isThisUserWriter;
+    private List<String> hashtags;
 
-    public static DetailImageBoardResponse fromEntity(ImageBoard imageBoard, Long loginId){
+    public static DetailImageBoardResponse fromEntity(ImageBoard imageBoard, Long loginId, List<String> hashtags){
         User imageWriter = imageBoard.getUser();
         return DetailImageBoardResponse.builder()
                 .id(imageBoard.getId()).imageBoardTitle(imageBoard.getImageBoardTitle())
                 .createdTime(imageBoard.getCreatedTime()).viewCount(imageBoard.getViewCount()).likeCount(imageBoard.getLikeCount())
                 .writerId(imageWriter.getUserId()).writerNickname(imageWriter.getNickname()).isThisUserWriter(imageWriter.getUserId().equals(loginId))
-                .imageUrl(imageBoard.getImageUrl())
+                .imageUrl(imageBoard.getImageUrl()).hashtags(hashtags)
                 .build();
     }
 
