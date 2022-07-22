@@ -5,6 +5,7 @@ import com.example.backend.customHashtag.CustomHashtag;
 import com.example.backend.customHashtag.QCustomHashtag;
 import com.example.backend.image.domain.ImageBoard;
 import com.example.backend.image.domain.QImageBoard;
+import com.example.backend.image.dto.TempImageDto;
 import com.example.backend.video.domain.QVideoHashtag;
 import com.example.backend.video.domain.VideoHashtag;
 import com.querydsl.core.QueryResults;
@@ -30,6 +31,11 @@ import static com.example.backend.video.domain.QVideo.video;
 @RequiredArgsConstructor
 public class CustomImageRepositoryImpl implements CustomImageRepository{
     private final JPAQueryFactory jpaQueryFactory;
+
+    @Override
+    public TempImageDto findAll(Pageable pageable, List<String> tags, List<String> queries) {
+        return null;
+    }
 
     @Override
     public List<ImageBoard> findBestBoards() {
