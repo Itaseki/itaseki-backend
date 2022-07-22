@@ -17,6 +17,7 @@ import java.util.*;
 public class ChatService {
     private final ObjectMapper objectMapper;
     private Map<String,ChatRoom> chatRooms;
+    private final ChatRoomRepository chatRoomRepository;
 
     @PostConstruct
     private void init() {
@@ -31,14 +32,17 @@ public class ChatService {
         return chatRooms.get(roomId);
     }
 
-    public ChatRoom createRoom(String name) {
+    public ChatRoom createRoom() {
         String randomId = UUID.randomUUID().toString();
         ChatRoom chatRoom = ChatRoom.builder()
                 .roomId(randomId)
-                .name(name)
                 .build();
         chatRooms.put(randomId, chatRoom);
         return chatRoom;
+    }
+
+    public void saveChatRoom(ChatRoom chatRoom){
+        chatRoomRepository.save(chatRoom);
     }
 
     public <T> void sendMessage(WebSocketSession session, T message) {

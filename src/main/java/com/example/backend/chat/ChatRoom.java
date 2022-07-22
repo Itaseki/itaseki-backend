@@ -2,26 +2,30 @@ package com.example.backend.chat;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.web.socket.WebSocketSession;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
-@Getter
+@Getter @Setter
+@Entity
 public class ChatRoom {
 
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long roomNumber;
+
+    @Column
     private String roomId;
-    private String name;
+
+
+    @Transient
     private Set<WebSocketSession> sessions = new HashSet<>();
 
     @Builder
-    public ChatRoom(String roomId, String name) {
+    public ChatRoom(String roomId) {
         this.roomId = roomId;
-        this.name = name;
     }
 
     public void handlerActions(WebSocketSession session, ChatMessage chatMessage, ChatService chatService) {
