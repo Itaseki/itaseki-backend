@@ -13,13 +13,19 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.CookieGenerator;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.security.Principal;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -45,7 +51,7 @@ public class OAuthController {
         JsonNode userProfileUrl = userInfo.get("properties").get("profile_image");
 
 
-        Long id = kakaoId.asLong();
+        String id = kakaoId.toString();
         System.out.println(id);
         String nickname = userNickname.toString();
         nickname = nickname.substring(1,nickname.length()-1);
@@ -62,11 +68,11 @@ public class OAuthController {
             newUser.setNickname(nickname);
             newUser.setProfileUrl(profileUrl);
             newUser.setEmail("");
-            newUser.setUserDescription("테스트 입니다. ㅎ하하하하하 정말 재밌네요");
+            newUser.setUserDescription("카카오톡 소셜로그인으로 사용자 추가");
             userService.saveUser(newUser);
         }
 
-        String token = jwtAuthenticationProvider.createToken(newUser.getUserId(), newUser.getRoles());
+        String token = jwtAuthenticationProvider.createToken(newUser.getKakaoId(), newUser.getRoles());
         response.setHeader("ITASEKKI", token);
         Cookie cookie = new Cookie("ITASEKKI", token);
         cookie.setPath("/");
@@ -74,5 +80,42 @@ public class OAuthController {
         cookie.setSecure(true);
         response.addCookie(cookie);
     }
+
+//    @ResponseBody
+//    @GetMapping("/test")
+//    public void test(HttpServletRequest request) {
+//        List<String> role = new ArrayList<>();
+//        role.add("AUTHENTICATED");
+//        String kakaoId = "12345678";
+//        User user = new User();
+//        user.setKakaoId(kakaoId);
+//        user.setName("소셜 로그인 jwt 테스트");
+//        user.setNickname("너무 피곤하다 ㅠ");
+//        user.setProfileUrl("asdfasdf");
+//        user.setUserDescription("asdf");
+//        user.setEmail("dlrlxo999@naver.com");
+//        user.setRoles(role);
+//        userService.saveUser(user);
+//        String token = jwtAuthenticationProvider.createToken(user.getKakaoId(), user.getRoles());
+//        System.out.println(token);
+//
+//    }
+//
+//    @ResponseBody
+//    @GetMapping("/test/token")
+//    public void tokenTest(HttpServletRequest request){
+//        String header = request.getHeader("ITASEKKI");
+//        String kakaoId = jwtAuthenticationProvider.getUserPk(header);
+//        User user = userService.findUserByKakaoId(kakaoId);
+//        System.out.println(user.getKakaoId());
+//        Authentication newAuth = new UsernamePasswordAuthenticationToken(kakaoId, null, user.getAuthorities());
+//        System.out.println(newAuth);
+//    }
+//
+//    @ResponseBody
+//    @GetMapping("/test/token/principal")
+//    public void principalTest(){
+//        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//    }
 
 }

@@ -1,9 +1,13 @@
 package com.example.backend.kakaoSocialLogin.service;
 
+import com.example.backend.kakaoSocialLogin.JwtAuthenticationProvider;
+import com.example.backend.user.UserService;
+import com.example.backend.user.domain.User;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonElement;
+import lombok.AllArgsConstructor;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -11,12 +15,17 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 @Service
+@AllArgsConstructor
 public class OAuthService{
+
+    private final JwtAuthenticationProvider jwtAuthenticationProvider;
+    private final UserService userService;
 
     public String getKakaoAccessToken (String code) {
         String access_Token = "";
@@ -113,5 +122,12 @@ public class OAuthService{
         }
 //        System.out.println(returnNode);
         return returnNode;
+    }
+
+    public User getUserInformation(HttpServletRequest request){
+        String header = request.getHeader("ITASEKKI");
+        String kakaoId = jwtAuthenticationProvider.getUserPk(header);
+        User loginUser = userService.findUserByKakaoId(kakaoId);
+        return loginUser;
     }
 }

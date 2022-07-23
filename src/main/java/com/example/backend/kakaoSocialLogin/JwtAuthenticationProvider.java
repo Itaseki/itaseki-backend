@@ -29,7 +29,7 @@ public class JwtAuthenticationProvider {
 
 
     // JWT 토큰 생성
-    public String createToken(Long userPk, List<String> roles) {
+    public String createToken(String userPk, List<String> roles) {
         Claims claims = Jwts.claims().setSubject(String.valueOf(userPk)); // JWT payload 에 저장되는 정보단위
         claims.put("roles", roles); // 정보는 key / value 쌍으로 저장된다.
         Date now = new Date();
