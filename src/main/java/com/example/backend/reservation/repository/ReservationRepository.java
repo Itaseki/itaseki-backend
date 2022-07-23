@@ -13,4 +13,5 @@ import java.util.Optional;
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long>,CustomReservationRepository {
     Optional<Reservation> findByReservationDateAndUser(LocalDate date, User user);
+    List<Reservation> findAllByReservationDateAndStartTimeAndEndTimeAndVideo(LocalDate date, String startTime, String endTime, Video video);
 }
