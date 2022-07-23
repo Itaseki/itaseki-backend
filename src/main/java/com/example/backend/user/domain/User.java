@@ -1,5 +1,6 @@
 package com.example.backend.user.domain;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -36,7 +37,7 @@ public class User implements UserDetails{
     private Long userId;
 
     @Column(name = "kakaoId")
-    private Long kakaoId;
+    private String kakaoId;
 
     @Column(nullable = false)
     private String nickname;
@@ -55,6 +56,9 @@ public class User implements UserDetails{
 
     @Column(nullable = false)
     private Integer userReportCount=0;
+
+//    @Column(nullable = false)
+//    private String userRole = null;
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles = new ArrayList<>();
@@ -94,6 +98,14 @@ public class User implements UserDetails{
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Builder
+    public User(String name, String nickname, String profileUrl, String kakaoId){
+        this.name = name;
+        this.nickname = nickname;
+        this.profileUrl = profileUrl;
+        this.kakaoId = kakaoId;
     }
 }
 

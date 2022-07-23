@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,7 +28,7 @@ public class UserService implements UserDetailsService {
         return user.orElse(null);
     }
 
-    public User findUserByKakaoId(Long kakaoId){
+    public User findUserByKakaoId(String kakaoId){
         Optional<User> user = userRepository.findByKakaoId(kakaoId);
         return user.orElse(null);
     }
@@ -37,9 +38,13 @@ public class UserService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+    public UserDetails loadUserByUsername(String kakaoId) throws UsernameNotFoundException {
+        Optional<User> user = userRepository.findByKakaoId(kakaoId);
+        if (user.isPresent()){
+            User loginUser = user.get();
+            return new User(loginUser.getName(), loginUser.getNickname(), loginUser.getProfileUrl(), loginUser.getKakaoId());
+        }
+        return null;
     }
 
     public List<Subscribe> findAllSubscribingTargets(User user){
