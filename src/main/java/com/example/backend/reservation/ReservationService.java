@@ -186,4 +186,20 @@ public class ReservationService {
 
     }
 
+    public Reservation findReservationById(Long id){
+        return reservationRepository.findById(id).orElse(null);
+    }
+
+    public ConfirmedReservation findConfirmById(Long id){
+        return confirmedRepository.findById(id).orElse(null);
+    }
+
+    public int getReservationsCount(Reservation r){
+        return reservationRepository.findAllByReservationDateAndStartTimeAndEndTimeAndVideo(r.getReservationDate(),r.getStartTime(),r.getEndTime(),r.getVideo()).size();
+    }
+
+    public int getReservationsCount(ConfirmedReservation r){
+        return reservationRepository.findAllByReservationDateAndStartTimeAndEndTimeAndVideo(r.getReservationDate(),r.getStartTime(),r.getEndTime(),r.getVideo()).size();
+    }
+
 }

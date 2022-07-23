@@ -105,4 +105,16 @@ public class ReservationController {
     ResponseEntity<String> handleWrongDateFormat(WrongDateFormatException e){
         return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
     }
+
+    @GetMapping("/{reservationId}")
+    public ResponseEntity<DetailReservationResponse> getReservationDetail(@PathVariable Long reservationId){
+        Reservation reservation = reservationService.findReservationById(reservationId);
+        return new ResponseEntity<>(DetailReservationResponse.fromReservation(reservation, reservationService.getReservationsCount(reservation)),HttpStatus.OK);
+    }
+
+    @GetMapping("/confirm/{confirmedReservationId}")
+    public ResponseEntity<DetailReservationResponse> getConfirmedReservationDetail(@PathVariable Long confirmedReservationId){
+        ConfirmedReservation reservation = reservationService.findConfirmById(confirmedReservationId);
+        return new ResponseEntity<>(DetailReservationResponse.fromConfirm(reservation,reservationService.getReservationsCount(reservation)),HttpStatus.OK);
+    }
 }
