@@ -42,6 +42,7 @@ public class ImageController {
     public ResponseEntity<String> createImagePost(@RequestPart ImageBoardDto imageBoardDto, @RequestPart List<MultipartFile> files){
         Long loginId = 1L;
         User user = userService.findUserById(loginId);
+        System.out.println(imageBoardDto);
 
         String url = awsS3Service.uploadFile(files.get(0));
         List<String> hashtags = imageBoardDto.getHashtags();
