@@ -33,9 +33,7 @@ public class RunningController {
             return null;
         }
         else{
-            String title = nextConfirm.getTitle();
             String videoUrl = nextConfirm.getVideoUrl();
-            runningInformation.put("videoTitle", title);
             runningInformation.put("videoUrl", videoUrl);
             runningInformation.put("userProfileUrl", userProfileUrl);
         }
