@@ -14,6 +14,7 @@ public class BestReservationResponse {
     private String title;
     private String runTime;
     private String videoUrl;
+    private String thumbnailUrl;
     private Long count;
     private String reservationDate;
     private String startTime;
@@ -25,6 +26,7 @@ public class BestReservationResponse {
                 .id(video.getId()).title(video.getDescription())
                 .runTime(getVideoRuntimeString(video))
                 .videoUrl(video.getVideoUrl())
+                .thumbnailUrl(video.getThumbnailUrl())
                 .count(count)
                 .reservationDate(reservation.getReservationDate().toString())
                 .startTime(reservation.getStartTime())
