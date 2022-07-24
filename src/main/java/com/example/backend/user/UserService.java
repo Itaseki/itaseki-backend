@@ -61,7 +61,6 @@ public class UserService implements UserDetailsService {
                 .user(user)
                 .build();
         subscribeRepository.save(build);
-
     }
 
 }
