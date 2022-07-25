@@ -42,7 +42,7 @@ public class MainController {
 
     @GetMapping("/user")
     public ResponseEntity<MainUserResponse> getMainUserInfo(){
-        Long loginId=1L;
+        Long loginId=8L;
         return new ResponseEntity<>(mainService.getUserProfileForMain(loginId),HttpStatus.OK);
     }
 
