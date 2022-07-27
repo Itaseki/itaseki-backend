@@ -24,9 +24,10 @@ public class RoomController {
     @GetMapping(value = "/rooms")
     @ResponseBody
     public List<ChatRoomDTO> rooms(){
-
+        ChatMessageDTO chatMessageDTO = new ChatMessageDTO();
         log.info("# All Chat Rooms");
         ModelAndView mv = new ModelAndView("chat/rooms");
+        System.out.println(chatMessageDTO.getProfileUrl());
         return repository.findAllRooms();
     }
 
