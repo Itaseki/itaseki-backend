@@ -16,7 +16,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             ,"/boards/**"
             ,"/run/reservations","/run/reservations/**" //로그인 구현 전 영상 달리기 예약 위해 임시허가
             ,"/boards/image", "/boards/image/**"
-            ,"/chat/**"
+            ,"/chat/**", "/chat"
     };
 
     @Override
