@@ -64,6 +64,7 @@ jobs:
 
       # Deploy
       # appname: code deploy application name
+      # code deploy 사용하기 전에 ec2에 code deploy agent 설치 -> 실행 중인지 확인해야 함
     - name: Deploy
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
