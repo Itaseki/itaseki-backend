@@ -4,7 +4,7 @@ import com.example.backend.reservation.domain.ConfirmedReservation;
 import com.example.backend.reservation.domain.Reservation;
 import com.example.backend.reservation.dto.*;
 import com.example.backend.reservation.exception.WrongDateFormatException;
-import com.example.backend.user.UserService;
+import com.example.backend.user.service.UserService;
 import com.example.backend.user.domain.User;
 import com.example.backend.video.domain.Video;
 import com.example.backend.video.service.VideoService;

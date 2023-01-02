@@ -1,6 +1,5 @@
 package com.example.backend.main;
 
-import com.example.backend.community.repository.CommunityBoardRepository;
 import com.example.backend.community.service.CommunityBoardService;
 import com.example.backend.image.repository.ImageBoardRepository;
 import com.example.backend.main.dto.MainCommunityResponse;
@@ -9,7 +8,7 @@ import com.example.backend.main.dto.MainUserResponse;
 import com.example.backend.main.dto.MainVideoResponse;
 import com.example.backend.playlist.dto.AllPlaylistsResponse;
 import com.example.backend.playlist.service.PlaylistService;
-import com.example.backend.user.UserService;
+import com.example.backend.user.service.UserService;
 import com.example.backend.user.domain.User;
 import com.example.backend.video.service.VideoService;
 import lombok.RequiredArgsConstructor;

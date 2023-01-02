@@ -1,8 +1,6 @@
 package com.example.backend.user.domain;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,9 +12,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Entity
+@Getter @Setter
 @Table(name = "user")
-@Data
-@NoArgsConstructor
 public class User implements UserDetails{
 
     /**
@@ -24,10 +21,7 @@ public class User implements UserDetails{
      * userId
      * nickname
      * email
-     * password
-     * name
      * profileUrl
-     * userDescription
      * userReportCount
      */
 
@@ -36,31 +30,20 @@ public class User implements UserDetails{
     @Column(name = "user")
     private Long userId;
 
-    @Column(name = "kakaoId")
-    private String kakaoId;
-
     @Column(nullable = false)
     private String nickname;
 
     @Column(nullable = false)
     private String email;
 
-    @Column(nullable = false)
-    private String name;
-
     @Column(nullable = true)
     private String profileUrl;
-
-    @Column(nullable = true)
-    private String userDescription;
 
     @Column(nullable = false)
     private Integer userReportCount=0;
 
-//    @Column(nullable = false)
-//    private String userRole = null;
-
     @ElementCollection(fetch = FetchType.EAGER)
+    @Builder.Default
     private List<String> roles = new ArrayList<>();
 
     @Override
@@ -77,7 +60,7 @@ public class User implements UserDetails{
 
     @Override
     public String getUsername() {
-        return email;
+        return userId.toString();
     }
 
     @Override
@@ -98,14 +81,6 @@ public class User implements UserDetails{
     @Override
     public boolean isEnabled() {
         return true;
-    }
-
-    @Builder
-    public User(String name, String nickname, String profileUrl, String kakaoId){
-        this.name = name;
-        this.nickname = nickname;
-        this.profileUrl = profileUrl;
-        this.kakaoId = kakaoId;
     }
 }
 

@@ -1,6 +1,5 @@
 package com.example.backend.image;
 
-import com.example.backend.community.dto.DetailCommunityBoardResponse;
 import com.example.backend.image.domain.ImageBoard;
 import com.example.backend.image.dto.AllImageBoardsResponse;
 import com.example.backend.image.dto.AllImageResponseWithPageCount;
@@ -12,7 +11,7 @@ import com.example.backend.like.LikeService;
 import com.example.backend.report.Report;
 import com.example.backend.report.ReportService;
 import com.example.backend.s3Image.AwsS3Service;
-import com.example.backend.user.UserService;
+import com.example.backend.user.service.UserService;
 import com.example.backend.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
