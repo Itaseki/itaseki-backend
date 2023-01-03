@@ -24,7 +24,7 @@ public class Like {
     private Boolean likeStatus = true;
 
     @ManyToOne
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne

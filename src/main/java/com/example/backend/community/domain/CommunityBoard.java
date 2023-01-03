@@ -45,7 +45,7 @@ public class CommunityBoard {
 
     //추후 필요시 양방향 매핑 추가
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @OneToMany(mappedBy = "communityBoard",targetEntity = CommunityComment.class)
