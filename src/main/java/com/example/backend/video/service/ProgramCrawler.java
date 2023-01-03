@@ -1,5 +1,8 @@
 package com.example.backend.video.service;
 
+import com.example.backend.video.domain.Series;
+import com.example.backend.video.repository.SeriesRepository;
+import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -15,39 +18,38 @@ import java.util.Date;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class ProgramCrawler {
+    private final SeriesRepository seriesRepository;
 
-    public static void main(String[] args) {
-//        System.out.println("------------------KBS-----------------");
-//        kbs().forEach(System.out::println);
-//        System.out.println("------------------SBS-----------------");
-//        sbs().forEach(System.out::println);
-//        System.out.println("------------------MBC-----------------");
-//        mbc(2).forEach(System.out::println); //2: 현재방송 / 3: 종영
-//        mbc(3).forEach(System.out::println);
-        System.out.println("------------------TVN-----------------");
-        tvn().forEach(System.out::println);
+    // 초 분 시간 일 월 요일 -> 매주 일요일 0시 0분 0초에 수행 -> cron = "0 0 0 ? * 1", zone = "Asia/Seoul"
+    @Scheduled(cron = "0 0 0 ? * 1", zone = "Asia/Seoul")
+    private void updatePrograms() {
+        tvn().stream().filter(this::isNotSaved)
+                .forEach(this::saveSeries);
+
+        mbc(2).stream().filter(this::isNotSaved)
+                .forEach(this::saveSeries);
+
+        sbs().stream().filter(this::isNotSaved)
+                .forEach(this::saveSeries);
+
+        kbs().stream().filter(this::isNotSaved)
+                .forEach(this::saveSeries);
     }
 
-    @Scheduled
-    private static void updatePrograms() {
-        // mbc 종영 예능은 한 번만 실행, 비동기 처리로
+    private boolean isNotSaved(String series) {
+        return seriesRepository.findBySeriesName(series)
+                .isEmpty();
     }
 
-    private static void jtbc() { //selenium 사용
-        String url = "https://tv.jtbc.co.kr/tv/program-list-more";
-        while (true) {
-            try {
-                Document document = Jsoup.connect(url).ignoreContentType(true).post();
-                System.out.println(document.body().toString());
-            } catch (IOException exception) {
-                break;
-            }
-
-        }
+    private void saveSeries(String series) {
+        seriesRepository.save(Series.builder()
+                .name(series)
+                .build());
     }
 
-    private static List<String> tvn() {
+    private List<String> tvn() {
         String baseUrl = "http://tvn.tving.com/tvn/Program?page=%d&onair=A&code=%s&order=";
         String entertainmentCategory = "CAT002";
         String digitalCategory = "CAT011";
@@ -85,7 +87,7 @@ public class ProgramCrawler {
     }
 
 
-    private static List<String> sbs() {
+    private List<String> sbs() {
         String url1 = "https://apis.sbs.co.kr/main-api/section/tv?pgm_sct=ET&sort=new&offset=";
         String url2 = "&limit=30";
         int offset = 0;
@@ -118,7 +120,7 @@ public class ProgramCrawler {
         return sbsProgram;
     }
 
-    private static List<String> mbc(int state) {
+    private List<String> mbc(int state) {
         String url1 = "https://control.imbc.com/TV/Program?callback=Program_2_1_1_3_2_0_0_0_";
         String url2 = "&subCategoryId=2&curPage=";
         String url3 = "&pageSize=100&order=3&broadState=" + state + "&endYear=0&initial=&genre=0";
@@ -160,7 +162,7 @@ public class ProgramCrawler {
         return mbcProgram;
     }
 
-    private static List<String> kbs() {
+    private List<String> kbs() {
         String url1 = "https://pprogramapi.kbs.co.kr/api/v1/external/program?end_yn=n&section_code=04&page=";
         String url2 = "&page_size=12&rtype=jsonp&show_yn=Y&sort_option=rdatetime%20desc&dict=Y&callback=section3";
         int page = 1;
@@ -192,7 +194,7 @@ public class ProgramCrawler {
     }
 
 
-    private static List<Integer> findIndexes(String word, String document) {
+    private List<Integer> findIndexes(String word, String document) {
         List<Integer> indexList = new ArrayList<>();
         int index = document.indexOf(word);
         while (index != -1) {
