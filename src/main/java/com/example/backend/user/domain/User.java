@@ -39,6 +39,9 @@ public class User implements UserDetails{
     @Column(nullable = true)
     private String profileUrl;
 
+    @Column(nullable = true)
+    private String userDescription;
+
     @Column(nullable = false)
     private Integer userReportCount=0;
 

@@ -48,6 +48,7 @@ public class OAuthController {
             newUser.setEmail(email);
             newUser.setProfileUrl(profileUrl);
             newUser.setNickname(nickname);
+            newUser.setUserDescription(null);
             userService.saveUser(newUser);
             user = newUser;
         }
