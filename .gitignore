@@ -41,3 +41,6 @@ application-s3.properties
 
 ### mysql settings ###
 application-mysql.properties
+
+### kakao settings ###
+application-kakao.properties

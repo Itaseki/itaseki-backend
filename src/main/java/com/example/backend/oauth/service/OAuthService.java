@@ -8,11 +8,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonElement;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,8 +23,14 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class OAuthService{
+
+    @Value("${KAKAO.RESTAPI}")
+    private String restApi;
+
+    @Value("${KAKAO.BACKEND.REDIRECT}")
+    private String redirect;
 
     public String getAccessToken (String code) {
         String accessToken = "";
@@ -37,8 +45,8 @@ public class OAuthService{
 
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
             String sb = "grant_type=authorization_code" +
-                    "&client_id=53ab9d9beaf347ecc3d5779342ef3562" + // TODO REST_API_KEY 입력
-                    "&redirect_uri=http://localhost:3000/oauth/kakao" + // TODO 인가코드 받은 redirect_uri 입력
+                    "&client_id="+restApi + // TODO REST_API_KEY 입력
+                    "&redirect_uri="+redirect + // TODO 인가코드 받은 redirect_uri 입력
                     "&code=" + code;
             bw.write(sb);
             bw.flush();
