@@ -19,4 +19,8 @@ public class BlackListService {
         Optional<BlackList> blackList = blackListRepository.findByToken(token);
         return blackList.orElse(null);
     }
+
+    public void saveBlackList(BlackList blackList){
+        blackListRepository.save(blackList);
+    }
 }
