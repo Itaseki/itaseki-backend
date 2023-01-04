@@ -38,7 +38,7 @@ public class CommunityController {
     public ResponseEntity<String> createCommunityPost(@RequestPart CommunityBoardDto communityBoardDto,
                                                       @RequestPart(required = false) List<MultipartFile> files){
         //principal 로 유저 정보 받아오는 부분 추가 (회원가입, 로그인 구현 후)
-        Long loginId=1L;
+        Long loginId=3L;
         User user=userService.findUserById(loginId);
         System.out.println("board content: "+communityBoardDto.getContent());
         CommunityBoard post= CommunityBoard.builder()
@@ -111,14 +111,14 @@ public class CommunityController {
 
     @PostMapping("/{communityBoardId}/reports")
     public ResponseEntity<String> reportCommunityBoard(@PathVariable Long communityBoardId){
-        Long loginId=1L;
+        Long loginId=2L;
         CommunityBoard communityBoard = communityBoardService.findCommunityBoardEntity(communityBoardId);
         User user=userService.findUserById(loginId);
         if(reportService.checkReportExistence(user,communityBoard)){
             return new ResponseEntity<>("해당 사용자가 이미 신고한 잡담글",HttpStatus.OK);
         }
         Report report = Report.builder().communityBoard(communityBoard).user(user).build();
-        reportService.saveReport(report);
+        reportService.saveReport(report, communityBoard.getUser());
         if(communityBoard.getReports().size()>=5){
             communityBoardService.deleteCommunityBoard(communityBoard); //삭제하기 보다는 그냥 status 를 0으로 바꿔둘까,,?
             return new ResponseEntity<>("신고 5번 누적으로 삭제",HttpStatus.OK);
@@ -128,14 +128,14 @@ public class CommunityController {
 
     @PostMapping("/{communityBoardId}/comments/{communityCommentId}/reports")
     public ResponseEntity<String> reportCommunityComment(@PathVariable Long communityBoardId, @PathVariable Long communityCommentId){
-        Long loginId=1L;
+        Long loginId=3L;
         CommunityComment comment = commentService.findCommunityCommentById(communityCommentId);
         User user=userService.findUserById(loginId);
         if(reportService.checkReportExistence(user,comment)){
             return new ResponseEntity<>("해당 사용자가 이미 신고한 잡담댓글",HttpStatus.OK);
         }
         Report report = Report.builder().communityComment(comment).user(user).build();
-        reportService.saveReport(report);
+        reportService.saveReport(report, comment.getUser());
         if(comment.getReports().size()>=5){
             commentService.deleteCommunityComment(comment); //삭제하기 보다는 그냥 status 를 0으로 바꿔둘까,,?
             return new ResponseEntity<>("신고 5번 누적으로 삭제",HttpStatus.OK);

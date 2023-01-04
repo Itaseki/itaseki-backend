@@ -58,7 +58,7 @@ public class PlaylistCommentController {
             return new ResponseEntity<>("해당 사용자가 이미 신고한 영상 댓글",HttpStatus.OK);
         Report report = Report.builder()
                 .user(user).playlistComment(comment).build();
-        reportService.saveReport(report);
+        reportService.saveReport(report, comment.getUser());
         if(comment.getReports().size()>=5){
             commentService.deletePlaylistComment(comment);
             return new ResponseEntity<>("신고 5번 누적으로 삭제",HttpStatus.OK);

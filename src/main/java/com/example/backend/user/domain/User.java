@@ -85,6 +85,10 @@ public class User implements UserDetails{
     public boolean isEnabled() {
         return true;
     }
+
+    public void updateUserReportCount() {
+        this.userReportCount += 1;
+    }
 }
 
 
