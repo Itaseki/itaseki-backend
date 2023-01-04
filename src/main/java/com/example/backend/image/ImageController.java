@@ -106,7 +106,7 @@ public class ImageController {
             return new ResponseEntity<>("해당 사용자가 이미 신고한 짤",HttpStatus.OK);
         }
         Report report = Report.builder().imageBoard(imageBoard).user(user).build();
-        reportService.saveReport(report);
+        reportService.saveReport(report, imageBoard.getUser());
         if(imageBoard.getReports().size()>=5){
             imageBoardService.deleteImageBoard(imageBoard);
             return new ResponseEntity<>("신고 5번 누적으로 삭제",HttpStatus.OK);
