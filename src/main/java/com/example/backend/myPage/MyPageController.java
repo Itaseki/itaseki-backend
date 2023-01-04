@@ -2,6 +2,7 @@ package com.example.backend.myPage;
 
 import com.example.backend.blackList.domain.BlackList;
 import com.example.backend.blackList.service.BlackListService;
+import com.example.backend.myPage.dto.LikeDataDto;
 import com.example.backend.myPage.dto.UserInfoDto;
 import com.example.backend.user.domain.User;
 import com.example.backend.user.service.UserService;
@@ -29,9 +30,9 @@ public class MyPageController {
 
     /**
      * 로그아웃
-     * */
+     */
     @PatchMapping("/edit")
-    public ResponseEntity<String> logout(HttpServletRequest request){
+    public ResponseEntity<String> logout(HttpServletRequest request) {
         String accessToken = jwtAuthenticationProvider.resolveToken(request);   // API를 요청한 토큰(Access Token) 가져오기
         BlackList blackList = new BlackList();
         blackList.setToken(accessToken);
@@ -46,5 +47,14 @@ public class MyPageController {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(myPageService.findUserBasicInformation(user), HttpStatus.OK);
+    }
+
+    @GetMapping("/likes")
+    public ResponseEntity<LikeDataDto> getMyPageLikeData(@PathVariable Long userId) {
+        User user = userService.findUserById(userId);
+        if (user == null) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(myPageService.getAllLikedData(user), HttpStatus.OK);
     }
 }
