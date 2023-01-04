@@ -8,7 +8,7 @@ import com.example.backend.playlist.domain.UserSavedPlaylist;
 import com.example.backend.playlist.dto.*;
 import com.example.backend.report.Report;
 import com.example.backend.report.ReportService;
-import com.example.backend.user.UserService;
+import com.example.backend.user.service.UserService;
 import com.example.backend.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;

@@ -1,8 +1,9 @@
-package com.example.backend.user;
+package com.example.backend.user.service;
 
-import com.example.backend.report.Report;
 import com.example.backend.user.domain.Subscribe;
 import com.example.backend.user.domain.User;
+import com.example.backend.user.repository.SubscribeRepository;
+import com.example.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,8 +28,8 @@ public class UserService implements UserDetailsService {
         return user.orElse(null);
     }
 
-    public User findUserByKakaoId(String kakaoId){
-        Optional<User> user = userRepository.findByKakaoId(kakaoId);
+    public User findUserByEmail(String email){
+        Optional<User> user = userRepository.findByEmail(email);
         return user.orElse(null);
     }
 
@@ -38,13 +38,14 @@ public class UserService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String kakaoId) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findByKakaoId(kakaoId);
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<User> user = userRepository.findById(Long.parseLong(username));
         if (user.isPresent()){
-            User loginUser = user.get();
-            return new User(loginUser.getName(), loginUser.getNickname(), loginUser.getProfileUrl(), loginUser.getKakaoId());
+            return user.get();
         }
-        return null;
+        else{
+            throw new UsernameNotFoundException("사용자를 찾을 수 없습니다.");
+        }
     }
 
     public List<Subscribe> findAllSubscribingTargets(User user){

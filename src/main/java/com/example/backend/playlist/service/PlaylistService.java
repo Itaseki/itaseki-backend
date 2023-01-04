@@ -8,7 +8,7 @@ import com.example.backend.playlist.dto.*;
 import com.example.backend.playlist.repository.PlaylistRepository;
 import com.example.backend.playlist.repository.PlaylistVideoRepository;
 import com.example.backend.playlist.repository.UserSavedPlaylistRepository;
-import com.example.backend.user.UserService;
+import com.example.backend.user.service.UserService;
 import com.example.backend.user.domain.Subscribe;
 import com.example.backend.user.domain.User;
 import com.example.backend.video.domain.Video;
@@ -16,7 +16,6 @@ import com.example.backend.video.dto.PlaylistVideoResponse;
 import com.example.backend.video.repository.VideoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 

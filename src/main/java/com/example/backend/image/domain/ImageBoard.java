@@ -44,7 +44,7 @@ public class ImageBoard {
     private Boolean status=true;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @OneToMany(mappedBy = "imageBoard",targetEntity = Report.class)

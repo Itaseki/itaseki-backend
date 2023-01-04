@@ -1,4 +1,4 @@
-package com.example.backend.user;
+package com.example.backend.user.repository;
 
 import com.example.backend.user.domain.Subscribe;
 import com.example.backend.user.domain.User;
