@@ -29,7 +29,7 @@ public class OAuthService{
     @Value("${KAKAO.RESTAPI}")
     private String restApi;
 
-    @Value("${KAKAO.FRONT.REDIRECT}")
+    @Value("${KAKAO.BACKEND.REDIRECT}")
     private String redirect;
 
     public String getAccessToken (String code) {

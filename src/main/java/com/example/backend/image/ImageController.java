@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/boards/image")
@@ -123,8 +124,17 @@ public class ImageController {
 
     @DeleteMapping("/{imageBoardId}")
     public ResponseEntity<String> deleteImageBoard(@PathVariable Long imageBoardId){
+
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username = ((UserDetails) principal).getUsername();
+        User user = userService.findUserById(Long.parseLong(username));
+
         ImageBoard imageBoard = imageBoardService.findImageBoardEntity(imageBoardId);
-        imageBoardService.deleteImageBoard(imageBoard);
-        return new ResponseEntity<>("짤 게시글 삭제 성공",HttpStatus.NO_CONTENT);
+
+        if(Objects.equals(imageBoard.getUser().getUserId(), user.getUserId())){
+            imageBoardService.deleteImageBoard(imageBoard);
+            return new ResponseEntity<>("짤 게시글 삭제 성공",HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>("작성자만 삭제 가능", HttpStatus.BAD_REQUEST);
     }
 }
