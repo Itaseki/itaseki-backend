@@ -32,7 +32,7 @@ public class ImageBoardService {
     private final AwsS3Service awsS3Service;
     private final CustomHashtagRepository customHashtagRepository;
 
-    public void savePost(ImageBoard imageBoard, List<MultipartFile> files){
+    public void savePost(ImageBoard imageBoard){
         imageBoardRepository.save(imageBoard);
     }
 

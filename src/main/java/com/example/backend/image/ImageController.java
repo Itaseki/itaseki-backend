@@ -40,20 +40,18 @@ public class ImageController {
     private final AwsS3Service awsS3Service;
 
     @PostMapping(value = "",consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<String> createImagePost(@RequestPart ImageBoardDto imageBoardDto, @RequestPart List<MultipartFile> files){
+    public ResponseEntity<String> createImagePost(@RequestPart ImageBoardDto imageBoardDto, @RequestPart MultipartFile imageFile){
 
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username = ((UserDetails) principal).getUsername();
         User user = userService.findUserById(Long.parseLong(username));
 
-        System.out.println(imageBoardDto);
-
-        String url = awsS3Service.uploadFile(files.get(0));
+        String url = awsS3Service.uploadFile(imageFile);
         List<String> hashtags = imageBoardDto.getHashtags();
         ImageBoard imageBoard = ImageBoard.builder()
                 .imageBoardTitle(imageBoardDto.getImageBoardTitle()).imageUrl(url).createdTime(LocalDateTime.now()).user(user)
                 .build();
-        imageBoardService.savePost(imageBoard,files);
+        imageBoardService.savePost(imageBoard);
         imageBoardService.saveImageBoardHashtag(hashtags, imageBoard);
         return new ResponseEntity<>("짤 게시판 등록 성공", HttpStatus.CREATED);
     }
