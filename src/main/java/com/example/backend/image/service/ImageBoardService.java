@@ -69,7 +69,7 @@ public class ImageBoardService {
     private List<AllImageBoardsResponse> toAllImageBoardResponse(List<ImageBoard> imageBoards){
         return imageBoards.stream()
                 .filter(imageBoard -> imageBoard.getStatus().equals(true))
-                .map(imageBoard -> AllImageBoardsResponse.fromEntity(imageBoard))
+                .map(AllImageBoardsResponse::fromEntity)
                 .collect(Collectors.toList());
     }
 
