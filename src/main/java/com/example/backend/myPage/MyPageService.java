@@ -1,8 +1,13 @@
 package com.example.backend.myPage;
 
+import com.example.backend.community.domain.CommunityBoard;
+import com.example.backend.community.repository.CommunityBoardRepository;
+import com.example.backend.image.domain.ImageBoard;
+import com.example.backend.image.repository.ImageBoardRepository;
 import com.example.backend.like.Like;
 import com.example.backend.like.LikeRepository;
 import com.example.backend.myPage.dto.LikeDataDto;
+import com.example.backend.myPage.dto.MyDataDto;
 import com.example.backend.myPage.dto.MyPageCommunityDto;
 import com.example.backend.myPage.dto.MyPageImageDto;
 import com.example.backend.myPage.dto.MyPageVideoDto;
@@ -12,6 +17,7 @@ import com.example.backend.playlist.service.PlaylistService;
 import com.example.backend.user.domain.Subscribe;
 import com.example.backend.user.domain.User;
 import com.example.backend.user.repository.SubscribeRepository;
+import com.example.backend.video.domain.Video;
 import com.example.backend.video.repository.VideoRepository;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,6 +31,8 @@ public class MyPageService {
     private final SubscribeRepository subscribeRepository;
     private final VideoRepository videoRepository;
     private final LikeRepository likeRepository;
+    private final CommunityBoardRepository communityBoardRepository;
+    private final ImageBoardRepository imageBoardRepository;
 
     public UserInfoDto findUserBasicInformation(User user) {
         return UserInfoDto.fromUserAndDetail(user,
@@ -37,6 +45,34 @@ public class MyPageService {
         List<Like> likedData = findAllLikedByUser(user);
         return new LikeDataDto(findAllLikedVideos(likedData), findAllLikedCommunityBoards(likedData),
                 findAllLikedImages(likedData));
+    }
+
+    public MyDataDto getAllDataUploadedByUser(User user) {
+        return new MyDataDto(findAllCommunityBoardByUser(user), findAllVideoByUser(user), findAllImageByUser(user));
+    }
+
+    private List<MyPageCommunityDto> findAllCommunityBoardByUser(User user) {
+        return communityBoardRepository.findAllByUserOrderByCreatedTimeDesc(user)
+                .stream()
+                .filter(CommunityBoard::getStatus)
+                .map(MyPageCommunityDto::of)
+                .collect(Collectors.toList());
+    }
+
+    private List<MyPageImageDto> findAllImageByUser(User user) {
+        return imageBoardRepository.findAllByUserOrderByCreatedTimeDesc(user)
+                .stream()
+                .filter(ImageBoard::getStatus)
+                .map(MyPageImageDto::of)
+                .collect(Collectors.toList());
+    }
+
+    private List<MyPageVideoDto> findAllVideoByUser(User user) {
+        return videoRepository.findAllByUserOrderByCreatedTimeDesc(user)
+                .stream()
+                .filter(Video::getStatus)
+                .map(MyPageVideoDto::of)
+                .collect(Collectors.toList());
     }
 
     private List<Playlist> findAllPublicPlaylistByUser(User user) {

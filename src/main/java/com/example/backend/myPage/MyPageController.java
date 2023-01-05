@@ -3,6 +3,7 @@ package com.example.backend.myPage;
 import com.example.backend.blackList.domain.BlackList;
 import com.example.backend.blackList.service.BlackListService;
 import com.example.backend.myPage.dto.LikeDataDto;
+import com.example.backend.myPage.dto.MyDataDto;
 import com.example.backend.myPage.dto.UserInfoDto;
 import com.example.backend.user.domain.User;
 import com.example.backend.user.service.UserService;
@@ -56,5 +57,14 @@ public class MyPageController {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(myPageService.getAllLikedData(user), HttpStatus.OK);
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<MyDataDto> getMyPageUploadedDataByUser(@PathVariable Long userId) {
+        User user = userService.findUserById(userId);
+        if (user == null) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(myPageService.getAllDataUploadedByUser(user), HttpStatus.OK);
     }
 }
