@@ -58,13 +58,17 @@ public class ImageController {
 
     @GetMapping("/{imageBoardId}")
     public ResponseEntity<DetailImageBoardResponse> getDetailImageBoard(@PathVariable Long imageBoardId){
-        Long loginId = 1L;
+
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username = ((UserDetails) principal).getUsername();
+        User user = userService.findUserById(Long.parseLong(username));
+
         ImageBoard targetImageBoard = imageBoardService.findImageBoardEntity(imageBoardId);
         if(targetImageBoard == null){
             return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
         }
         imageBoardService.updateImageBoardViewCount(targetImageBoard);
-        DetailImageBoardResponse imageBoardResponse = imageBoardService.getDetailImageResponse(targetImageBoard, loginId);
+        DetailImageBoardResponse imageBoardResponse = imageBoardService.getDetailImageResponse(targetImageBoard, user.getUserId());
         return new ResponseEntity<>(imageBoardResponse, HttpStatus.OK);
     }
 
