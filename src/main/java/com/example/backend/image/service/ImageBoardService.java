@@ -40,6 +40,13 @@ public class ImageBoardService {
     public void deleteImageBoard(ImageBoard imageBoard){
         imageBoard.setStatus(false);
         imageBoardRepository.save(imageBoard);
+
+        System.out.println(imageBoard.getId());
+        List<CustomHashtag> hashtags = customHashtagRepository.findByImageBoard_Id(imageBoard.getId());
+
+        for (CustomHashtag hashtag : hashtags) {
+            customHashtagRepository.delete(hashtag);
+        }
     }
 
     public ImageBoard findImageBoardEntity(Long imageBoardId){

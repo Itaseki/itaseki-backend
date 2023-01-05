@@ -6,6 +6,7 @@ import com.example.backend.user.domain.User;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -16,7 +17,9 @@ import java.util.List;
 @Table(name = "imageBoard")
 @Data
 @NoArgsConstructor
+@ToString(exclude = "customHashtags")
 public class ImageBoard {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "imageBoardId")

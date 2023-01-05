@@ -107,9 +107,12 @@ public class ImageController {
 
     @PostMapping("/{imageBoardId}/reports")
     public ResponseEntity<String> reportImageBoard(@PathVariable Long imageBoardId){
-        Long loginId = 5L;
+
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username = ((UserDetails) principal).getUsername();
+        User user = userService.findUserById(Long.parseLong(username));
+
         ImageBoard imageBoard = imageBoardService.findImageBoardEntity(imageBoardId);
-        User user = userService.findUserById(loginId);
         if(reportService.checkReportExistence(user,imageBoard)){
             return new ResponseEntity<>("해당 사용자가 이미 신고한 짤",HttpStatus.OK);
         }
