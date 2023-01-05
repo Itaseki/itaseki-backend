@@ -86,9 +86,12 @@ public class ImageController {
 
     @PostMapping("/{imageBoardId}/likes")
     public ResponseEntity<Integer> setLikeOnImageBoard(@PathVariable Long imageBoardId){
-        Long loginId = 1L;
+
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username = ((UserDetails) principal).getUsername();
+        User user = userService.findUserById(Long.parseLong(username));
+
         ImageBoard imageBoard = imageBoardService.findImageBoardEntity(imageBoardId);
-        User user = userService.findUserById(loginId);
         Like like = likeService.findExistingLike(imageBoard,user);
         Integer totalLikeCount;
         if(like==null){
