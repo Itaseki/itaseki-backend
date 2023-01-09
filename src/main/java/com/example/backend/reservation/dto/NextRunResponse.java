@@ -1,5 +1,6 @@
 package com.example.backend.reservation.dto;
 
+import com.example.backend.reservation.converter.TimeConverter;
 import com.example.backend.reservation.domain.ConfirmedReservation;
 import com.example.backend.video.domain.Video;
 import lombok.Builder;
@@ -29,7 +30,7 @@ public class NextRunResponse {
                 .videoUrl(video.getVideoUrl())
                 .count(res.getReservationCount())
                 .reservationDate(res.getReservationDate().toString())
-                .startTime(res.getStartTime())
+                .startTime(TimeConverter.convertToString(res.getStartTime()))
                 .build();
     }
 

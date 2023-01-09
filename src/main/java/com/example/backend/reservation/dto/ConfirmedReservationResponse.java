@@ -1,5 +1,6 @@
 package com.example.backend.reservation.dto;
 
+import com.example.backend.reservation.converter.TimeConverter;
 import com.example.backend.reservation.domain.ConfirmedReservation;
 import com.example.backend.video.domain.Video;
 import lombok.Builder;
@@ -17,15 +18,15 @@ public class ConfirmedReservationResponse {
     private String startTime;
     private String endTime;
 
-    public static ConfirmedReservationResponse of(ConfirmedReservation res){
-        Video video = res.getVideo();
+    public static ConfirmedReservationResponse of(ConfirmedReservation reservation){
+        Video video = reservation.getVideo();
         return ConfirmedReservationResponse.builder()
-                .reservationId(res.getId())
+                .reservationId(reservation.getId())
                 .videoId(video.getId())
                 .title(video.getDescription())
-                .reservationDate(res.getReservationDate().toString())
-                .startTime(res.getStartTime())
-                .endTime(res.getEndTime())
+                .reservationDate(reservation.getReservationDate().toString())
+                .startTime(TimeConverter.convertToString(reservation.getStartTime()))
+                .endTime(TimeConverter.convertToString(reservation.getEndTime()))
                 .build();
     }
 }

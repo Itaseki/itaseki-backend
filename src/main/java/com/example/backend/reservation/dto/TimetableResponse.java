@@ -1,5 +1,6 @@
 package com.example.backend.reservation.dto;
 
+import com.example.backend.reservation.converter.TimeConverter;
 import com.example.backend.reservation.domain.Reservation;
 import com.example.backend.video.domain.Video;
 import lombok.Builder;
@@ -24,8 +25,8 @@ public class TimetableResponse {
                 .id(video.getId())
                 .title(video.getDescription())
                 .reservationDate(reservation.getReservationDate().toString())
-                .startTime(reservation.getStartTime())
-                .endTime(reservation.getEndTime())
+                .startTime(TimeConverter.convertToString(reservation.getStartTime()))
+                .endTime(TimeConverter.convertToString(reservation.getEndTime()))
                 .runTime(getVideoRuntimeString(video))
                 .count(count)
                 .build();
