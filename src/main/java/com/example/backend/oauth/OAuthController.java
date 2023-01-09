@@ -22,10 +22,10 @@ public class OAuthController {
 
     /**
      * 카카오 callback
-     * [GET] /oauth/kakao
+     * [POST] /oauth/kakao
      */
 
-    @GetMapping("/kakao")
+    @PostMapping("/kakao")
     public ResponseEntity<String> socialLogin(OauthDto oauthDto) {
 
         JsonNode userInfo = oAuthService.getUserInfo(oauthDto.getAccessCode());

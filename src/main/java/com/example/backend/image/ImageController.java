@@ -74,9 +74,8 @@ public class ImageController {
     }
 
     @GetMapping("")
-    public ResponseEntity<AllImageResponseWithPageCount> getAllImageBoards(@PageableDefault(sort="id", direction = Sort.Direction.DESC) Pageable pageable,
-                                                                           @RequestParam(required = false) String q, @RequestParam(required = false) String hashtag){
-        return new ResponseEntity<>(imageBoardService.getAllResponseOfImageBoard(pageable,q), HttpStatus.OK);
+    public ResponseEntity<AllImageResponseWithPageCount> getAllImageBoards(@PageableDefault(sort="id", direction = Sort.Direction.DESC) Pageable pageable){
+        return new ResponseEntity<>(imageBoardService.getAllResponseOfImageBoard(pageable), HttpStatus.OK);
     }
 
     @GetMapping("best")
