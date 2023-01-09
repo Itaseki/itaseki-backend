@@ -45,10 +45,11 @@ public class ReservationService {
         }
 
         reservationRepository.save(Reservation.fromDtoAndUserVideo(reservationDto, user, video));
-        // 예약 업데이트
+
+        makeNewConfirms(LocalDate.now());
     }
 
-    public void saveConfirm(ConfirmedReservation confirm) {
+    private void saveConfirm(ConfirmedReservation confirm) {
         confirmedRepository.save(confirm);
     }
 
@@ -85,19 +86,17 @@ public class ReservationService {
     public List<ConfirmedReservationResponse> findAllConfirmedReservationsByDate(LocalDate date) {
         return confirmedRepository.findAllByReservationDate(date)
                 .stream()
-                .filter(reservation -> !isAlreadySameConfirmedReservationExist(reservation.getVideo(), reservation.getStartTime(), reservation.getEndTime()))
+                .sorted(Comparator.comparing(ConfirmedReservation::getStartTime))
                 .map(ConfirmedReservationResponse::of)
                 .collect(Collectors.toList());
     }
 
-    public void makeNewConfirms(LocalDate date) {
-//        List<Reservation> confirmNeeded = reservationRepository.getReservationsConfirmNeeded(date, criteria);
-//        reservationRepository.getReservationsConfirmNeeded(date, criteria)
-//                .stream()
-//                .filter(r -> findConfirmedReservation(r.getReservation().getReservationDate(), r.getReservation().getVideo(), r.getReservation().getStartTime(), r.getReservation().getEndTime()) == null)
-//                .map(ConfirmedReservation::new)
-//                .forEach(this::saveConfirm);
-
+    private void makeNewConfirms(LocalDate date) {
+        reservationRepository.findReservationsConfirmNeeded(date, CONFIRM_CRITERIA)
+                .stream()
+                .filter(reservation -> !isAlreadySameConfirmedReservationExist(reservation.getVideo(), reservation.getStartTime(), reservation.getEndTime()))
+                .map(ConfirmedReservation::fromDto)
+                .forEach(this::saveConfirm);
     }
 
     public List<TimetableResponse> getTimeTable(String start, String end, String select, String date) {

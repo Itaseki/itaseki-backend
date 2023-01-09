@@ -1,8 +1,8 @@
 package com.example.backend.reservation.repository;
 
-import com.example.backend.reservation.dto.ReservationCountDto;
 import com.example.backend.reservation.dto.ReservationGroupDto;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.QBean;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -20,26 +20,20 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
 
 
     @Override
-    public List<ReservationCountDto> findReservationsConfirmNeeded(LocalDate criteriaDate, Long confirmCount) {
+    public List<ReservationGroupDto> findReservationsConfirmNeeded(LocalDate criteriaDate, Long confirmCriteria) {
         return jpaQueryFactory
-                .select(Projections.fields(ReservationCountDto.class, reservation.as("reservation"),
-                        reservation.count().as("count")))
+                .select(projectionsForGroup())
                 .from(reservation)
-                .where(reservation.reservationDate.goe(criteriaDate)) //날짜가 오늘 날짜 이후 (이전 날짜는 업데이트 필요 없음)
+                .where(reservation.reservationDate.goe(criteriaDate))
                 .groupBy(reservation.reservationDate, reservation.video, reservation.startTime, reservation.endTime)
-                .having(reservation.count().goe(confirmCount))
+                .having(reservation.count().goe(confirmCriteria))
                 .fetch();
     }
 
     @Override
     public List<ReservationGroupDto> findReservationByDate(LocalDate date) {
         return jpaQueryFactory
-                .select(Projections.fields(ReservationGroupDto.class,
-                        reservation.video.as("video"),
-                        reservation.startTime.as("startTime"),
-                        reservation.endTime.as("endTime"),
-                        reservation.reservationDate.as("reservationDate"),
-                        reservation.count().as("reservationCount")))
+                .select(projectionsForGroup())
                 .from(reservation)
                 .where(reservation.reservationDate.eq(date))
                 .groupBy(reservation.reservationDate, reservation.video, reservation.startTime, reservation.endTime)
@@ -50,12 +44,7 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
     public List<ReservationGroupDto> findAllByTimeCondition(LocalDateTime startTime, LocalDateTime endTime,
                                                             List<LocalDateTime> selection) {
         return jpaQueryFactory
-                .select(Projections.fields(ReservationGroupDto.class,
-                        reservation.video.as("video"),
-                        reservation.startTime.as("startTime"),
-                        reservation.endTime.as("endTime"),
-                        reservation.reservationDate.as("reservationDate"),
-                        reservation.count().as("reservationCount")))
+                .select(projectionsForGroup())
                 .from(reservation)
                 .where(reservationIsBetweenStartAndEnd(startTime, endTime)
                         .and(reservationIsIncludingSelection(selection)))
@@ -77,6 +66,15 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
 
     private BooleanExpression reservationIncludingSelectedTime(LocalDateTime selectedTime) {
         return reservation.startTime.loe(selectedTime).and(reservation.endTime.goe(selectedTime));
+    }
+
+    private QBean<ReservationGroupDto> projectionsForGroup() {
+        return Projections.fields(ReservationGroupDto.class,
+                reservation.video.as("video"),
+                reservation.startTime.as("startTime"),
+                reservation.endTime.as("endTime"),
+                reservation.reservationDate.as("reservationDate"),
+                reservation.count().as("reservationCount"));
     }
 
 }
