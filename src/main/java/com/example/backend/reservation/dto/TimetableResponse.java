@@ -1,8 +1,6 @@
 package com.example.backend.reservation.dto;
 
 import com.example.backend.reservation.converter.TimeConverter;
-import com.example.backend.reservation.domain.Reservation;
-import com.example.backend.video.domain.Video;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,24 +17,17 @@ public class TimetableResponse {
     private String runTime;
     private Long count;
 
-    public static TimetableResponse of(Reservation reservation, Long count){
-        Video video = reservation.getVideo();
+    public static TimetableResponse fromDto(ReservationGroupDto dto) {
         return TimetableResponse.builder()
-                .id(video.getId())
-                .title(video.getDescription())
-                .reservationDate(reservation.getReservationDate().toString())
-                .startTime(TimeConverter.convertToString(reservation.getStartTime()))
-                .endTime(TimeConverter.convertToString(reservation.getEndTime()))
-                .runTime(getVideoRuntimeString(video))
-                .count(count)
+                .id(dto.getVideo().getId())
+                .title(dto.getVideo().getDescription())
+                .reservationDate(dto.getReservationDate().toString())
+                .startTime(TimeConverter.convertToString(dto.getStartTime()))
+                .endTime(TimeConverter.convertToString(dto.getEndTime()))
+                .runTime(dto.getVideo().getConvertedRuntime())
+                .count(dto.getReservationCount())
                 .build();
     }
 
-    private static String getVideoRuntimeString(Video video){
-        String h = video.getRuntimeHour()<10?"0"+video.getRuntimeHour():video.getRuntimeHour().toString();
-        String m = video.getRuntimeMin()<10?"0"+video.getRuntimeMin():video.getRuntimeMin().toString();
-        String s = video.getRuntimeSec()<10?"0"+video.getRuntimeSec():video.getRuntimeSec().toString();
-        return h+":"+m+":"+s;
-    }
 
 }

@@ -1,5 +1,6 @@
 package com.example.backend.reservation;
 
+import com.example.backend.reservation.converter.TimeConverter;
 import com.example.backend.reservation.domain.ConfirmedReservation;
 import com.example.backend.reservation.domain.Reservation;
 import com.example.backend.reservation.dto.*;
@@ -97,36 +98,21 @@ public class ReservationService {
 
     }
 
-    // 예외 발생 -> 시작시간과 종료시간이 start, end 내에 있고 예약 시간에 select 가 포함되어 있어야 한다!
     public List<TimetableResponse> getTimeTable(String start, String end, String select, String date) {
-//        LocalDate localDate = LocalDate.parse(date);
-//        Date startT=toDate(start);
-//        Date endT=toDate(end);
-//        List<Date> selects = Arrays.stream(select.split(","))
-//                .map(this::toDate)
-//                .collect(Collectors.toList());
-//
-//        //파라미터롤 넘어온 날짜에 예약된 모든 예약 내역 그룹 (시작시간, 종료시간, 영상 id) 으로 반환
-//        List<ReservationCountDto> groupVideo = reservationRepository.getVideoGroupByDate(localDate);
-//
-//        return groupVideo
-//                .stream()
-//                .filter(g -> toDate(g.getReservation().getStartTime()).compareTo(startT) >= 0 && toDate(g.getReservation().getEndTime()).compareTo(endT) <= 0)
-//                .filter(g -> filterSelection(selects, toDate(g.getReservation().getStartTime()), toDate(g.getReservation().getEndTime())))
-//                .sorted(Comparator.comparing(g->toDate(g.getReservation().getStartTime())))
-//                .map(g->TimetableResponse.of(g.getReservation(),g.getCount()))
-//                .collect(Collectors.toList());
+        LocalDateTime startTime = TimeConverter.convertToLocalTime(date, start);
+        LocalDateTime endTime = TimeConverter.convertToLocalTime(date, end);
+        List<LocalDateTime> selectedTimes = convertSelectedTimes(date, select);
 
-//        finals.stream()
-//                .forEach(v-> System.out.println("v = " + v.getReservation().getId()+", "+v.getCount()));
-        return null;
-
+        return reservationRepository.findAllByTimeCondition(startTime, endTime, selectedTimes)
+                .stream()
+                .map(TimetableResponse::fromDto)
+                .collect(Collectors.toList());
     }
 
-
-    private Boolean filterSelection(List<Date> selects, Date start, Date end) {
-        return selects.stream()
-                .anyMatch(select -> start.compareTo(select) <= 0 && end.compareTo(select) >= 0);
+    private List<LocalDateTime> convertSelectedTimes(String date, String select) {
+        return Arrays.stream(select.split(","))
+                .map(time -> TimeConverter.convertToLocalTime(date, time))
+                .collect(Collectors.toList());
     }
 
     public List<BestReservationResponse> getBestReservations() {
