@@ -1,14 +1,11 @@
 package com.example.backend.reservation.dto;
 
 import com.example.backend.reservation.converter.TimeConverter;
-import com.example.backend.reservation.domain.Reservation;
 import com.example.backend.video.domain.Video;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
-@Setter
 @Builder
 public class BestReservationResponse {
     private Long id;
@@ -21,24 +18,18 @@ public class BestReservationResponse {
     private String startTime;
     private String endTime;
 
-    public static BestReservationResponse of(Reservation reservation, Long count){
-        Video video = reservation.getVideo();
+    public static BestReservationResponse fromDto(ReservationGroupDto dto){
+        Video video = dto.getVideo();
         return BestReservationResponse.builder()
-                .id(video.getId()).title(video.getDescription())
-                .runTime(getVideoRuntimeString(video))
+                .id(video.getId())
+                .title(video.getDescription())
+                .runTime(video.getConvertedRuntime())
                 .videoUrl(video.getVideoUrl())
                 .thumbnailUrl(video.getThumbnailUrl())
-                .count(count)
-                .reservationDate(reservation.getReservationDate().toString())
-                .startTime(TimeConverter.convertToString(reservation.getStartTime()))
-                .endTime(TimeConverter.convertToString(reservation.getEndTime()))
+                .count(dto.getReservationCount())
+                .reservationDate(dto.getReservationDate().toString())
+                .startTime(TimeConverter.convertToString(dto.getStartTime()))
+                .endTime(TimeConverter.convertToString(dto.getEndTime()))
                 .build();
-    }
-
-    private static String getVideoRuntimeString(Video video){
-        String h = video.getRuntimeHour()<10?"0"+video.getRuntimeHour():video.getRuntimeHour().toString();
-        String m = video.getRuntimeMin()<10?"0"+video.getRuntimeMin():video.getRuntimeMin().toString();
-        String s = video.getRuntimeSec()<10?"0"+video.getRuntimeSec():video.getRuntimeSec().toString();
-        return h+":"+m+":"+s;
     }
 }

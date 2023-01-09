@@ -63,7 +63,6 @@ public class ReservationController {
 
     @GetMapping("/best")
     public ResponseEntity<List<BestReservationResponse>> getBest3Reservations() {
-        //오늘 날짜 -> group by 해서 예약 수 기준으로 정렬 -> limit 3
         return new ResponseEntity<>(reservationService.getBestReservations(), HttpStatus.OK);
     }
 

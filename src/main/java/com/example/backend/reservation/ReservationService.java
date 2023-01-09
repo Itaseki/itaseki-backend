@@ -25,6 +25,7 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final ConfirmedReservationRepository confirmedRepository;
     private final long CONFIRM_CRITERIA = 2L;
+    private final int BEST_LIMIT = 3;
 
     public void saveReservation(ReservationDto reservationDto, User user, Video video) {
         if (isOverNextDay(reservationDto.getStartTime(), reservationDto.getEndTime())) {
@@ -84,6 +85,7 @@ public class ReservationService {
     public List<ConfirmedReservationResponse> findAllConfirmedReservationsByDate(LocalDate date) {
         return confirmedRepository.findAllByReservationDate(date)
                 .stream()
+                .filter(reservation -> !isAlreadySameConfirmedReservationExist(reservation.getVideo(), reservation.getStartTime(), reservation.getEndTime()))
                 .map(ConfirmedReservationResponse::of)
                 .collect(Collectors.toList());
     }
@@ -116,15 +118,12 @@ public class ReservationService {
     }
 
     public List<BestReservationResponse> getBestReservations() {
-        LocalDate now = LocalDate.now();
-//        return reservationRepository.getVideoGroupByDate(now)
-//                .stream()
-//                .filter(g->findConfirmedReservation(g.getReservation().getReservationDate(), g.getReservation().getVideo(), g.getReservation().getStartTime(),g.getReservation().getEndTime())==null)
-//                .sorted(Comparator.comparing(ReservationCountDto::getCount).reversed()) //예약 많은 순 정렬
-//                .limit(3)
-//                .map(g -> BestReservationResponse.of(g.getReservation(), g.getCount()))
-//                .collect(Collectors.toList());
-        return null;
+        return reservationRepository.findReservationByDate(LocalDate.now())
+                .stream()
+                .sorted(Comparator.comparing(ReservationGroupDto::getReservationCount).reversed())
+                .limit(BEST_LIMIT)
+                .map(BestReservationResponse::fromDto)
+                .collect(Collectors.toList());
     }
 
     // 예외 발생

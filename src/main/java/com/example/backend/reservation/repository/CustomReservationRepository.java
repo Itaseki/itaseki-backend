@@ -9,7 +9,7 @@ import java.util.List;
 public interface CustomReservationRepository {
     List<ReservationCountDto> findReservationsConfirmNeeded(LocalDate criteriaDate, Long confirmCriteria);
 
-    List<ReservationCountDto> findVideoGroupByDate(LocalDate date);
+    List<ReservationGroupDto> findReservationByDate(LocalDate date);
 
     List<ReservationGroupDto> findAllByTimeCondition(LocalDateTime startTime, LocalDateTime endTime,
                                                      List<LocalDateTime> selection);

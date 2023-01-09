@@ -32,11 +32,14 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
     }
 
     @Override
-    public List<ReservationCountDto> findVideoGroupByDate(LocalDate date) {
-        //여기서 날짜, 시작시간, 종료시간, 영상으로 같은 비디오 다 groupBy 해주고 그 결과에서 startTIme, endTime 비교해서 선택시간만 반환
+    public List<ReservationGroupDto> findReservationByDate(LocalDate date) {
         return jpaQueryFactory
-                .select(Projections.fields(ReservationCountDto.class, reservation.as("reservation"),
-                        reservation.count().as("count")))
+                .select(Projections.fields(ReservationGroupDto.class,
+                        reservation.video.as("video"),
+                        reservation.startTime.as("startTime"),
+                        reservation.endTime.as("endTime"),
+                        reservation.reservationDate.as("reservationDate"),
+                        reservation.count().as("reservationCount")))
                 .from(reservation)
                 .where(reservation.reservationDate.eq(date))
                 .groupBy(reservation.reservationDate, reservation.video, reservation.startTime, reservation.endTime)
