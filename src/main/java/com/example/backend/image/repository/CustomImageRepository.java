@@ -12,6 +12,6 @@ import java.util.List;
 public interface CustomImageRepository {
     TempImageDto findAll(Pageable pageable, List<String> tags, List<String> queries);
     List<ImageBoard> findBestBoards();
-    Page<ImageBoard> findAll(Pageable pageable, String[] queryList);
+    Page<ImageBoard> findAll(Pageable pageable);
     List<ImageBoard> findAllForSearch(String sort, String[] queryList, String tag);
 }

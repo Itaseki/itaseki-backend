@@ -82,12 +82,8 @@ public class ImageBoardService {
         return DetailImageBoardResponse.fromEntity(imageBoard, loginId, getHashtagKeywordStringInImageBoard(imageBoard));
     }
 
-    public AllImageResponseWithPageCount getAllResponseOfImageBoard(Pageable pageable, String query){
-        String[] queryList = null;
-        if(query!=null){
-            queryList = query.split(" ");
-        }
-        Page<ImageBoard> imageBoardPage = imageBoardRepository.findAll(pageable,queryList);
+    public AllImageResponseWithPageCount getAllResponseOfImageBoard(Pageable pageable){
+        Page<ImageBoard> imageBoardPage = imageBoardRepository.findAll(pageable);
         List<AllImageBoardsResponse> imageBoardsResponses = toAllImageBoardResponse(imageBoardPage.getContent());
         return new AllImageResponseWithPageCount(imageBoardPage.getTotalPages(),imageBoardsResponses);
     }

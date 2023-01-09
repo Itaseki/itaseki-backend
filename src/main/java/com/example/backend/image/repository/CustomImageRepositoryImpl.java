@@ -47,9 +47,9 @@ public class CustomImageRepositoryImpl implements CustomImageRepository{
     }
 
     @Override
-    public Page<ImageBoard> findAll(Pageable pageable, String[] queryList) {
+    public Page<ImageBoard> findAll(Pageable pageable) {
         QueryResults<ImageBoard> queryResults = jpaQueryFactory.selectFrom(imageBoard)
-                .where(imageBoard.status.eq(true), getPredicate(queryList))
+                .where(imageBoard.status.eq(true))
                 .orderBy(getOrders(pageable.getSort()).toArray(OrderSpecifier[]::new))
                 .offset(pageable.getOffset()) //시작 위치
                 .limit(pageable.getPageSize()) //한 페이지에 들어가는 데이터 개수만큼만 조회
