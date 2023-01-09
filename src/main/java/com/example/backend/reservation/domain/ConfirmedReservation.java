@@ -2,7 +2,7 @@ package com.example.backend.reservation.domain;
 
 import com.example.backend.reservation.dto.ReservationCountDto;
 import com.example.backend.video.domain.Video;
-import lombok.Builder;
+import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -14,11 +14,12 @@ import java.time.LocalDate;
 @Data
 @RequiredArgsConstructor
 public class ConfirmedReservation {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "confirm_id")
     private Long id;
 
-    @DateTimeFormat(pattern="yyyy-MM-dd")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(nullable = false)
     private LocalDate reservationDate;
 
@@ -26,25 +27,26 @@ public class ConfirmedReservation {
     @JoinColumn(name = "video_id")
     private Video video;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
     @Column(nullable = false)
-    private String startTime;
+    private LocalDateTime startTime;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
     @Column(nullable = false)
-    private String endTime;
+    private LocalDateTime endTime;
 
     @Column
     private Long reservationCount;
 
-    public ConfirmedReservation(ReservationCountDto dto){
+    public ConfirmedReservation(ReservationCountDto dto) {
         Reservation reservation = dto.getReservation();
         Long count = dto.getCount();
-        this.reservationDate=reservation.getReservationDate();
-        this.startTime=reservation.getStartTime();
-        this.endTime=reservation.getEndTime();
-        this.video=reservation.getVideo();
-        this.reservationCount=count;
+        this.reservationDate = reservation.getReservationDate();
+        this.startTime = reservation.getStartTime();
+        this.endTime = reservation.getEndTime();
+        this.video = reservation.getVideo();
+        this.reservationCount = count;
     }
-
 
 
 }
