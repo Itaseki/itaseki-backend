@@ -80,9 +80,6 @@ public class ReservationService {
                 confirmedReservation.getStartTime());
     }
 
-    private void updateConfirms() {
-    }
-
     public List<ConfirmedReservationResponse> findAllConfirmedReservationsByDate(LocalDate date) {
         return confirmedRepository.findAllByReservationDate(date)
                 .stream()
@@ -125,38 +122,25 @@ public class ReservationService {
                 .collect(Collectors.toList());
     }
 
-    // 예외 발생
     public NextRunResponse findNextConfirm() {
-        List<ConfirmedReservation> all = confirmedRepository.findAllByReservationDateGreaterThanEqual(LocalDate.now());
-        Date today = new Date();
+        LocalDateTime now = LocalDateTime.now();
+        System.out.println(now);
 
-        if (all.isEmpty()) {
-            return null; // 오늘 예약 영상이 없는 경우
+        // 재생시간이 50분 까지면, 50분 59초 까지를 의미하는지 아니면 49분 59초 까지를 의미하는지
+        ConfirmedReservation confirmedReservation =
+                confirmedRepository.findByStartTimeLessThanEqualAndEndTimeGreaterThanEqual(now, now)
+                .orElse(null);
+
+        if (confirmedReservation != null) {
+            return NextRunResponse.of(confirmedReservation);
         }
 
-        //1. 현재 재생중인 영상 찾고, 있으면 그거 return ->
-        //2. 다음 재생 예정 영상 찾고, 있으면 return
-        //1,2 다 없으면 null return
+        List<ConfirmedReservation> confirms = confirmedRepository.findByStartTimeGreaterThanEqualOrderByStartTime(now);
 
-        //시작시간 >= 지금시간 -> 대기중 / 시작시간 <= 지금시간 <=종료시간
-
-//        ConfirmedReservation confirmedReservation = all.stream()
-//                .filter(c->toDate(c.getReservationDate(),c.getStartTime()).compareTo(today)<=0&&today.compareTo(toDate(c.getReservationDate(),c.getEndTime()))<=0)
-//                .findAny()
-//                .orElse(null);
-//
-//        if(confirmedReservation!=null)
-//            return NextRunResponse.of(confirmedReservation);
-//
-//        ConfirmedReservation nextReservation = all.stream()
-//                .filter(c -> toDate(c.getReservationDate(), c.getStartTime()).compareTo(today) >= 0).min(Comparator.comparing(c -> toDate(c.getReservationDate(), c.getStartTime())))
-//                .orElse(null);
-//
-//        if(nextReservation!=null)
-//            return NextRunResponse.of(nextReservation);
-
-        return null;
-
+        return confirms.stream()
+                .findFirst()
+                .map(NextRunResponse::of)
+                .orElse(null);
     }
 
     public Reservation findReservationById(Long id) {
@@ -168,13 +152,11 @@ public class ReservationService {
     }
 
     public int getReservationsCount(Reservation r) {
-//        return reservationRepository.findAllByReservationDateAndStartTimeAndEndTimeAndVideo(r.getReservationDate(),r.getStartTime(),r.getEndTime(),r.getVideo()).size();
-        return 0;
+        return reservationRepository.findAllByReservationDateAndStartTimeAndEndTimeAndVideo(r.getReservationDate(),r.getStartTime(),r.getEndTime(),r.getVideo()).size();
     }
 
     public int getReservationsCount(ConfirmedReservation r) {
-//        return reservationRepository.findAllByReservationDateAndStartTimeAndEndTimeAndVideo(r.getReservationDate(),r.getStartTime(),r.getEndTime(),r.getVideo()).size();
-        return 0;
+        return reservationRepository.findAllByReservationDateAndStartTimeAndEndTimeAndVideo(r.getReservationDate(),r.getStartTime(),r.getEndTime(),r.getVideo()).size();
     }
 
 }
