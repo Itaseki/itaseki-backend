@@ -150,7 +150,7 @@ public class PlaylistController {
             return new ResponseEntity<>("해당 사용자가 이미 신고한 플레이리스트",HttpStatus.OK);
         Report report = Report.builder()
                 .user(user).playlist(playlist).build();
-        reportService.saveReport(report);
+        reportService.saveReport(report, playlist.getUser());
         if(playlist.getReports().size()>=5){
             playlistService.deletePlaylist(playlist);
             return new ResponseEntity<>("신고 5번 누적으로 삭제",HttpStatus.OK);

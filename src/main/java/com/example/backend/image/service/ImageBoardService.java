@@ -32,7 +32,7 @@ public class ImageBoardService {
     private final AwsS3Service awsS3Service;
     private final CustomHashtagRepository customHashtagRepository;
 
-    public void savePost(ImageBoard imageBoard, List<MultipartFile> files){
+    public void savePost(ImageBoard imageBoard){
         imageBoardRepository.save(imageBoard);
     }
 
@@ -40,6 +40,13 @@ public class ImageBoardService {
     public void deleteImageBoard(ImageBoard imageBoard){
         imageBoard.setStatus(false);
         imageBoardRepository.save(imageBoard);
+
+        System.out.println(imageBoard.getId());
+        List<CustomHashtag> hashtags = customHashtagRepository.findByImageBoard_Id(imageBoard.getId());
+
+        for (CustomHashtag hashtag : hashtags) {
+            customHashtagRepository.delete(hashtag);
+        }
     }
 
     public ImageBoard findImageBoardEntity(Long imageBoardId){
@@ -62,7 +69,7 @@ public class ImageBoardService {
     private List<AllImageBoardsResponse> toAllImageBoardResponse(List<ImageBoard> imageBoards){
         return imageBoards.stream()
                 .filter(imageBoard -> imageBoard.getStatus().equals(true))
-                .map(imageBoard -> AllImageBoardsResponse.fromEntity(imageBoard))
+                .map(AllImageBoardsResponse::fromEntity)
                 .collect(Collectors.toList());
     }
 
@@ -75,12 +82,8 @@ public class ImageBoardService {
         return DetailImageBoardResponse.fromEntity(imageBoard, loginId, getHashtagKeywordStringInImageBoard(imageBoard));
     }
 
-    public AllImageResponseWithPageCount getAllResponseOfImageBoard(Pageable pageable, String query){
-        String[] queryList = null;
-        if(query!=null){
-            queryList = query.split(" ");
-        }
-        Page<ImageBoard> imageBoardPage = imageBoardRepository.findAll(pageable,queryList);
+    public AllImageResponseWithPageCount getAllResponseOfImageBoard(Pageable pageable){
+        Page<ImageBoard> imageBoardPage = imageBoardRepository.findAll(pageable);
         List<AllImageBoardsResponse> imageBoardsResponses = toAllImageBoardResponse(imageBoardPage.getContent());
         return new AllImageResponseWithPageCount(imageBoardPage.getTotalPages(),imageBoardsResponses);
     }
