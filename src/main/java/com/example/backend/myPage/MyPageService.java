@@ -1,26 +1,35 @@
 package com.example.backend.myPage;
 
 import com.example.backend.community.domain.CommunityBoard;
+import com.example.backend.community.domain.CommunityComment;
 import com.example.backend.community.repository.CommunityBoardRepository;
+import com.example.backend.community.repository.CommunityCommentRepository;
 import com.example.backend.image.domain.ImageBoard;
 import com.example.backend.image.repository.ImageBoardRepository;
 import com.example.backend.like.Like;
 import com.example.backend.like.LikeRepository;
 import com.example.backend.myPage.dto.LikeDataDto;
+import com.example.backend.myPage.dto.MyCommentDto;
 import com.example.backend.myPage.dto.MyDataDto;
 import com.example.backend.myPage.dto.MyPageCommunityDto;
 import com.example.backend.myPage.dto.MyPageImageDto;
 import com.example.backend.myPage.dto.MyPageVideoDto;
 import com.example.backend.myPage.dto.UserInfoDto;
 import com.example.backend.playlist.domain.Playlist;
+import com.example.backend.playlist.domain.PlaylistComment;
+import com.example.backend.playlist.repository.PlaylistCommentRepository;
 import com.example.backend.playlist.service.PlaylistService;
 import com.example.backend.user.domain.Subscribe;
 import com.example.backend.user.domain.User;
 import com.example.backend.user.repository.SubscribeRepository;
 import com.example.backend.video.domain.Video;
+import com.example.backend.video.domain.VideoComment;
+import com.example.backend.video.repository.VideoCommentRepository;
 import com.example.backend.video.repository.VideoRepository;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +42,9 @@ public class MyPageService {
     private final LikeRepository likeRepository;
     private final CommunityBoardRepository communityBoardRepository;
     private final ImageBoardRepository imageBoardRepository;
+    private final CommunityCommentRepository communityCommentRepository;
+    private final VideoCommentRepository videoCommentRepository;
+    private final PlaylistCommentRepository playlistCommentRepository;
 
     public UserInfoDto findUserBasicInformation(User user) {
         return UserInfoDto.fromUserAndDetail(user,
@@ -48,7 +60,7 @@ public class MyPageService {
     }
 
     public MyDataDto getAllDataUploadedByUser(User user) {
-        return new MyDataDto(findAllCommunityBoardByUser(user), findAllVideoByUser(user), findAllImageByUser(user));
+        return new MyDataDto(findAllCommunityBoardByUser(user), findAllVideoByUser(user), findAllImageByUser(user), findAllCommentsByUser(user));
     }
 
     private List<MyPageCommunityDto> findAllCommunityBoardByUser(User user) {
@@ -117,5 +129,32 @@ public class MyPageService {
                 .stream()
                 .filter(Like::getLikeStatus)
                 .collect(Collectors.toList());
+    }
+
+    private List<MyCommentDto> findAllCommentsByUser(User user) {
+        return Stream.concat(Stream.concat(findAllCommunityCommentByUser(user), findAllPlaylistCommentByUser(user)), findAllVideoCommentByUser(user))
+                .sorted(Comparator.comparing(MyCommentDto::getCreatedTime).reversed())
+                .collect(Collectors.toList());
+    }
+
+    private Stream<MyCommentDto> findAllCommunityCommentByUser(User user) {
+        return communityCommentRepository.findAllByUser(user)
+                .stream()
+                .filter(CommunityComment::getStatus)
+                .map(MyCommentDto::ofCommunityBoard);
+    }
+
+    private Stream<MyCommentDto> findAllVideoCommentByUser(User user) {
+        return videoCommentRepository.findAllByUser(user)
+                .stream()
+                .filter(VideoComment::getStatus)
+                .map(MyCommentDto::ofVideo);
+    }
+
+    private Stream<MyCommentDto> findAllPlaylistCommentByUser(User user) {
+        return playlistCommentRepository.findAllByUser(user)
+                .stream()
+                .filter(PlaylistComment::getStatus)
+                .map(MyCommentDto::ofPlaylist);
     }
 }
