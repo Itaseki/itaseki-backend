@@ -116,7 +116,7 @@ public class PlaylistService {
         playlist.updateSaveCount();
     }
 
-    private List<UserSavedPlaylist> findAllSavedPlaylistByUser(User user){
+    public List<UserSavedPlaylist> findAllSavedPlaylistByUser(User user){
         return savedPlaylistRepository.findAllByUser(user)
                 .stream()
                 .filter(UserSavedPlaylist::getStatus)

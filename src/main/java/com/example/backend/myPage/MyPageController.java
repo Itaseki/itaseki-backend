@@ -78,4 +78,13 @@ public class MyPageController {
         }
         return new ResponseEntity<>(myPageService.findAllPlaylistByUser(user), HttpStatus.OK);
     }
+
+    @GetMapping("/my/saved/playlist")
+    public ResponseEntity<List<MyPagePlaylistDto>> getSavedPlaylist(@PathVariable Long userId) {
+        User user = userService.findUserById(userId);
+        if (user == null) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(myPageService.findAllSavedPlaylist(user), HttpStatus.OK);
+    }
 }

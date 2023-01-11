@@ -18,6 +18,7 @@ import com.example.backend.myPage.dto.MyPageVideoDto;
 import com.example.backend.myPage.dto.UserInfoDto;
 import com.example.backend.playlist.domain.Playlist;
 import com.example.backend.playlist.domain.PlaylistComment;
+import com.example.backend.playlist.domain.UserSavedPlaylist;
 import com.example.backend.playlist.repository.PlaylistCommentRepository;
 import com.example.backend.playlist.service.PlaylistService;
 import com.example.backend.user.domain.Subscribe;
@@ -67,7 +68,19 @@ public class MyPageService {
     public List<MyPagePlaylistDto> findAllPlaylistByUser(User user) {
         return playlistService.findAllPlaylistByUser(user)
                 .stream()
+                .sorted(Comparator.comparing(Playlist::getCreatedTime))
                 .map(playlist -> MyPagePlaylistDto.forMyPlaylist(playlist,
+                                playlistService.getFirstThumbnailInPlaylist(playlist.getId()),
+                                playlistService.findAllVideosInPlaylist(playlist.getId()).size()))
+                .collect(Collectors.toList());
+    }
+
+    public List<MyPagePlaylistDto> findAllSavedPlaylist(User user) {
+        return playlistService.findAllSavedPlaylistByUser(user)
+                .stream()
+                .map(UserSavedPlaylist::getPlaylist)
+                .sorted(Comparator.comparing(Playlist::getCreatedTime))
+                .map(playlist -> MyPagePlaylistDto.forSavedPlaylist(playlist,
                         playlistService.getFirstThumbnailInPlaylist(playlist.getId()),
                         playlistService.findAllVideosInPlaylist(playlist.getId()).size()))
                 .collect(Collectors.toList());
