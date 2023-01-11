@@ -2,10 +2,12 @@ package com.example.backend.myPage;
 
 import com.example.backend.blackList.domain.BlackList;
 import com.example.backend.blackList.service.BlackListService;
+import com.example.backend.myPage.dto.DetailPlaylistDto;
 import com.example.backend.myPage.dto.LikeDataDto;
 import com.example.backend.myPage.dto.MyDataDto;
 import com.example.backend.myPage.dto.MyPagePlaylistDto;
 import com.example.backend.myPage.dto.UserInfoDto;
+import com.example.backend.playlist.exception.PlaylistNotFoundException;
 import com.example.backend.user.domain.User;
 import com.example.backend.user.service.UserService;
 import com.example.backend.utils.JwtAuthenticationProvider;
@@ -13,6 +15,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -86,5 +89,15 @@ public class MyPageController {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(myPageService.findAllSavedPlaylist(user), HttpStatus.OK);
+    }
+
+    @GetMapping("/my/playlist/{playlistId}")
+    public ResponseEntity<DetailPlaylistDto> getDetailMyPagePlaylist(@PathVariable Long playlistId) {
+        return new ResponseEntity<>(myPageService.getMyPagePlaylistDetail(playlistId), HttpStatus.OK);
+    }
+
+    @ExceptionHandler(PlaylistNotFoundException.class)
+    public ResponseEntity<String> handlePlaylistNotFoundException(PlaylistNotFoundException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 }

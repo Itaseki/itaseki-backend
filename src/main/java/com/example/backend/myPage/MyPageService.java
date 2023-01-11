@@ -8,6 +8,7 @@ import com.example.backend.image.domain.ImageBoard;
 import com.example.backend.image.repository.ImageBoardRepository;
 import com.example.backend.like.Like;
 import com.example.backend.like.LikeRepository;
+import com.example.backend.myPage.dto.DetailPlaylistDto;
 import com.example.backend.myPage.dto.LikeDataDto;
 import com.example.backend.myPage.dto.MyCommentDto;
 import com.example.backend.myPage.dto.MyDataDto;
@@ -19,6 +20,7 @@ import com.example.backend.myPage.dto.UserInfoDto;
 import com.example.backend.playlist.domain.Playlist;
 import com.example.backend.playlist.domain.PlaylistComment;
 import com.example.backend.playlist.domain.UserSavedPlaylist;
+import com.example.backend.playlist.exception.PlaylistNotFoundException;
 import com.example.backend.playlist.repository.PlaylistCommentRepository;
 import com.example.backend.playlist.service.PlaylistService;
 import com.example.backend.user.domain.Subscribe;
@@ -84,6 +86,17 @@ public class MyPageService {
                         playlistService.getFirstThumbnailInPlaylist(playlist.getId()),
                         playlistService.findAllVideosInPlaylist(playlist.getId()).size()))
                 .collect(Collectors.toList());
+    }
+
+    public DetailPlaylistDto getMyPagePlaylistDetail(Long playlistId) {
+        Playlist playlist = playlistService.findPlaylistEntity(playlistId);
+        if (playlist == null) {
+            throw new PlaylistNotFoundException();
+        }
+        return DetailPlaylistDto.builder()
+                .playlist(playlist)
+                .videos(playlistService.findAllVideosInPlaylist(playlistId))
+                .build();
     }
 
     private List<MyPageCommunityDto> findAllCommunityBoardByUser(User user) {
