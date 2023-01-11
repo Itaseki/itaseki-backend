@@ -37,4 +37,9 @@ public class Subscribe {
         this.subscribeTarget=subscribeTarget;
         this.lastModified=lastModified;
     }
+
+    public Subscribe modifySubscribeStatus() {
+        this.status = !status;
+        return this;
+    }
 }

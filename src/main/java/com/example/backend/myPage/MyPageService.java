@@ -16,6 +16,8 @@ import com.example.backend.myPage.dto.MyPageCommunityDto;
 import com.example.backend.myPage.dto.MyPageImageDto;
 import com.example.backend.myPage.dto.MyPagePlaylistDto;
 import com.example.backend.myPage.dto.MyPageVideoDto;
+import com.example.backend.myPage.dto.MySubscribeDto;
+import com.example.backend.myPage.dto.SubscribeUserDto;
 import com.example.backend.myPage.dto.UserInfoDto;
 import com.example.backend.playlist.domain.Playlist;
 import com.example.backend.playlist.domain.PlaylistComment;
@@ -30,15 +32,18 @@ import com.example.backend.video.domain.Video;
 import com.example.backend.video.domain.VideoComment;
 import com.example.backend.video.repository.VideoCommentRepository;
 import com.example.backend.video.repository.VideoRepository;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class MyPageService {
     private final PlaylistService playlistService;
     private final SubscribeRepository subscribeRepository;
@@ -99,6 +104,33 @@ public class MyPageService {
                 .build();
     }
 
+    public MySubscribeDto getMyPageSubscribeInfo(User user) {
+        return MySubscribeDto.builder()
+                .mySubscribe(findAllSubscribingTargetsByUser(user))
+                .recommendedSubscribe(recommendSubscribingTargets(user))
+                .build();
+    }
+
+
+    public void saveSubscribe(User user, User target) {
+        subscribeRepository.findByUserAndSubscribeTarget(user, target)
+                .ifPresentOrElse(subscribe -> updateSubscribeInfo(subscribe.modifySubscribeStatus()),
+                        () -> updateSubscribeInfo(createNewSubscribe(user, target)));
+    }
+
+    private void updateSubscribeInfo(Subscribe subscribe){
+        subscribeRepository.save(subscribe);
+    }
+
+    private Subscribe createNewSubscribe(User user, User target) {
+        return Subscribe.builder()
+                .subscribeTarget(target)
+                .lastModified(LocalDateTime.now())
+                .user(user)
+                .build();
+    }
+
+
     private List<MyPageCommunityDto> findAllCommunityBoardByUser(User user) {
         return communityBoardRepository.findAllByUserOrderByCreatedTimeDesc(user)
                 .stream()
@@ -127,6 +159,7 @@ public class MyPageService {
         return playlistService.findAllPublicPlaylistsByUserDesc(user);
     }
 
+    // "user" 를 구독하는 사람들
     private List<User> findMySubscribers(User user) {
         return subscribeRepository.findAllBySubscribeTarget(user)
                 .stream()
@@ -135,6 +168,19 @@ public class MyPageService {
                 .collect(Collectors.toList());
     }
 
+    private List<SubscribeUserDto> findAllSubscribingTargetsByUser(User user) {
+        return subscribeRepository.findAllByUser(user)
+                .stream()
+                .filter(Subscribe::getStatus)
+                .sorted(Comparator.comparing(Subscribe::getLastModified).reversed())
+                .map(Subscribe::getSubscribeTarget)
+                .map(target -> SubscribeUserDto.ofUser(target, findMySubscribers(target).size()))
+                .collect(Collectors.toList());
+    }
+
+    private List<SubscribeUserDto> recommendSubscribingTargets(User user) {
+        return subscribeRepository.findAllNonSubscribingTargets(user);
+    }
     private int getUserReportedCount(User user) {
         return user.getUserReportCount();
     }
