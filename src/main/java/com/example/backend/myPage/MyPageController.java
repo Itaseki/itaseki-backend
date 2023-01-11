@@ -4,10 +4,12 @@ import com.example.backend.blackList.domain.BlackList;
 import com.example.backend.blackList.service.BlackListService;
 import com.example.backend.myPage.dto.LikeDataDto;
 import com.example.backend.myPage.dto.MyDataDto;
+import com.example.backend.myPage.dto.MyPagePlaylistDto;
 import com.example.backend.myPage.dto.UserInfoDto;
 import com.example.backend.user.domain.User;
 import com.example.backend.user.service.UserService;
 import com.example.backend.utils.JwtAuthenticationProvider;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -66,5 +68,14 @@ public class MyPageController {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(myPageService.getAllDataUploadedByUser(user), HttpStatus.OK);
+    }
+
+    @GetMapping("/my/playlist")
+    public ResponseEntity<List<MyPagePlaylistDto>> getMyUploadedPlaylist(@PathVariable Long userId) {
+        User user = userService.findUserById(userId);
+        if (user == null) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(myPageService.findAllPlaylistByUser(user), HttpStatus.OK);
     }
 }

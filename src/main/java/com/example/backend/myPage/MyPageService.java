@@ -13,6 +13,7 @@ import com.example.backend.myPage.dto.MyCommentDto;
 import com.example.backend.myPage.dto.MyDataDto;
 import com.example.backend.myPage.dto.MyPageCommunityDto;
 import com.example.backend.myPage.dto.MyPageImageDto;
+import com.example.backend.myPage.dto.MyPagePlaylistDto;
 import com.example.backend.myPage.dto.MyPageVideoDto;
 import com.example.backend.myPage.dto.UserInfoDto;
 import com.example.backend.playlist.domain.Playlist;
@@ -61,6 +62,15 @@ public class MyPageService {
 
     public MyDataDto getAllDataUploadedByUser(User user) {
         return new MyDataDto(findAllCommunityBoardByUser(user), findAllVideoByUser(user), findAllImageByUser(user), findAllCommentsByUser(user));
+    }
+
+    public List<MyPagePlaylistDto> findAllPlaylistByUser(User user) {
+        return playlistService.findAllPlaylistByUser(user)
+                .stream()
+                .map(playlist -> MyPagePlaylistDto.forMyPlaylist(playlist,
+                        playlistService.getFirstThumbnailInPlaylist(playlist.getId()),
+                        playlistService.findAllVideosInPlaylist(playlist.getId()).size()))
+                .collect(Collectors.toList());
     }
 
     private List<MyPageCommunityDto> findAllCommunityBoardByUser(User user) {
