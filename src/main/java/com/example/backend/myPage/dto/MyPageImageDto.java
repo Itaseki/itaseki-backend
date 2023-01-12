@@ -8,6 +8,7 @@ import lombok.Getter;
 public class MyPageImageDto {
     private final Long id;
     private final String imageUrl;
+    private final String title;
 
     public static MyPageImageDto of(ImageBoard imageBoard) {
         return MyPageImageDto.builder()
@@ -19,5 +20,6 @@ public class MyPageImageDto {
     private MyPageImageDto(ImageBoard imageBoard) {
         this.id = imageBoard.getId();
         this.imageUrl = imageBoard.getImageUrl();
+        this.title = imageBoard.getImageBoardTitle();
     }
 }

@@ -116,7 +116,7 @@ public class PlaylistService {
         playlist.updateSaveCount();
     }
 
-    private List<UserSavedPlaylist> findAllSavedPlaylistByUser(User user){
+    public List<UserSavedPlaylist> findAllSavedPlaylistByUser(User user){
         return savedPlaylistRepository.findAllByUser(user)
                 .stream()
                 .filter(UserSavedPlaylist::getStatus)
@@ -178,7 +178,7 @@ public class PlaylistService {
         return search;
     }
 
-    private String getFirstThumbnailInPlaylist(Long playlistId){
+    public String getFirstThumbnailInPlaylist(Long playlistId){
         Playlist playlist = this.findPlaylistEntity(playlistId);
         return pvRepository.findFirstThumbnailUrl(playlist);
     }
@@ -187,7 +187,7 @@ public class PlaylistService {
         return (int) (1+Math.ceil((totalPlaylistsCount-8)/(double)12));
     }
 
-    private List<PlaylistVideo> findAllVideosInPlaylist(Long playlistId){
+    public List<PlaylistVideo> findAllVideosInPlaylist(Long playlistId){
         Playlist playlist = this.findPlaylistEntity(playlistId);
         return playlist.getVideos()
                 .stream()

@@ -11,7 +11,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -53,15 +52,6 @@ public class UserService implements UserDetailsService {
                 .stream()
                 .filter(Subscribe::getStatus)
                 .collect(Collectors.toList());
-    }
-
-    public void saveSubscribe(User user, User target){
-        Subscribe build = Subscribe.builder()
-                .subscribeTarget(target)
-                .lastModified(LocalDateTime.now())
-                .user(user)
-                .build();
-        subscribeRepository.save(build);
     }
 
 }

@@ -9,13 +9,13 @@ public class MyDataDto {
     private final List<MyPageCommunityDto> communityDto;
     private final List<MyPageVideoDto> videoDto;
     private final List<MyPageImageDto> imageDto;
-//    private final List<MyCommentDto> commentDto;
+    private final List<MyCommentDto> commentDto;
 
     @Builder
-    public MyDataDto(List<MyPageCommunityDto> communityDto, List<MyPageVideoDto> videoDto, List<MyPageImageDto> imageDto) {
+    public MyDataDto(List<MyPageCommunityDto> communityDto, List<MyPageVideoDto> videoDto, List<MyPageImageDto> imageDto, List<MyCommentDto> commentDto) {
         this.communityDto = communityDto;
         this.videoDto = videoDto;
         this.imageDto = imageDto;
-//        this.commentDto = null;
+        this.commentDto = commentDto;
     }
 }
