@@ -120,4 +120,9 @@ public class Video {
         return this.likeCount;
     }
 
+    public String getConvertedRuntime() {
+        String format = "%02d:%02d:%02d";
+        return String.format(format, runtimeHour, runtimeMin, runtimeSec);
+    }
+
 }
