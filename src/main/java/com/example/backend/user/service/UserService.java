@@ -2,6 +2,7 @@ package com.example.backend.user.service;
 
 import com.example.backend.user.domain.Subscribe;
 import com.example.backend.user.domain.User;
+import com.example.backend.user.exception.NoSuchUserException;
 import com.example.backend.user.exception.WrongAuthorizationException;
 import com.example.backend.user.repository.SubscribeRepository;
 import com.example.backend.user.repository.UserRepository;
@@ -41,6 +42,14 @@ public class UserService implements UserDetailsService {
         if (!loginId.equals(requestTargetId)) {
             throw new WrongAuthorizationException();
         }
+    }
+
+    public User findExistingUser(Long userId) {
+        User user = findUserById(userId);
+        if (user == null || !user.isUserExist()) {
+            throw new NoSuchUserException();
+        }
+        return user;
     }
 
     @Override
