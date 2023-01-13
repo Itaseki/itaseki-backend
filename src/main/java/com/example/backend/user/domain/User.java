@@ -46,6 +46,9 @@ public class User implements UserDetails{
     @Column(nullable = false)
     private Integer userReportCount=0;
 
+    @Column(name = "user_status")
+    private boolean status = true;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
     private List<String> roles = new ArrayList<>();
@@ -95,6 +98,15 @@ public class User implements UserDetails{
         this.nickname = nickname;
         this.userDescription = description;
         updateProfileImage(imageUrl);
+    }
+
+    public void deleteUser() {
+        this.nickname = "알 수 없음";
+        this.status = false;
+    }
+
+    public boolean isUserExist() {
+        return this.status;
     }
 
     private void updateProfileImage(String imageUrl) {

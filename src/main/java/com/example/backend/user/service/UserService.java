@@ -2,6 +2,7 @@ package com.example.backend.user.service;
 
 import com.example.backend.user.domain.Subscribe;
 import com.example.backend.user.domain.User;
+import com.example.backend.user.exception.WrongAuthorizationException;
 import com.example.backend.user.repository.SubscribeRepository;
 import com.example.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,12 @@ public class UserService implements UserDetailsService {
 
     public void saveUser(User user){
         userRepository.save(user);
+    }
+
+    public void checkUserAuthority(Long loginId, Long requestTargetId) {
+        if (!loginId.equals(requestTargetId)) {
+            throw new WrongAuthorizationException();
+        }
     }
 
     @Override

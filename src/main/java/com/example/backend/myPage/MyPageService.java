@@ -120,6 +120,11 @@ public class MyPageService {
         return UserEditInfoDto.ofUser(user);
     }
 
+    public String deleteUser(User user) {
+        user.deleteUser();
+        return "삭제 성공";
+    }
+
     public MySubscribeDto getMyPageSubscribeInfo(User user) {
         return MySubscribeDto.builder()
                 .mySubscribe(findAllSubscribingTargetsByUser(user))

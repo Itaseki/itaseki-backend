@@ -20,6 +20,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -146,10 +149,23 @@ public class MyPageController {
         return new ResponseEntity<>("프로필 정보 업데이트 성공", HttpStatus.CREATED);
     }
 
-
+    @DeleteMapping("/edit")
+    public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
+        User user = findUserByAuthentication();
+        if (user == null || !user.isUserExist()) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+        userService.checkUserAuthority(user.getUserId(), userId);
+        return new ResponseEntity<>(myPageService.deleteUser(user), HttpStatus.NO_CONTENT);
+    }
 
     @ExceptionHandler(PlaylistNotFoundException.class)
     public ResponseEntity<String> handlePlaylistNotFoundException(PlaylistNotFoundException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    private User findUserByAuthentication() {
+        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userService.findUserById(Long.parseLong(principal.getUsername()));
     }
 }
