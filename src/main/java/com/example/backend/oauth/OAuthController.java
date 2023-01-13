@@ -1,6 +1,5 @@
 package com.example.backend.oauth;
 
-import com.example.backend.oauth.dto.OauthDto;
 import com.example.backend.oauth.service.OAuthService;
 import com.example.backend.user.service.UserService;
 import com.example.backend.user.domain.User;
@@ -25,10 +24,10 @@ public class OAuthController {
      * [POST] /oauth/kakao
      */
 
-    @PostMapping("/kakao")
-    public ResponseEntity<String> socialLogin(@RequestBody OauthDto oauthDto) {
+    @GetMapping("/kakao")
+    public ResponseEntity<String> socialLogin(@RequestParam("accessCode") String accessCode) {
 
-        JsonNode userInfo = oAuthService.getUserInfo(oauthDto.getAccessCode());
+        JsonNode userInfo = oAuthService.getUserInfo(accessCode);
 
         JsonNode jsonUserNickname = userInfo.get("properties").get("nickname");
         JsonNode jsonProfileUrl = userInfo.get("properties").get("profile_image");
