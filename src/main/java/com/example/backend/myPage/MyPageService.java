@@ -18,6 +18,8 @@ import com.example.backend.myPage.dto.MyPagePlaylistDto;
 import com.example.backend.myPage.dto.MyPageVideoDto;
 import com.example.backend.myPage.dto.MySubscribeDto;
 import com.example.backend.myPage.dto.SubscribeUserDto;
+import com.example.backend.myPage.dto.UserEditInfoDto;
+import com.example.backend.myPage.dto.UserEditRequest;
 import com.example.backend.myPage.dto.UserInfoDto;
 import com.example.backend.playlist.domain.Playlist;
 import com.example.backend.playlist.domain.PlaylistComment;
@@ -25,6 +27,7 @@ import com.example.backend.playlist.domain.UserSavedPlaylist;
 import com.example.backend.playlist.exception.PlaylistNotFoundException;
 import com.example.backend.playlist.repository.PlaylistCommentRepository;
 import com.example.backend.playlist.service.PlaylistService;
+import com.example.backend.s3Image.AwsS3Service;
 import com.example.backend.user.domain.Subscribe;
 import com.example.backend.user.domain.User;
 import com.example.backend.user.repository.SubscribeRepository;
@@ -41,6 +44,7 @@ import java.util.stream.Stream;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -55,6 +59,7 @@ public class MyPageService {
     private final CommunityCommentRepository communityCommentRepository;
     private final VideoCommentRepository videoCommentRepository;
     private final PlaylistCommentRepository playlistCommentRepository;
+    private final AwsS3Service awsS3Service;
     private final static long RECOMMENDATION_LIMIT = 1L;
     private final static int SUBSCRIBE_SHOW_COUNT = 5;
 
@@ -105,6 +110,14 @@ public class MyPageService {
                 .playlist(playlist)
                 .videos(playlistService.findAllVideosInPlaylist(playlistId))
                 .build();
+    }
+
+    public void editUserInfo(User user, UserEditRequest request, MultipartFile profileImage) {
+        user.updateUserProfileInfo(request.getNickname(), request.getDescription(), awsS3Service.uploadFile(profileImage));
+    }
+
+    public UserEditInfoDto getUserInfoForEdit(User user) {
+        return UserEditInfoDto.ofUser(user);
     }
 
     public MySubscribeDto getMyPageSubscribeInfo(User user) {

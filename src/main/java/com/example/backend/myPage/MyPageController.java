@@ -8,6 +8,8 @@ import com.example.backend.myPage.dto.MyDataDto;
 import com.example.backend.myPage.dto.MyPagePlaylistDto;
 import com.example.backend.myPage.dto.MySubscribeDto;
 import com.example.backend.myPage.dto.SubscribeRequest;
+import com.example.backend.myPage.dto.UserEditInfoDto;
+import com.example.backend.myPage.dto.UserEditRequest;
 import com.example.backend.myPage.dto.UserInfoDto;
 import com.example.backend.playlist.exception.PlaylistNotFoundException;
 import com.example.backend.user.domain.User;
@@ -16,6 +18,7 @@ import com.example.backend.utils.JwtAuthenticationProvider;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,9 +27,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/user/{userId}")
@@ -119,6 +124,29 @@ public class MyPageController {
         myPageService.saveSubscribe(user, target);
         return new ResponseEntity<>("구독 정보 업데이트 성공", HttpStatus.OK);
     }
+
+    @GetMapping("/edit")
+    public ResponseEntity<UserEditInfoDto> getUserInfoForEdit(@PathVariable Long userId) {
+        User user = userService.findUserById(userId);
+        if (user == null) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(myPageService.getUserInfoForEdit(user), HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/edit", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<String> editUserProfile(@RequestPart UserEditRequest editRequest,
+                                                  @RequestPart(required = false) MultipartFile profileImage,
+                                                  @PathVariable Long userId) {
+        User user = userService.findUserById(userId);
+        if (user == null) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+        myPageService.editUserInfo(user, editRequest, profileImage);
+        return new ResponseEntity<>("프로필 정보 업데이트 성공", HttpStatus.CREATED);
+    }
+
+
 
     @ExceptionHandler(PlaylistNotFoundException.class)
     public ResponseEntity<String> handlePlaylistNotFoundException(PlaylistNotFoundException exception) {

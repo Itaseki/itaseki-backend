@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.web.multipart.MultipartFile;
 
 @Entity
 @Getter @Setter
@@ -88,6 +89,19 @@ public class User implements UserDetails{
 
     public void updateUserReportCount() {
         this.userReportCount += 1;
+    }
+
+    public void updateUserProfileInfo(String nickname, String description, String imageUrl) {
+        this.nickname = nickname;
+        this.userDescription = description;
+        updateProfileImage(imageUrl);
+    }
+
+    private void updateProfileImage(String imageUrl) {
+        if (imageUrl == null) {
+            return;
+        }
+        this.profileUrl = imageUrl;
     }
 }
 
