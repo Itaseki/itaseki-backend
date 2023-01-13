@@ -34,7 +34,7 @@ public class JwtAuthenticationProvider {
     public String createJWT(Long userId){
         Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
         Date now = new Date();
-        long tokenValidTime = 30 * 60 * 1000L;
+        long tokenValidTime = 30 * 60 * 1000 * 6L;
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(new Date())
