@@ -26,7 +26,7 @@ public class OAuthController {
      */
 
     @PostMapping("/kakao")
-    public ResponseEntity<String> socialLogin(OauthDto oauthDto) {
+    public ResponseEntity<String> socialLogin(@RequestBody OauthDto oauthDto) {
 
         JsonNode userInfo = oAuthService.getUserInfo(oauthDto.getAccessCode());
 
