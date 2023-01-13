@@ -5,5 +5,5 @@ import com.example.backend.user.domain.User;
 import java.util.List;
 
 public interface CustomSubscribeRepository {
-    List<SubscribeUserDto> findAllNonSubscribingTargets(User user);
+    List<SubscribeUserDto> findAllNonSubscribingTargets(User user, long recommendationLimit);
 }

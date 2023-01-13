@@ -33,6 +33,7 @@ import com.example.backend.video.domain.VideoComment;
 import com.example.backend.video.repository.VideoCommentRepository;
 import com.example.backend.video.repository.VideoRepository;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,6 +55,8 @@ public class MyPageService {
     private final CommunityCommentRepository communityCommentRepository;
     private final VideoCommentRepository videoCommentRepository;
     private final PlaylistCommentRepository playlistCommentRepository;
+    private final static long RECOMMENDATION_LIMIT = 1L;
+    private final static int SUBSCRIBE_SHOW_COUNT = 5;
 
     public UserInfoDto findUserBasicInformation(User user) {
         return UserInfoDto.fromUserAndDetail(user,
@@ -173,13 +176,18 @@ public class MyPageService {
                 .stream()
                 .filter(Subscribe::getStatus)
                 .sorted(Comparator.comparing(Subscribe::getLastModified).reversed())
+                .limit(SUBSCRIBE_SHOW_COUNT)
                 .map(Subscribe::getSubscribeTarget)
                 .map(target -> SubscribeUserDto.ofUser(target, findMySubscribers(target).size()))
                 .collect(Collectors.toList());
     }
 
     private List<SubscribeUserDto> recommendSubscribingTargets(User user) {
-        return subscribeRepository.findAllNonSubscribingTargets(user);
+        List<SubscribeUserDto> recommendation = subscribeRepository.findAllNonSubscribingTargets(user, RECOMMENDATION_LIMIT);
+        Collections.shuffle(recommendation);
+        return recommendation.stream()
+                .limit(SUBSCRIBE_SHOW_COUNT)
+                .collect(Collectors.toList());
     }
     private int getUserReportedCount(User user) {
         return user.getUserReportCount();

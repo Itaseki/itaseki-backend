@@ -13,18 +13,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CustomSubscribeRepositoryImpl implements CustomSubscribeRepository {
     private final JPAQueryFactory jpaQueryFactory;
-    private final Long RECOMMENDATION_LIMIT = 1L;
 
     @Override
-    public List<SubscribeUserDto> findAllNonSubscribingTargets(User user) {
+    public List<SubscribeUserDto> findAllNonSubscribingTargets(User user, long recommendationLimit) {
         return jpaQueryFactory.select(Projections.fields(SubscribeUserDto.class, subscribe.subscribeTarget.nickname.as("nickname"),
                 subscribe.subscribeTarget.profileUrl.as("profileUrl"),
                 subscribe.count().as("subscribeCount")))
                 .from(subscribe)
                 .where(predicateNonSubscribe(user.getUserId()))
                 .groupBy(subscribe.subscribeTarget.nickname, subscribe.subscribeTarget.profileUrl)
-                .having(subscribe.count().goe(RECOMMENDATION_LIMIT))
-                .orderBy(subscribe.count().desc())
+                .having(subscribe.count().goe(recommendationLimit))
                 .fetch();
     }
 
