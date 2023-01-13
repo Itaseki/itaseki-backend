@@ -12,6 +12,7 @@ import com.example.backend.myPage.dto.UserEditInfoDto;
 import com.example.backend.myPage.dto.UserEditRequest;
 import com.example.backend.myPage.dto.UserInfoDto;
 import com.example.backend.playlist.exception.PlaylistNotFoundException;
+import com.example.backend.user.domain.UserCounter;
 import com.example.backend.user.domain.User;
 import com.example.backend.user.service.UserService;
 import com.example.backend.utils.JwtAuthenticationProvider;
@@ -44,6 +45,7 @@ public class MyPageController {
     private final BlackListService blackListService;
     private final UserService userService;
     private final MyPageService myPageService;
+    private final UserCounter userCounter;
 
     /**
      * 로그아웃
@@ -54,6 +56,7 @@ public class MyPageController {
         BlackList blackList = new BlackList();
         blackList.setToken(accessToken);
         blackListService.saveBlackList(blackList);
+        userCounter.logoutUser(accessToken);
         return new ResponseEntity<>("로그아웃 되었습니다.", HttpStatus.OK);
     }
 

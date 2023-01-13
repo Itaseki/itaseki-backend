@@ -3,6 +3,7 @@ package com.example.backend.reservation;
 import com.example.backend.reservation.converter.TimeConverter;
 import com.example.backend.reservation.domain.ConfirmedReservation;
 import com.example.backend.reservation.domain.Reservation;
+import com.example.backend.user.domain.UserCounter;
 import com.example.backend.reservation.dto.*;
 import com.example.backend.reservation.exception.ConfirmExistException;
 import com.example.backend.reservation.exception.DuplicateReservationException;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
 public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final ConfirmedReservationRepository confirmedRepository;
-    private final long CONFIRM_CRITERIA = 2L;
+    private final UserCounter userCounter;
     private final int BEST_LIMIT = 3;
 
     public void saveReservation(ReservationDto reservationDto, User user, Video video) {
@@ -89,7 +90,7 @@ public class ReservationService {
     }
 
     private void makeNewConfirms(LocalDate date) {
-        reservationRepository.findReservationsConfirmNeeded(date, CONFIRM_CRITERIA)
+        reservationRepository.findReservationsConfirmNeeded(date, (long) Math.ceil((double) userCounter.getLoggedInUserCount() / 100 * 10))
                 .stream()
                 .filter(reservation -> !isAlreadySameConfirmedReservationExist(reservation.getVideo(), reservation.getStartTime(), reservation.getEndTime()))
                 .map(ConfirmedReservation::fromDto)
