@@ -10,6 +10,7 @@ public class MyPageVideoDto {
     private final String title;
     private final String writerNickname;
     private final int likeCount;
+    private final String runtime;
     private final String thumbnailUrl;
 
     public static MyPageVideoDto of(Video video) {
@@ -25,6 +26,6 @@ public class MyPageVideoDto {
         this.writerNickname = video.getUser().getNickname();
         this.likeCount = video.getLikeCount();
         this.thumbnailUrl = video.getThumbnailUrl();
-
+        this.runtime = video.getConvertedRuntime();
     }
 }
