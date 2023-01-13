@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.web.multipart.MultipartFile;
 
 @Entity
 @Getter @Setter
@@ -44,6 +45,9 @@ public class User implements UserDetails{
 
     @Column(nullable = false)
     private Integer userReportCount=0;
+
+    @Column(name = "user_status")
+    private boolean status = true;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
@@ -88,6 +92,28 @@ public class User implements UserDetails{
 
     public void updateUserReportCount() {
         this.userReportCount += 1;
+    }
+
+    public void updateUserProfileInfo(String nickname, String description, String imageUrl) {
+        this.nickname = nickname;
+        this.userDescription = description;
+        updateProfileImage(imageUrl);
+    }
+
+    public void deleteUser() {
+        this.nickname = "알 수 없음";
+        this.status = false;
+    }
+
+    public boolean isUserExist() {
+        return this.status;
+    }
+
+    private void updateProfileImage(String imageUrl) {
+        if (imageUrl == null) {
+            return;
+        }
+        this.profileUrl = imageUrl;
     }
 }
 

@@ -18,6 +18,8 @@ import com.example.backend.myPage.dto.MyPagePlaylistDto;
 import com.example.backend.myPage.dto.MyPageVideoDto;
 import com.example.backend.myPage.dto.MySubscribeDto;
 import com.example.backend.myPage.dto.SubscribeUserDto;
+import com.example.backend.myPage.dto.UserEditInfoDto;
+import com.example.backend.myPage.dto.UserEditRequest;
 import com.example.backend.myPage.dto.UserInfoDto;
 import com.example.backend.playlist.domain.Playlist;
 import com.example.backend.playlist.domain.PlaylistComment;
@@ -25,6 +27,7 @@ import com.example.backend.playlist.domain.UserSavedPlaylist;
 import com.example.backend.playlist.exception.PlaylistNotFoundException;
 import com.example.backend.playlist.repository.PlaylistCommentRepository;
 import com.example.backend.playlist.service.PlaylistService;
+import com.example.backend.s3Image.AwsS3Service;
 import com.example.backend.user.domain.Subscribe;
 import com.example.backend.user.domain.User;
 import com.example.backend.user.repository.SubscribeRepository;
@@ -33,6 +36,7 @@ import com.example.backend.video.domain.VideoComment;
 import com.example.backend.video.repository.VideoCommentRepository;
 import com.example.backend.video.repository.VideoRepository;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,6 +44,7 @@ import java.util.stream.Stream;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -54,6 +59,9 @@ public class MyPageService {
     private final CommunityCommentRepository communityCommentRepository;
     private final VideoCommentRepository videoCommentRepository;
     private final PlaylistCommentRepository playlistCommentRepository;
+    private final AwsS3Service awsS3Service;
+    private final static long RECOMMENDATION_LIMIT = 1L;
+    private final static int SUBSCRIBE_SHOW_COUNT = 5;
 
     public UserInfoDto findUserBasicInformation(User user) {
         return UserInfoDto.fromUserAndDetail(user,
@@ -102,6 +110,19 @@ public class MyPageService {
                 .playlist(playlist)
                 .videos(playlistService.findAllVideosInPlaylist(playlistId))
                 .build();
+    }
+
+    public void editUserInfo(User user, UserEditRequest request, MultipartFile profileImage) {
+        user.updateUserProfileInfo(request.getNickname(), request.getDescription(), awsS3Service.uploadFile(profileImage));
+    }
+
+    public UserEditInfoDto getUserInfoForEdit(User user) {
+        return UserEditInfoDto.ofUser(user);
+    }
+
+    public String deleteUser(User user) {
+        user.deleteUser();
+        return "삭제 성공";
     }
 
     public MySubscribeDto getMyPageSubscribeInfo(User user) {
@@ -173,13 +194,18 @@ public class MyPageService {
                 .stream()
                 .filter(Subscribe::getStatus)
                 .sorted(Comparator.comparing(Subscribe::getLastModified).reversed())
+                .limit(SUBSCRIBE_SHOW_COUNT)
                 .map(Subscribe::getSubscribeTarget)
                 .map(target -> SubscribeUserDto.ofUser(target, findMySubscribers(target).size()))
                 .collect(Collectors.toList());
     }
 
     private List<SubscribeUserDto> recommendSubscribingTargets(User user) {
-        return subscribeRepository.findAllNonSubscribingTargets(user);
+        List<SubscribeUserDto> recommendation = subscribeRepository.findAllNonSubscribingTargets(user, RECOMMENDATION_LIMIT);
+        Collections.shuffle(recommendation);
+        return recommendation.stream()
+                .limit(SUBSCRIBE_SHOW_COUNT)
+                .collect(Collectors.toList());
     }
     private int getUserReportedCount(User user) {
         return user.getUserReportCount();

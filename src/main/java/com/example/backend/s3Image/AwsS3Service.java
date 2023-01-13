@@ -22,6 +22,9 @@ public class AwsS3Service {
     private String bucketName;
 
     public String uploadFile(MultipartFile multipartFile) {
+        if (multipartFile == null || multipartFile.isEmpty()) {
+            return null;
+        }
 
         String fileName = CommonUtils.buildFileName(multipartFile.getOriginalFilename());
 
@@ -37,16 +40,5 @@ public class AwsS3Service {
 
         return amazonS3Client.getUrl(bucketName, fileName).toString();
     }
-
-    private void validateFileExists(MultipartFile multipartFile) {
-        if (multipartFile.isEmpty()) {
-            System.out.println("file empty error");
-        }
-    }
-
-//
-//    public String findFile(String fileName){
-//        return amazonS3Client.getUrl(bucketName,fileName).toString();
-//    }
 
 }
