@@ -44,8 +44,8 @@ public class ReservationController {
 
 
     @GetMapping("/title/search")
-    public ResponseEntity<List<VideoTitleSearchResponse>> findVideoContainingTitle(@RequestParam String query) {
-        List<Video> videos = videoService.findVideoContainingTitle(query, "id");
+    public ResponseEntity<List<VideoTitleSearchResponse>> findVideoContainingTitle(@RequestParam String q) {
+        List<Video> videos = videoService.findVideoContainingTitle(q, "id");
         List<VideoTitleSearchResponse> searchResponses = videos.stream()
                 .map(VideoTitleSearchResponse::fromEntity)
                 .limit(5)
