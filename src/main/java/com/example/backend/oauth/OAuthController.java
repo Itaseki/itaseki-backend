@@ -29,22 +29,21 @@ public class OAuthController {
 
         JsonNode userInfo = oAuthService.getUserInfo(accessCode);
 
+        JsonNode jsonKakaoId = userInfo.get("id");
         JsonNode jsonUserNickname = userInfo.get("properties").get("nickname");
         JsonNode jsonProfileUrl = userInfo.get("properties").get("profile_image");
-        JsonNode jsonEmail = userInfo.get("kakao_account").get("email");
 
         String nickname = jsonUserNickname.toString();
         nickname = nickname.substring(1,nickname.length()-1);
         String profileUrl = jsonProfileUrl.toString();
         profileUrl = profileUrl.substring(1,profileUrl.length()-1);
-        String email = jsonEmail.toString();
-        email = email.substring(1,email.length()-1);
+        Long kakaoId = Long.parseLong(jsonKakaoId.toString());
 
-        User user = userService.findUserByEmail(email);
+        User user = userService.findUserByKakaoId(kakaoId);
 
         if(user == null){
             User newUser = new User();
-            newUser.setEmail(email);
+            newUser.setKakaoId(kakaoId);
             newUser.setProfileUrl(profileUrl);
             newUser.setNickname(nickname);
             newUser.setUserDescription(null);

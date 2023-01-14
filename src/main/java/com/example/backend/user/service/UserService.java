@@ -29,8 +29,8 @@ public class UserService implements UserDetailsService {
         return user.orElse(null);
     }
 
-    public User findUserByEmail(String email){
-        Optional<User> user = userRepository.findByEmail(email);
+    public User findUserByKakaoId(Long kakaoId){
+        Optional<User> user = userRepository.findByKakaoId(kakaoId);
         return user.orElse(null);
     }
 
