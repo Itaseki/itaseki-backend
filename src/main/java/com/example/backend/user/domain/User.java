@@ -35,7 +35,7 @@ public class User implements UserDetails{
     private String nickname;
 
     @Column(nullable = false)
-    private String email;
+    private Long kakaoId;
 
     @Column(nullable = true)
     private String profileUrl;
