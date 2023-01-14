@@ -32,6 +32,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             ,"/oauth", "/oauth/**"
             ,"/user", "/user/**"    // 마이페이지 관련 부분 (임시허가)
             ,"/main", "/main/**"
+            ,"/search", "/search/**"
     };
 
     private static final String[] AUTHENTICATED_URL_ARRAY={
