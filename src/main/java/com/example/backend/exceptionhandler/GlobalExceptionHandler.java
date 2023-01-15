@@ -2,6 +2,8 @@ package com.example.backend.exceptionhandler;
 
 import com.example.backend.user.exception.NoSuchUserException;
 import com.example.backend.user.exception.WrongAuthorizationException;
+import com.example.backend.video.exception.NoSuchCommentException;
+import com.example.backend.video.exception.NoSuchVideoException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,6 +21,16 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NoSuchUserException.class)
     ResponseEntity<String> handleNoSuchUserException(NoSuchUserException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(NoSuchVideoException.class)
+    ResponseEntity<String> handleNoSuchVideoException(NoSuchVideoException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(NoSuchCommentException.class)
+    ResponseEntity<String> handleNoSuchCommentException(NoSuchCommentException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 }
