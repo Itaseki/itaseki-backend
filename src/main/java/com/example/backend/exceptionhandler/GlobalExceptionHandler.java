@@ -1,5 +1,6 @@
 package com.example.backend.exceptionhandler;
 
+import com.example.backend.playlist.exception.NoSuchPlaylistException;
 import com.example.backend.user.exception.NoSuchUserException;
 import com.example.backend.user.exception.WrongAuthorizationException;
 import com.example.backend.video.exception.NoSuchCommentException;
@@ -31,6 +32,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NoSuchCommentException.class)
     ResponseEntity<String> handleNoSuchCommentException(NoSuchCommentException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(NoSuchPlaylistException.class)
+    ResponseEntity<String> handleNoSuchPlaylistException(NoSuchPlaylistException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 }

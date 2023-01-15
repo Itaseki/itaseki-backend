@@ -11,7 +11,6 @@ import com.example.backend.myPage.dto.SubscribeRequest;
 import com.example.backend.myPage.dto.UserEditInfoDto;
 import com.example.backend.myPage.dto.UserEditRequest;
 import com.example.backend.myPage.dto.UserInfoDto;
-import com.example.backend.playlist.exception.PlaylistNotFoundException;
 import com.example.backend.user.domain.UserCounter;
 import com.example.backend.user.domain.User;
 import com.example.backend.user.service.UserService;
@@ -24,7 +23,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -127,11 +125,6 @@ public class MyPageController {
     @DeleteMapping("/edit")
     public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
         return new ResponseEntity<>(myPageService.deleteUser(findUserAndCheckAuthority(userId)), HttpStatus.NO_CONTENT);
-    }
-
-    @ExceptionHandler(PlaylistNotFoundException.class)
-    public ResponseEntity<String> handlePlaylistNotFoundException(PlaylistNotFoundException exception) {
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     private User findUserByAuthentication() {

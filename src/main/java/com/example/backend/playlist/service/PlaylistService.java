@@ -5,6 +5,7 @@ import com.example.backend.playlist.domain.PlaylistComment;
 import com.example.backend.playlist.domain.PlaylistVideo;
 import com.example.backend.playlist.domain.UserSavedPlaylist;
 import com.example.backend.playlist.dto.*;
+import com.example.backend.playlist.exception.NoSuchPlaylistException;
 import com.example.backend.playlist.repository.PlaylistRepository;
 import com.example.backend.playlist.repository.PlaylistVideoRepository;
 import com.example.backend.playlist.repository.UserSavedPlaylistRepository;
@@ -97,13 +98,12 @@ public class PlaylistService {
         return null;
     }
 
-    public Playlist findPlaylistEntity(Long playlistId){
-        Playlist playlist = playlistRepository.findById(playlistId).orElse(null);
-        if(playlist==null)
-            return null;
-        if(playlist.getStatus())
-            return playlist;
-        return null;
+    public Playlist findPlaylistEntity(Long playlistId) {
+        Optional<Playlist> playlist = playlistRepository.findById(playlistId);
+        if (playlist.isPresent() && playlist.get().getStatus()) {
+            return playlist.get();
+        }
+        throw new NoSuchPlaylistException();
     }
 
     public void saveOthersPlaylist(Playlist playlist, User user){
@@ -136,17 +136,12 @@ public class PlaylistService {
         return changedPlaylist.getIsPublic();
     }
 
-    public Boolean checkUserPlaylistAuthority(User user, Playlist playlist){
-        return playlist.getUser().equals(user);
-    }
-
     public void deleteVideoInPlaylist(Video video, Long playlistId){
         Playlist playlist = findPlaylistEntity(playlistId);
-        if(playlist==null)
-            return;
         PlaylistVideo playlistVideo = this.findExistingPlaylistVideo(video, playlist);
-        if(playlistVideo==null)
+        if(playlistVideo == null) {
             return;
+        }
         playlistVideo.setStatus(false);
         pvRepository.save(playlistVideo);
     }
@@ -179,16 +174,15 @@ public class PlaylistService {
     }
 
     public String getFirstThumbnailInPlaylist(Long playlistId){
-        Playlist playlist = this.findPlaylistEntity(playlistId);
-        return pvRepository.findFirstThumbnailUrl(playlist);
+        return pvRepository.findFirstThumbnailUrl(findPlaylistEntity(playlistId));
     }
 
     private int getTotalPageCount(long totalPlaylistsCount){
         return (int) (1+Math.ceil((totalPlaylistsCount-8)/(double)12));
     }
 
-    public List<PlaylistVideo> findAllVideosInPlaylist(Long playlistId){
-        Playlist playlist = this.findPlaylistEntity(playlistId);
+    public List<PlaylistVideo> findAllVideosInPlaylist(Long playlistId) {
+        Playlist playlist = findPlaylistEntity(playlistId);
         return playlist.getVideos()
                 .stream()
                 .filter(PlaylistVideo::getStatus)
