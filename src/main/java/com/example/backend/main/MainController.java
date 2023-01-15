@@ -5,9 +5,13 @@ import com.example.backend.main.dto.MainImageResponse;
 import com.example.backend.main.dto.MainUserResponse;
 import com.example.backend.main.dto.MainVideoResponse;
 import com.example.backend.playlist.dto.AllPlaylistsResponse;
+import com.example.backend.user.domain.User;
+import com.example.backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MainController {
     private final MainService mainService;
+    private final UserService userService;
 
     @GetMapping("/community")
     public ResponseEntity<List<MainCommunityResponse>> getMainCommunityBoards(){
@@ -42,10 +47,11 @@ public class MainController {
 
     @GetMapping("/user")
     public ResponseEntity<MainUserResponse> getMainUserInfo(){
-        Long loginId=8L;
-        return new ResponseEntity<>(mainService.getUserProfileForMain(loginId),HttpStatus.OK);
+        return new ResponseEntity<>(mainService.getUserProfileForMain(findUserByAuthentication().getUserId()),HttpStatus.OK);
     }
 
-
-
+    private User findUserByAuthentication() {
+        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userService.findUserById(Long.parseLong(principal.getUsername()));
+    }
 }
