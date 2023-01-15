@@ -24,7 +24,6 @@ import com.example.backend.myPage.dto.UserInfoDto;
 import com.example.backend.playlist.domain.Playlist;
 import com.example.backend.playlist.domain.PlaylistComment;
 import com.example.backend.playlist.domain.UserSavedPlaylist;
-import com.example.backend.playlist.exception.PlaylistNotFoundException;
 import com.example.backend.playlist.repository.PlaylistCommentRepository;
 import com.example.backend.playlist.service.PlaylistService;
 import com.example.backend.s3Image.AwsS3Service;
@@ -102,12 +101,8 @@ public class MyPageService {
     }
 
     public DetailPlaylistDto getMyPagePlaylistDetail(Long playlistId) {
-        Playlist playlist = playlistService.findPlaylistEntity(playlistId);
-        if (playlist == null) {
-            throw new PlaylistNotFoundException();
-        }
         return DetailPlaylistDto.builder()
-                .playlist(playlist)
+                .playlist(playlistService.findPlaylistEntity(playlistId))
                 .videos(playlistService.findAllVideosInPlaylist(playlistId))
                 .build();
     }

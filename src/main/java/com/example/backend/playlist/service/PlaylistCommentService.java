@@ -3,6 +3,7 @@ package com.example.backend.playlist.service;
 import com.example.backend.playlist.domain.PlaylistComment;
 import com.example.backend.playlist.repository.PlaylistCommentRepository;
 import com.example.backend.playlist.dto.PlaylistCommentsResponse;
+import com.example.backend.video.exception.NoSuchCommentException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -63,10 +64,10 @@ public class PlaylistCommentService {
 
     public PlaylistComment findPlaylistCommentById(Long id){
         Optional<PlaylistComment> comment = commentRepository.findById(id);
-        if(comment.isPresent()&&comment.get().getStatus()){
+        if(comment.isPresent() && comment.get().getStatus()){
             return comment.get();
         }
-        return null;
+        throw new NoSuchCommentException();
     }
 
     public void deletePlaylistComment(PlaylistComment comment){

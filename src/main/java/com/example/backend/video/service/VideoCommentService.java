@@ -2,6 +2,7 @@ package com.example.backend.video.service;
 
 import com.example.backend.video.domain.VideoComment;
 import com.example.backend.video.dto.VideoCommentsResponse;
+import com.example.backend.video.exception.NoSuchCommentException;
 import com.example.backend.video.repository.VideoCommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -61,12 +62,12 @@ public class VideoCommentService {
         return response;
     }
 
-    public VideoComment findVideoCommentById(Long id){
+    public VideoComment findVideoCommentById(Long id) {
         Optional<VideoComment> comment = commentRepository.findById(id);
-        if(comment.isPresent()&&comment.get().getStatus()){
+        if(comment.isPresent() && comment.get().getStatus()){
             return comment.get();
         }
-        return null;
+        throw new NoSuchCommentException();
     }
 
     public void deleteVideoComment(VideoComment comment){

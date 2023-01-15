@@ -1,6 +1,7 @@
 package com.example.backend.oauth;
 
 import com.example.backend.oauth.service.OAuthService;
+import com.example.backend.user.domain.UserCounter;
 import com.example.backend.user.service.UserService;
 import com.example.backend.user.domain.User;
 import com.example.backend.utils.JwtAuthenticationProvider;
@@ -18,6 +19,7 @@ public class OAuthController {
     private final OAuthService oAuthService;
     private final JwtAuthenticationProvider jwtAuthenticationProvider;
     private final UserService userService;
+    private final UserCounter userCounter;
 
     /**
      * 카카오 callback
@@ -51,6 +53,7 @@ public class OAuthController {
             user = newUser;
         }
         String jsonWebToken = jwtAuthenticationProvider.createJWT(user.getUserId());
+        userCounter.loginNewUser(user.getUserId(), jsonWebToken);
         return new ResponseEntity<>(jsonWebToken, HttpStatus.OK);
     }
 }

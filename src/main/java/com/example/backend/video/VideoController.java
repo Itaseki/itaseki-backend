@@ -17,6 +17,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,36 +34,26 @@ public class VideoController {
     private final ReportService reportService;
 
     @GetMapping("/verify")
-    public ResponseEntity<String> verifyVideoUrl(@RequestParam String url){
-        String existence= videoService.checkVideoUrlExistence(url);
-        return new ResponseEntity<>(existence,HttpStatus.OK);
+    public ResponseEntity<String> verifyVideoUrl(@RequestParam String url) {
+        return new ResponseEntity<>(videoService.checkVideoUrlExistence(url),HttpStatus.OK);
     }
 
     @GetMapping("/info/{userId}")
-    public ResponseEntity<VideoUploadInfoResponse> getInfoForVideoUpload(@PathVariable Long userId){
-        User user = userService.findUserById(userId);
-        return new ResponseEntity<>(videoService.getPreInfoForVideoUpload(user),HttpStatus.OK);
+    public ResponseEntity<VideoUploadInfoResponse> getInfoForVideoUpload(@PathVariable Long userId) {
+        return new ResponseEntity<>(videoService.getPreInfoForVideoUpload(userService.findExistingUser(userId)),HttpStatus.OK);
     }
 
     @PostMapping("")
-    public ResponseEntity<String> uploadVideo(@RequestBody VideoDto videoDto){
-        Long loginId=1L;
-        User user = userService.findUserById(loginId);
-        videoService.saveVideo(videoDto,user);
+    public ResponseEntity<String> uploadVideo(@RequestBody VideoDto videoDto) {
+        videoService.saveVideo(videoDto, findUserByAuthentication());
         return new ResponseEntity<>("영상 등록 성공", HttpStatus.CREATED);
     }
 
     @PostMapping("/{videoId}/comments")
     public ResponseEntity<String> uploadVideoComment(@PathVariable Long videoId, @RequestBody VideoCommentDto commentDto){
-        //principal 추가
-        Long loginId=1L;
-        User user=userService.findUserById(loginId);
         Video video = videoService.findVideoEntityById(videoId);
-        if(video==null){
-            return new ResponseEntity<>("존재하지 않는 영상에 대한 댓글 등록 요청",HttpStatus.NOT_FOUND);
-        }
         VideoComment videoComment = VideoComment.builder()
-                .content(commentDto.getContent()).user(user)
+                .content(commentDto.getContent()).user(findUserByAuthentication())
                 .video(video).parentId(commentDto.getParentCommentId())
                 .build();
         commentService.saveVideoComment(videoComment, commentDto.getParentCommentId());
@@ -71,11 +63,9 @@ public class VideoController {
 
     @GetMapping("/{videoId}")
     public ResponseEntity<DetailVideoResponse> getDetailVideo(@PathVariable Long videoId){
-        Long loginId=1L;
         Video video = videoService.findVideoEntityById(videoId);
-        if(video==null)
-            return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
-        DetailVideoResponse detailVideoResponse = videoService.getDetailVideoResponse(video, loginId);
+        DetailVideoResponse detailVideoResponse = videoService.getDetailVideoResponse(video,
+                findUserByAuthentication().getUserId());
         videoService.updateVideoViewCount(video);
         return new ResponseEntity<>(detailVideoResponse,HttpStatus.OK);
     }
@@ -93,16 +83,15 @@ public class VideoController {
 
     @PostMapping("/{videoId}/likes")
     public ResponseEntity<Integer> likeOnVideo(@PathVariable Long videoId){
-        Long loginId=1L;
         Video video = videoService.findVideoEntityById(videoId);
-        User user = userService.findUserById(loginId);
+        User user = findUserByAuthentication();
         Like like = likeService.findExistingLike(video, user);
         Integer likeCount;
-        if(like==null){
+        if(like == null){
             like=Like.builder()
                     .video(video).user(user).build();
             likeCount = video.updateLikeCount(1);
-        }else{
+        } else {
             Boolean likeStatus = like.modifyLikeStatus();
             likeCount = video.updateLikeCount(likeStatus?1:-1);
         }
@@ -111,24 +100,24 @@ public class VideoController {
     }
 
     @DeleteMapping("/{videoId}")
-    public ResponseEntity<String> deleteVideo(@PathVariable Long videoId){
+    public ResponseEntity<String> deleteVideo(@PathVariable Long videoId) {
         Video video = videoService.findVideoEntityById(videoId);
+        findUserAndCheckAuthority(video.getUser().getUserId());
         videoService.deleteVideo(video);
         return new ResponseEntity<>("영상 삭제 성공",HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/{videoId}/reports")
-    public ResponseEntity<String> reportVideo(@PathVariable Long videoId){
-        Long loginId=1L;
+    public ResponseEntity<String> reportVideo(@PathVariable Long videoId) {
         Video video = videoService.findVideoEntityById(videoId);
-        User user = userService.findUserById(loginId);
-        Boolean existence = reportService.checkReportExistence(user, video);
-        if(existence)
-            return new ResponseEntity<>("해당 사용자가 이미 신고한 영상",HttpStatus.OK);
+        User user = findUserByAuthentication();
+        if(reportService.checkReportExistence(user, video)) {
+            return new ResponseEntity<>("해당 사용자가 이미 신고한 영상", HttpStatus.OK);
+        }
         Report report = Report.builder()
                 .user(user).video(video).build();
         reportService.saveReport(report, video.getUser());
-        if(video.getReports().size()>=5){
+        if(video.getReports().size() >= 5) {
             videoService.deleteVideo(video);
             return new ResponseEntity<>("신고 5번 누적으로 삭제",HttpStatus.OK);
         }
@@ -136,24 +125,25 @@ public class VideoController {
     }
 
     @DeleteMapping("/{videoId}/comments/{videoCommentId}")
-    public ResponseEntity<String> deleteVideo(@PathVariable Long videoId, @PathVariable Long videoCommentId){
+    public ResponseEntity<String> deleteVideoComment(@PathVariable Long videoId, @PathVariable Long videoCommentId){
         VideoComment videoComment = commentService.findVideoCommentById(videoCommentId);
+        findUserAndCheckAuthority(videoComment.getUser().getUserId());
         commentService.deleteVideoComment(videoComment);
         return new ResponseEntity<>("영상 댓글 삭제 성공",HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/{videoId}/comments/{videoCommentId}/reports")
     public ResponseEntity<String> reportVideoComment(@PathVariable Long videoId, @PathVariable Long videoCommentId){
-        Long loginId=1L;
         VideoComment comment = commentService.findVideoCommentById(videoCommentId);
-        User user = userService.findUserById(loginId);
+        User user = findUserByAuthentication();
         Boolean existence = reportService.checkReportExistence(user, comment);
-        if(existence)
-            return new ResponseEntity<>("해당 사용자가 이미 신고한 영상 댓글",HttpStatus.OK);
+        if(existence) {
+            return new ResponseEntity<>("해당 사용자가 이미 신고한 영상 댓글", HttpStatus.OK);
+        }
         Report report = Report.builder()
                 .user(user).videoComment(comment).build();
         reportService.saveReport(report, comment.getUser());
-        if(comment.getReports().size()>=5){
+        if(comment.getReports().size() >= 5){
             commentService.deleteVideoComment(comment);
             return new ResponseEntity<>("신고 5번 누적으로 삭제",HttpStatus.OK);
         }
@@ -161,8 +151,19 @@ public class VideoController {
     }
 
     @GetMapping("/series/search")
-    public ResponseEntity<List<InnerInfoResponse>> searchSeriesName(@RequestParam String q){
+    public ResponseEntity<List<InnerInfoResponse>> searchSeriesName(@RequestParam String q) {
         return new ResponseEntity<>(videoService.findSeriesNameByQuery(q),HttpStatus.OK);
+    }
+
+    private User findUserByAuthentication() {
+        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userService.findUserById(Long.parseLong(principal.getUsername()));
+    }
+
+    private User findUserAndCheckAuthority(Long userId) {
+        User user = userService.findExistingUser(userId);
+        userService.checkUserAuthority(findUserByAuthentication().getUserId(), userId);
+        return user;
     }
 
 
