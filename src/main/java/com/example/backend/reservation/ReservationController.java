@@ -15,6 +15,8 @@ import java.time.format.DateTimeParseException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -31,8 +33,7 @@ public class ReservationController {
 
     @PostMapping("")
     public ResponseEntity<String> registerVideoReservation(@RequestBody ReservationDto reservationDto) {
-        Long loginId = 1L;
-        User user = userService.findUserById(loginId);
+        User user = findUserByAuthentication();
         Video video = videoService.findVideoEntityById(reservationDto.getVideoId());
         if (video == null) {
             return new ResponseEntity<>("잘못된 영상에 대한 예약 요청", HttpStatus.NOT_FOUND);
@@ -115,5 +116,10 @@ public class ReservationController {
         ConfirmedReservation reservation = reservationService.findConfirmById(confirmedReservationId);
         return new ResponseEntity<>(DetailReservationResponse.fromConfirm(reservation,
                 reservationService.getReservationsCount(reservation)), HttpStatus.OK);
+    }
+
+    private User findUserByAuthentication() {
+        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userService.findUserById(Long.parseLong(principal.getUsername()));
     }
 }
