@@ -154,19 +154,12 @@ public class VideoService {
         throw new NoSuchVideoException();
     }
 
-    private List<String> getHashtagKeywordStringInVideo(Video video) {
+    public List<String> getHashtagKeywordStringInVideo(Video video) {
         List<VideoHashtag> videoHashtags = video.getVideoHashtags();
         List<CustomHashtag> customHashtags = video.getCustomHashtags();
-        //두 개의 list 를 각각 string stream 으로 변경한 후, 두 stream을 하나로 합친 list를 반환
         return Stream.concat(videoHashtags.stream().map(videoHashtag -> videoHashtag.getHashtag().getHashtagName())
                         , customHashtags.stream().map(CustomHashtag::getCustomHashtagName))
                 .collect(Collectors.toList());
-    }
-
-    public List<String> getHashtagsStringByVideoId(Long videoId) {
-        Video video = this.findVideoEntityById(videoId);
-        List<VideoHashtag> videoHashtags = video.getVideoHashtags();
-        return videoHashtags.stream().map(v -> v.getHashtag().getHashtagName()).collect(Collectors.toList());
     }
 
     public DetailVideoResponse getDetailVideoResponse(Video video, Long loginId) {
@@ -202,20 +195,13 @@ public class VideoService {
         return new AllVideoResponseWithPageCount(allVideoResponses, getTotalPageCount(tempDto.getTotalCount()));
     }
 
-    public List<AllVideoResponse> getAllVideoForSearch(String q, String tag, String nickname, String sort) {
-        List<String> tags = null;
-        if (tag != null) {
-            tags = Arrays.stream(tag.split(",")).collect(Collectors.toList());
-        }
-        List<String> queries = null;
-        if (q != null) {
-            queries = Arrays.stream(q.split(" ")).collect(Collectors.toList());
-        }
-        return toAllResponse(videoRepository.findAllForSearch(tags, nickname, queries, sort));
+    public List<AllVideoResponse> getAllVideoForSearch(String q, String tag, String sort) {
+        List<String> tags = Arrays.stream(tag.split(",")).collect(Collectors.toList());
+        List<String> queries = Arrays.stream(q.split(" ")).collect(Collectors.toList());
+        return toAllResponse(videoRepository.findAllForSearch(tags, queries, sort));
     }
 
     private int getTotalPageCount(long pages) {
-        System.out.println("total elements = " + pages);
         if (pages <= 4) {
             return 1;
         }
