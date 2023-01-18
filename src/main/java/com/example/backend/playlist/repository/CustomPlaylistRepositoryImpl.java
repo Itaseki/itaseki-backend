@@ -82,11 +82,10 @@ public class CustomPlaylistRepositoryImpl implements CustomPlaylistRepository {
     }
 
     private BooleanExpression checkQuery(List<String> queryList){
+        if (queryList.isEmpty()) {
+            return null;
+        }
         return Expressions.anyOf(queryList.stream().map(this::containsTitle).toArray(BooleanExpression[]::new));
-    }
-
-    private BooleanExpression containsTitle(String title){
-        return playlist.title.contains(title).or(playlist.videos.any().video.description.contains(title));
     }
 
     private BooleanExpression videoContainsTag(String tag) {
@@ -96,6 +95,10 @@ public class CustomPlaylistRepositoryImpl implements CustomPlaylistRepository {
         QPlaylistVideo videoInPlaylist = playlist.videos.any();
         return videoInPlaylist.video.customHashtags.any().customHashtagName.eq(tag)
                 .or(videoInPlaylist.video.videoHashtags.any().hashtag.hashtagName.eq(tag));
+    }
+
+    private BooleanExpression containsTitle(String title){
+        return playlist.title.contains(title).or(playlist.videos.any().video.description.contains(title));
     }
 
     private List<OrderSpecifier> order(Sort sort){

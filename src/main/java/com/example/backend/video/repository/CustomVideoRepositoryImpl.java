@@ -1,5 +1,6 @@
 package com.example.backend.video.repository;
 
+import com.amazonaws.util.StringUtils;
 import com.example.backend.video.domain.Video;
 import com.example.backend.video.dto.TempVideoDto;
 import com.querydsl.core.types.Order;
@@ -18,6 +19,7 @@ import static com.example.backend.video.domain.QVideo.video;
 @RequiredArgsConstructor
 public class CustomVideoRepositoryImpl implements CustomVideoRepository{
     private final JPAQueryFactory jpaQueryFactory;
+    private final String EMPTY = "";
 
     @Override
     public List<Video> findBestVideos() {
@@ -80,22 +82,31 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository{
     }
 
     private BooleanExpression predicate(List<String> tags, List<String> queries){
-        return Expressions.anyOf(checkTag(tags), checkQuery(queries));
+        return Expressions.allOf(checkTag(tags), checkQuery(queries));
     }
 
     private BooleanExpression checkQuery(List<String> queryList){
+        if (queryList.isEmpty()) {
+            return null;
+        }
         return Expressions.anyOf(queryList.stream()
                 .map(video.description::contains)
                 .toArray(BooleanExpression[]::new));
     }
 
     private BooleanExpression checkTag(List<String> tags){
+        if (tags.isEmpty()) {
+            return null;
+        }
         return Expressions.anyOf(tags.stream()
                 .map(this::isTagInVideo)
                 .toArray(BooleanExpression[]::new));
     }
 
     private BooleanExpression isTagInVideo(String tag) {
+        if (StringUtils.isNullOrEmpty(tag)) {
+            return null;
+        }
         return video.videoHashtags.any().hashtag.hashtagName.eq(tag)
                 .or(video.customHashtags.any().customHashtagName.eq(tag));
     }
