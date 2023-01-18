@@ -156,8 +156,12 @@ public class VideoController {
     }
 
     private User findUserByAuthentication() {
-        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return userService.findUserById(Long.parseLong(principal.getUsername()));
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal.equals("anonymousUser")) {
+            return User.createAnonymousUser();
+        }
+        UserDetails user = (UserDetails) principal;
+        return userService.findUserById(Long.parseLong(user.getUsername()));
     }
 
     private User findUserAndCheckAuthority(Long userId) {
