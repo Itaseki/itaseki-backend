@@ -6,7 +6,6 @@ import com.example.backend.video.domain.QVideoHashtag;
 import com.example.backend.video.domain.Video;
 import com.example.backend.video.domain.VideoHashtag;
 import com.example.backend.video.dto.TempVideoDto;
-import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -14,17 +13,11 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.ListPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import static com.example.backend.community.domain.QCommunityBoard.communityBoard;
-import static com.example.backend.image.domain.QImageBoard.imageBoard;
 import static com.example.backend.video.domain.QVideo.video;
 
 @RequiredArgsConstructor
@@ -32,11 +25,11 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository{
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<Video> findBestVideos() {
+    public List<Video> findBestVideos(int videoCount) {
         return jpaQueryFactory.selectFrom(video)
                 .where(video.status.eq(true))
                 .orderBy(video.likeCount.desc(), video.id.desc())
-                .limit(4)
+                .limit(videoCount)
                 .fetch();
     }
 

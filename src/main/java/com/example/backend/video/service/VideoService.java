@@ -32,6 +32,7 @@ public class VideoService {
     private final CustomHashtagRepository customHashtagRepository;
     private final VideoCommentService videoCommentService;
     private final PlaylistService playlistService;
+    private final int BEST_VIDEO_COUNT = 4;
 
     public void saveVideo(VideoDto videoDto, User user) {
         List<Long> playlists = videoDto.getPlaylists();
@@ -231,7 +232,7 @@ public class VideoService {
     }
 
     public List<AllVideoResponse> getBestVideos() {
-        return toAllResponse(videoRepository.findBestVideos());
+        return toAllResponse(videoRepository.findBestVideos(BEST_VIDEO_COUNT));
 
     }
 

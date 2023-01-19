@@ -1,16 +1,14 @@
 package com.example.backend.main;
 
-import com.example.backend.community.service.CommunityBoardService;
-import com.example.backend.image.repository.ImageBoardRepository;
-import com.example.backend.main.dto.MainCommunityResponse;
-import com.example.backend.main.dto.MainImageResponse;
+import com.example.backend.main.dto.MainPlaylistResponse;
 import com.example.backend.main.dto.MainUserResponse;
-import com.example.backend.main.dto.MainVideoResponse;
+import com.example.backend.main.dto.MainVideo;
 import com.example.backend.playlist.dto.AllPlaylistsResponse;
+import com.example.backend.playlist.repository.PlaylistRepository;
 import com.example.backend.playlist.service.PlaylistService;
 import com.example.backend.user.service.UserService;
 import com.example.backend.user.domain.User;
-import com.example.backend.video.service.VideoService;
+import com.example.backend.video.repository.VideoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,44 +19,34 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MainService {
     private final UserService userService;
-    private final CommunityBoardService communityService;
-    private final ImageBoardRepository imageRepository;
-    private final VideoService videoService;
+    private final VideoRepository videoRepository;
+    private final PlaylistRepository playlistRepository;
     private final PlaylistService playlistService;
+    private final int VIDEO_COUNT = 5;
+    private final int PLAYLIST_COUNT = 1;
 
-    public List<MainCommunityResponse> getCommunityForMain(){
-        return communityService.getBestResponseOfCommunityBoard()
+    public List<MainVideo> getVideoForMain() {
+        return videoRepository.findBestVideos(VIDEO_COUNT)
                 .stream()
-                .map(MainCommunityResponse::fromAllResponse)
-                .limit(4)
+                .map(MainVideo::ofVideo)
                 .collect(Collectors.toList());
     }
 
-    public List<MainImageResponse> getImageForMain(){
-        return imageRepository.findBestBoards()
-                .stream()
-                .map(MainImageResponse::fromEntity)
-                .collect(Collectors.toList());
+    public MainPlaylistResponse getPlaylistsForMain() {
+        List<AllPlaylistsResponse> playlists = playlistRepository.findBestPlaylists(PLAYLIST_COUNT);
+        if (playlists.isEmpty()) {
+            return null;
+        }
+        return MainPlaylistResponse.builder()
+                .playlist(playlists.get(0))
+                .titleImage(playlistService.getFirstThumbnailInPlaylist(playlists.get(0).getId()))
+                .videos(playlistService.findAllVideosInPlaylist(playlists.get(0).getId()))
+                .build();
     }
 
-    public List<MainVideoResponse> getVideoForMain(){
-        List<MainVideoResponse> responses = videoService.getBestVideos()
-                .stream()
-                .map(MainVideoResponse::fromAllResponse)
-                .collect(Collectors.toList());
-
-        responses
-                .forEach(r->r.updateTags(videoService.getHashtagsStringByVideoId(r.getId())));
-
-        return responses;
-    }
-
-    public List<AllPlaylistsResponse> getPlaylistsForMain(){
-        return playlistService.getBestPlaylistsResponse();
-    }
-
-    public MainUserResponse getUserProfileForMain(Long loginId){
+    public MainUserResponse getUserProfileForMain(Long loginId) {
         User user = userService.findUserById(loginId);
         return MainUserResponse.fromEntity(user);
     }
+
 }

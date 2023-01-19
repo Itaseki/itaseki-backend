@@ -4,7 +4,7 @@ import com.example.backend.community.dto.AllCommunityBoardsResponse;
 import com.example.backend.community.service.CommunityBoardService;
 import com.example.backend.image.repository.ImageBoardRepository;
 import com.example.backend.main.dto.MainImageResponse;
-import com.example.backend.main.dto.MainVideoResponse;
+import com.example.backend.search.dto.SearchVideoResponse;
 import com.example.backend.playlist.dto.AllPlaylistsResponse;
 import com.example.backend.playlist.service.PlaylistService;
 import com.example.backend.user.service.UserService;
@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class SearchService {
-    private final UserService userService;
     private final CommunityBoardService communityService;
     private final ImageBoardRepository imageRepository;
     private final VideoService videoService;
@@ -39,10 +38,10 @@ public class SearchService {
                 .collect(Collectors.toList());
     }
 
-    public List<MainVideoResponse> getVideoForSearch(String q, String tag, String nickname, String sort){
-        List<MainVideoResponse> responses = videoService.getAllVideoForSearch(q,tag,nickname,sort)
+    public List<SearchVideoResponse> getVideoForSearch(String q, String tag, String nickname, String sort){
+        List<SearchVideoResponse> responses = videoService.getAllVideoForSearch(q,tag,nickname,sort)
                 .stream()
-                .map(MainVideoResponse::fromAllResponse)
+                .map(SearchVideoResponse::fromAllResponse)
                 .collect(Collectors.toList());
 
         responses

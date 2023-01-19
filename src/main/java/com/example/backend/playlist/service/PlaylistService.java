@@ -34,6 +34,7 @@ public class PlaylistService {
     private final UserSavedPlaylistRepository savedPlaylistRepository;
     private final PlaylistCommentService commentService;
     private final UserService userService;
+    private final int BEST_PLAYLIST_COUNT = 4;
 
     private Video findVideoEntityById(Long videoId){
         Optional<Video> video = videoRepository.findById(videoId);
@@ -191,7 +192,7 @@ public class PlaylistService {
     }
 
     public List<AllPlaylistsResponse> getBestPlaylistsResponse(){
-        List<AllPlaylistsResponse> bestPlaylists = playlistRepository.findBestPlaylists();
+        List<AllPlaylistsResponse> bestPlaylists = playlistRepository.findBestPlaylists(BEST_PLAYLIST_COUNT);
         bestPlaylists.forEach(r->r.updateData(getFirstThumbnailInPlaylist(r.getId()),findAllVideosInPlaylist(r.getId()).size()));
         return bestPlaylists;
     }
