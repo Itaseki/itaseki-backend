@@ -92,7 +92,7 @@ public class PlaylistController {
     public ResponseEntity<DetailPlaylistResponse> getDetailPlaylist(@PathVariable Long playlistId) {
         Playlist playlist = playlistService.findPlaylistEntity(playlistId);
         return new ResponseEntity<>(playlistService.getDetailVideoResponse(playlist,
-                findUserByAuthentication().getUserId()),HttpStatus.OK);
+                findUserOrAnonymousUser().getUserId()),HttpStatus.OK);
     }
 
     @GetMapping("/subscribe")
@@ -145,12 +145,8 @@ public class PlaylistController {
     }
 
     private User findUserByAuthentication() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal.equals("anonymousUser")) {
-            return User.createAnonymousUser();
-        }
-        UserDetails user = (UserDetails) principal;
-        return userService.findUserById(Long.parseLong(user.getUsername()));
+        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userService.findUserById(Long.parseLong(principal.getUsername()));
     }
 
     private User findUserAndCheckAuthority(Long userId) {
@@ -159,4 +155,12 @@ public class PlaylistController {
         return user;
     }
 
+    private User findUserOrAnonymousUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal.equals("anonymousUser")) {
+            return User.createAnonymousUser();
+        }
+        UserDetails user = (UserDetails) principal;
+        return userService.findUserById(Long.parseLong(user.getUsername()));
+    }
 }

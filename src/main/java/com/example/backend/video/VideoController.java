@@ -40,7 +40,7 @@ public class VideoController {
 
     @GetMapping("/info/{userId}")
     public ResponseEntity<VideoUploadInfoResponse> getInfoForVideoUpload(@PathVariable Long userId) {
-        return new ResponseEntity<>(videoService.getPreInfoForVideoUpload(userService.findExistingUser(userId)),HttpStatus.OK);
+        return new ResponseEntity<>(videoService.getPreInfoForVideoUpload(findUserAndCheckAuthority(userId)),HttpStatus.OK);
     }
 
     @PostMapping("")
@@ -65,7 +65,7 @@ public class VideoController {
     public ResponseEntity<DetailVideoResponse> getDetailVideo(@PathVariable Long videoId){
         Video video = videoService.findVideoEntityById(videoId);
         DetailVideoResponse detailVideoResponse = videoService.getDetailVideoResponse(video,
-                findUserByAuthentication().getUserId());
+                findUserOrAnonymousUser().getUserId());
         videoService.updateVideoViewCount(video);
         return new ResponseEntity<>(detailVideoResponse,HttpStatus.OK);
     }
@@ -156,12 +156,8 @@ public class VideoController {
     }
 
     private User findUserByAuthentication() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal.equals("anonymousUser")) {
-            return User.createAnonymousUser();
-        }
-        UserDetails user = (UserDetails) principal;
-        return userService.findUserById(Long.parseLong(user.getUsername()));
+        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userService.findUserById(Long.parseLong(principal.getUsername()));
     }
 
     private User findUserAndCheckAuthority(Long userId) {
@@ -170,5 +166,12 @@ public class VideoController {
         return user;
     }
 
-
+    private User findUserOrAnonymousUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal.equals("anonymousUser")) {
+            return User.createAnonymousUser();
+        }
+        UserDetails user = (UserDetails) principal;
+        return userService.findUserById(Long.parseLong(user.getUsername()));
+    }
 }
