@@ -1,14 +1,18 @@
 package com.example.backend.main;
 
+import com.example.backend.main.dto.MainNextRunResponse;
 import com.example.backend.main.dto.MainPlaylistResponse;
 import com.example.backend.main.dto.MainUserResponse;
 import com.example.backend.main.dto.MainVideo;
 import com.example.backend.playlist.dto.AllPlaylistsResponse;
 import com.example.backend.playlist.repository.PlaylistRepository;
 import com.example.backend.playlist.service.PlaylistService;
+import com.example.backend.reservation.ReservationService;
+import com.example.backend.reservation.dto.NextRunResponse;
 import com.example.backend.user.service.UserService;
 import com.example.backend.user.domain.User;
 import com.example.backend.video.repository.VideoRepository;
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +26,7 @@ public class MainService {
     private final VideoRepository videoRepository;
     private final PlaylistRepository playlistRepository;
     private final PlaylistService playlistService;
+    private final ReservationService reservationService;
     private final int VIDEO_COUNT = 5;
     private final int PLAYLIST_COUNT = 1;
 
@@ -47,6 +52,17 @@ public class MainService {
     public MainUserResponse getUserProfileForMain(Long loginId) {
         User user = userService.findUserById(loginId);
         return MainUserResponse.fromEntity(user);
+    }
+
+    public MainNextRunResponse getTodaysNextConfirm() {
+        NextRunResponse nextConfirm = reservationService.findNextConfirm();
+        if (nextConfirm == null) {
+            return null;
+        }
+        if (!LocalDate.parse(nextConfirm.getReservationDate()).equals(LocalDate.now())) {
+            return null;
+        }
+        return MainNextRunResponse.ofReservation(nextConfirm);
     }
 
 }

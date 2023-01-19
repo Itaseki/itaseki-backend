@@ -1,5 +1,6 @@
 package com.example.backend.main;
 
+import com.example.backend.main.dto.MainNextRunResponse;
 import com.example.backend.main.dto.MainPlaylistResponse;
 import com.example.backend.main.dto.MainUserResponse;
 import com.example.backend.main.dto.MainVideo;
@@ -36,6 +37,11 @@ public class MainController {
     @GetMapping("/user")
     public ResponseEntity<MainUserResponse> getMainUserInfo(){
         return new ResponseEntity<>(mainService.getUserProfileForMain(findUserByAuthentication().getUserId()),HttpStatus.OK);
+    }
+
+    @GetMapping("/run")
+    public ResponseEntity<MainNextRunResponse> getNextRunInformation() {
+        return new ResponseEntity<>(mainService.getTodaysNextConfirm(), HttpStatus.OK);
     }
 
     private User findUserByAuthentication() {
