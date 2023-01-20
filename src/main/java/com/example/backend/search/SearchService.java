@@ -39,7 +39,7 @@ public class SearchService {
     }
 
     public List<SearchVideoResponse> getVideoForSearch(String q, String tag, String sort) {
-        List<MainVideoResponse> responses = videoService.getAllVideoForSearch(q, tag, sort)
+        List<SearchVideoResponse> responses = videoService.getAllVideoForSearch(q, tag, sort)
                 .stream()
                 .map(SearchVideoResponse::fromAllResponse)
                 .collect(Collectors.toList());
