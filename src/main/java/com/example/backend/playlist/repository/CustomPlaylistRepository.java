@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface CustomPlaylistRepository {
     TempPlaylistDto findAllPlaylistsWithPageable(Pageable pageable, List<String> queries, String nickname);
-    List<AllPlaylistsResponse> findBestPlaylists();
+    List<AllPlaylistsResponse> findBestPlaylists(int count);
     List<AllPlaylistsResponse> findAllForSearch(String sort, List<String> q, String tag);
 }

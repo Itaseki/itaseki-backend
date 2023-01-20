@@ -1,6 +1,5 @@
 package com.example.backend.search.dto;
 
-import com.example.backend.video.domain.Video;
 import com.example.backend.video.dto.AllVideoResponse;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,13 +11,19 @@ import java.util.stream.Collectors;
 @Builder
 public class SearchVideoResponse {
     private Long id;
-    private String thumbnailUrl;
+    private String title;
+    private String writerNickname;
+    private Integer likeCount;
     private List<String> tags;
+    private String thumbnailUrl;
 
-    public static SearchVideoResponse fromAllResponse(AllVideoResponse response){
+    public static SearchVideoResponse fromAllResponse(AllVideoResponse video){
         return SearchVideoResponse.builder()
-                .id(response.getId())
-                .thumbnailUrl(response.getThumbnailUrl())
+                .id(video.getId())
+                .title(video.getTitle())
+                .writerNickname(video.getWriterNickname())
+                .likeCount(video.getLikeCount())
+                .thumbnailUrl(video.getThumbnailUrl())
                 .build();
     }
 

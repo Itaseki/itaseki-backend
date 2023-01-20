@@ -1,10 +1,9 @@
 package com.example.backend.main;
 
-import com.example.backend.main.dto.MainCommunityResponse;
-import com.example.backend.main.dto.MainImageResponse;
+import com.example.backend.main.dto.MainNextRunResponse;
+import com.example.backend.main.dto.MainPlaylistResponse;
 import com.example.backend.main.dto.MainUserResponse;
-import com.example.backend.main.dto.MainVideoResponse;
-import com.example.backend.playlist.dto.AllPlaylistsResponse;
+import com.example.backend.main.dto.MainVideo;
 import com.example.backend.user.domain.User;
 import com.example.backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -25,29 +24,24 @@ public class MainController {
     private final MainService mainService;
     private final UserService userService;
 
-    @GetMapping("/community")
-    public ResponseEntity<List<MainCommunityResponse>> getMainCommunityBoards(){
-        return new ResponseEntity<>(mainService.getCommunityForMain(), HttpStatus.OK);
-    }
-
-    @GetMapping("/image")
-    public ResponseEntity<List<MainImageResponse>> getMainImageBoards(){
-        return new ResponseEntity<>(mainService.getImageForMain(),HttpStatus.OK);
-    }
-
     @GetMapping("/video")
-    public ResponseEntity<List<MainVideoResponse>> getMainVideoBoards(){
+    public ResponseEntity<List<MainVideo>> getMainVideoBoards(){
         return new ResponseEntity<>(mainService.getVideoForMain(),HttpStatus.OK);
     }
 
     @GetMapping("/playlist")
-    public ResponseEntity<List<AllPlaylistsResponse>> getMainPlaylistBoards(){
+    public ResponseEntity<MainPlaylistResponse> getMainPlaylistBoards(){
         return new ResponseEntity<>(mainService.getPlaylistsForMain(),HttpStatus.OK);
     }
 
     @GetMapping("/user")
     public ResponseEntity<MainUserResponse> getMainUserInfo(){
         return new ResponseEntity<>(mainService.getUserProfileForMain(findUserByAuthentication().getUserId()),HttpStatus.OK);
+    }
+
+    @GetMapping("/run")
+    public ResponseEntity<MainNextRunResponse> getNextRunInformation() {
+        return new ResponseEntity<>(mainService.getTodaysNextConfirm(), HttpStatus.OK);
     }
 
     private User findUserByAuthentication() {

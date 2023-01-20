@@ -22,11 +22,11 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository{
     private final String EMPTY = "";
 
     @Override
-    public List<Video> findBestVideos() {
+    public List<Video> findBestVideos(int videoCount) {
         return jpaQueryFactory.selectFrom(video)
                 .where(video.status.eq(true))
                 .orderBy(video.likeCount.desc(), video.id.desc())
-                .limit(4)
+                .limit(videoCount)
                 .fetch();
     }
 

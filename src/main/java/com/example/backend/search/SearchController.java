@@ -1,6 +1,8 @@
 package com.example.backend.search;
 
-import com.example.backend.main.dto.MainVideoResponse;
+import com.example.backend.community.dto.AllCommunityBoardsResponse;
+import com.example.backend.main.dto.MainImageResponse;
+import com.example.backend.search.dto.SearchVideoResponse;
 import com.example.backend.playlist.dto.AllPlaylistsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,7 +33,7 @@ public class SearchController {
 //    }
 
     @GetMapping("/video")
-    public ResponseEntity<List<MainVideoResponse>> searchVideoBoards(@RequestParam String sort,
+    public ResponseEntity<List<SearchVideoResponse>> searchVideoBoards(@RequestParam String sort,
                                                                      @RequestParam(required = false, defaultValue = EMPTY) String q,
                                                                      @RequestParam(required = false, defaultValue = EMPTY) String tag) {
         return new ResponseEntity<>(searchService.getVideoForSearch(q,tag,sort),HttpStatus.OK);

@@ -125,7 +125,6 @@ public class ReservationService {
 
     public NextRunResponse findNextConfirm() {
         LocalDateTime now = LocalDateTime.now();
-        System.out.println(now);
 
         // 재생시간이 50분 까지면, 50분 59초 까지를 의미하는지 아니면 49분 59초 까지를 의미하는지
         ConfirmedReservation confirmedReservation =
