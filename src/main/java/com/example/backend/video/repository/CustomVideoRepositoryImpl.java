@@ -59,15 +59,15 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository{
     }
 
     @Override
-    public TempVideoDto findAll(Pageable pageable, List<String> tags, String nickname, List<String> queries) {
+    public TempVideoDto findAllByPageable(Pageable pageable) {
         long pageOffset= pageable.getOffset() - 4; // 첫 페이지는 4개, 그 이후부터는 8개 조회
         int pageSize = pageable.getPageSize();
         if(pageable.getPageNumber() == 0){
             pageOffset=0;
-            pageSize=4;
+            pageSize=8;
         }
         List<Video> videos = jpaQueryFactory.selectFrom(video)
-                .where(video.status.eq(true), predicate(tags, queries))
+                .where(video.status.eq(true))
                 .orderBy(order(pageable.getSort()).toArray(OrderSpecifier[]::new))
                 .offset(pageOffset)
                 .limit(pageSize)
@@ -75,8 +75,12 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository{
 
         Long totalCount = jpaQueryFactory.select(video.count())
                 .from(video)
-                .where(video.status.eq(true), predicate(tags, queries))
+                .where(video.status.eq(true))
                 .fetchOne();
+
+        if (totalCount == null) {
+            totalCount = 0L;
+        }
 
         return new TempVideoDto(totalCount,videos);
     }

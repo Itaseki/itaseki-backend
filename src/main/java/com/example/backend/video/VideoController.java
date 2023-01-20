@@ -71,9 +71,8 @@ public class VideoController {
     }
 
     @GetMapping("")
-    public ResponseEntity<AllVideoResponseWithPageCount> getAllVideos(@PageableDefault(size=8, sort="id",direction = Sort.Direction.DESC) Pageable pageable,
-                                                                      @RequestParam(required = false) String tag, @RequestParam(required = false) String nickname, @RequestParam(required = false) String q){
-        return new ResponseEntity<>(videoService.getAllVideosResponse(pageable, tag, nickname, q),HttpStatus.OK);
+    public ResponseEntity<AllVideoResponseWithPageCount> getAllVideos(@PageableDefault(size=12, sort="id",direction = Sort.Direction.DESC) Pageable pageable) {
+        return new ResponseEntity<>(videoService.getAllVideosResponse(pageable),HttpStatus.OK);
     }
 
     @GetMapping("/best")
