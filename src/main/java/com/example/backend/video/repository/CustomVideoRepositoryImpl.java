@@ -1,35 +1,25 @@
 package com.example.backend.video.repository;
 
-import com.example.backend.customHashtag.CustomHashtag;
-import com.example.backend.customHashtag.QCustomHashtag;
-import com.example.backend.video.domain.QVideoHashtag;
+import com.amazonaws.util.StringUtils;
 import com.example.backend.video.domain.Video;
-import com.example.backend.video.domain.VideoHashtag;
 import com.example.backend.video.dto.TempVideoDto;
-import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.ListPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import static com.example.backend.community.domain.QCommunityBoard.communityBoard;
-import static com.example.backend.image.domain.QImageBoard.imageBoard;
 import static com.example.backend.video.domain.QVideo.video;
 
 @RequiredArgsConstructor
 public class CustomVideoRepositoryImpl implements CustomVideoRepository{
     private final JPAQueryFactory jpaQueryFactory;
+    private final String EMPTY = "";
 
     @Override
     public List<Video> findBestVideos() {
@@ -53,7 +43,7 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository{
     }
 
     @Override
-    public List<Video> findAllForSearch(List<String> tags, String nickname, List<String> queries, String sort) {
+    public List<Video> findAllForSearch(List<String> tags, List<String> queries, String sort) {
         List<OrderSpecifier> orders=new ArrayList<>();
         if(sort.contains("like")){
             orders.add(new OrderSpecifier(Order.DESC, video.likeCount));
@@ -61,7 +51,7 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository{
         orders.add(new OrderSpecifier(Order.DESC, video.id));
 
         return jpaQueryFactory.selectFrom(video)
-                    .where(video.status.eq(true), predicate(tags, nickname, queries))
+                    .where(video.status.eq(true), predicate(tags, queries))
                     .orderBy(orders.toArray(OrderSpecifier[]::new))
                     .limit(8)
                     .fetch();
@@ -70,14 +60,14 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository{
 
     @Override
     public TempVideoDto findAll(Pageable pageable, List<String> tags, String nickname, List<String> queries) {
-        long pageOffset= pageable.getOffset()-4;
+        long pageOffset= pageable.getOffset() - 4; // 첫 페이지는 4개, 그 이후부터는 8개 조회
         int pageSize = pageable.getPageSize();
-        if(pageable.getPageNumber()==0){
+        if(pageable.getPageNumber() == 0){
             pageOffset=0;
             pageSize=4;
         }
         List<Video> videos = jpaQueryFactory.selectFrom(video)
-                .where(video.status.eq(true), predicate(tags, nickname, queries))
+                .where(video.status.eq(true), predicate(tags, queries))
                 .orderBy(order(pageable.getSort()).toArray(OrderSpecifier[]::new))
                 .offset(pageOffset)
                 .limit(pageSize)
@@ -85,63 +75,52 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository{
 
         Long totalCount = jpaQueryFactory.select(video.count())
                 .from(video)
-                .where(video.status.eq(true), predicate(tags, nickname, queries))
+                .where(video.status.eq(true), predicate(tags, queries))
                 .fetchOne();
 
         return new TempVideoDto(totalCount,videos);
     }
 
-    private BooleanExpression predicate(List<String> tags, String nickname, List<String> queries){
-        //해시태그에 있거나 키워드 (커스텀 해시태그) 에 있거나
-        BooleanExpression tagExpression=null;
-        BooleanExpression nicknameExpression=null;
-        BooleanExpression queryExpressions=null;
-        if(tags!=null){
-            tagExpression = Expressions.anyOf(tags.stream()
-                    .map(this::checkTag)
-                    .toArray(BooleanExpression[]::new));
-        }
-        if(nickname!=null){
-            nicknameExpression = checkNickname(nickname);
-        }
-
-        if(queries!=null){
-            queryExpressions=checkQuery(queries);
-        }
-
-        return Expressions.allOf(tagExpression,nicknameExpression,queryExpressions);
+    private BooleanExpression predicate(List<String> tags, List<String> queries){
+        return Expressions.allOf(checkTag(tags), checkQuery(queries));
     }
 
     private BooleanExpression checkQuery(List<String> queryList){
-        if(queryList==null)
+        if (queryList.isEmpty()) {
             return null;
-        return Expressions.anyOf(queryList.stream().map(video.description::contains).toArray(BooleanExpression[]::new));
-
+        }
+        return Expressions.anyOf(queryList.stream()
+                .map(video.description::contains)
+                .toArray(BooleanExpression[]::new));
     }
 
-    //join 쿼리로 바꿀 수 있나?
-    private BooleanExpression checkTag(String tag){
-        ListPath<VideoHashtag, QVideoHashtag> videoHashtags = video.videoHashtags; //이 비디오의 VideoHashtags 매핑 데이터들
-        ListPath<CustomHashtag, QCustomHashtag> customHashtags = video.customHashtags;
-        return videoHashtags.any().hashtag.hashtagName.eq(tag).or(customHashtags.any().customHashtagName.eq(tag)); //하나라도 현재 검색하는 hashtag 와 겹치는게 있는가?
+    private BooleanExpression checkTag(List<String> tags){
+        if (tags.isEmpty()) {
+            return null;
+        }
+        return Expressions.anyOf(tags.stream()
+                .map(this::isTagInVideo)
+                .toArray(BooleanExpression[]::new));
     }
 
-    private BooleanExpression checkNickname(String nickname){
-        return video.user.nickname.eq(nickname);
+    private BooleanExpression isTagInVideo(String tag) {
+        if (StringUtils.isNullOrEmpty(tag)) {
+            return null;
+        }
+        return video.videoHashtags.any().hashtag.hashtagName.eq(tag)
+                .or(video.customHashtags.any().customHashtagName.eq(tag));
     }
-
 
     private List<OrderSpecifier> order(Sort sort){
         List<OrderSpecifier> orders=new ArrayList<>();
-        Order direction= Order.DESC;
         for(Sort.Order order : sort){
             String orderProperty = order.getProperty();
             switch (orderProperty){
                 case "id":
-                    orders.add(new OrderSpecifier(direction,video.id));
+                    orders.add(new OrderSpecifier(Order.DESC, video.id));
                     return orders;
                 case "likeCount":
-                    orders.add(new OrderSpecifier(direction,video.likeCount));
+                    orders.add(new OrderSpecifier(Order.DESC, video.likeCount));
                     break;
             }
         }

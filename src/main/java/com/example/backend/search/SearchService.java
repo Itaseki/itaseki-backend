@@ -18,41 +18,39 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class SearchService {
-    private final UserService userService;
     private final CommunityBoardService communityService;
     private final ImageBoardRepository imageRepository;
     private final VideoService videoService;
     private final PlaylistService playlistService;
 
-    public List<AllCommunityBoardsResponse> getCommunityForSearch(String q, String sort){
-            return communityService.getSearchedCommunityBoards(q,sort);
+    public List<AllCommunityBoardsResponse> getCommunityForSearch(String q, String sort) {
+        return communityService.getSearchedCommunityBoards(q, sort);
     }
 
-    public List<MainImageResponse> getImageForSearch(String query, String tag, String sort){
+    public List<MainImageResponse> getImageForSearch(String query, String tag, String sort) {
         String[] queryList = null;
-        if(query!=null){
+        if (query != null) {
             queryList = query.split(" ");
         }
-        return imageRepository.findAllForSearch(sort,queryList,tag)
+        return imageRepository.findAllForSearch(sort, queryList, tag)
                 .stream()
                 .map(MainImageResponse::fromEntity)
                 .collect(Collectors.toList());
     }
 
-    public List<MainVideoResponse> getVideoForSearch(String q, String tag, String nickname, String sort){
-        List<MainVideoResponse> responses = videoService.getAllVideoForSearch(q,tag,nickname,sort)
+    public List<MainVideoResponse> getVideoForSearch(String q, String tag, String sort) {
+        List<MainVideoResponse> responses = videoService.getAllVideoForSearch(q, tag, sort)
                 .stream()
                 .map(MainVideoResponse::fromAllResponse)
                 .collect(Collectors.toList());
 
-        responses
-                .forEach(r->r.updateTags(videoService.getHashtagsStringByVideoId(r.getId())));
-
+        responses.forEach(video -> video.updateTags(
+                videoService.getHashtagKeywordStringInVideo(videoService.findVideoEntityById(video.getId()))));
         return responses;
     }
 
-    public List<AllPlaylistsResponse> getPlaylistsForSearch(String sort, String q, String nickname){
-        return playlistService.getAllPlaylistForSearch(q,sort,nickname);
+    public List<AllPlaylistsResponse> getPlaylistsForSearch(String sort, String q, String tag) {
+        return playlistService.getAllPlaylistForSearch(q, sort, tag);
     }
 
 }

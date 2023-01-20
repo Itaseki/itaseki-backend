@@ -47,8 +47,8 @@ public class MainService {
                 .map(MainVideoResponse::fromAllResponse)
                 .collect(Collectors.toList());
 
-        responses
-                .forEach(r->r.updateTags(videoService.getHashtagsStringByVideoId(r.getId())));
+        responses.forEach(video -> video.updateTags(
+                        videoService.getHashtagKeywordStringInVideo(videoService.findVideoEntityById(video.getId()))));
 
         return responses;
     }
