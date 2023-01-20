@@ -164,14 +164,12 @@ public class PlaylistService {
         return new AllPlaylistResponseWithPageCount(totalPages, responses);
     }
 
-    public List<AllPlaylistsResponse> getAllPlaylistForSearch(String q, String sort, String nickname){
-        List<String> queries=null;
-        if(q!=null){
-            queries=Arrays.stream(q.split(" ")).collect(Collectors.toList());
-        }
-        List<AllPlaylistsResponse> search = playlistRepository.findAllForSearch(sort, nickname, queries);
-        search.forEach(pr->pr.updateData(getFirstThumbnailInPlaylist(pr.getId()),findAllVideosInPlaylist(pr.getId()).size()));
-        return search;
+    public List<AllPlaylistsResponse> getAllPlaylistForSearch(String q, String sort, String tag){
+        List<String> queries = Arrays.stream(q.split(" ")).collect(Collectors.toList());
+        List<AllPlaylistsResponse> searchResult = playlistRepository.findAllForSearch(sort, queries, tag);
+        searchResult.forEach(playlist -> playlist.updateData(
+                getFirstThumbnailInPlaylist(playlist.getId()), findAllVideosInPlaylist(playlist.getId()).size()));
+        return searchResult;
     }
 
     public String getFirstThumbnailInPlaylist(Long playlistId){

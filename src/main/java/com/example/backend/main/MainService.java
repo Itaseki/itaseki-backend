@@ -49,6 +49,7 @@ public class MainService {
                 .build();
     }
 
+
     public MainUserResponse getUserProfileForMain(Long loginId) {
         User user = userService.findUserById(loginId);
         return MainUserResponse.fromEntity(user);
