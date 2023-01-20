@@ -148,17 +148,14 @@ public class PlaylistService {
     }
 
 
-    public AllPlaylistResponseWithPageCount getAllPlaylistsResponse(Pageable pageable, String q, String nickname){
-        List<String> queries=null;
-        if(q!=null){
-            queries=Arrays.stream(q.split(" ")).collect(Collectors.toList());
-        }
-        TempPlaylistDto fetchResult = playlistRepository.findAllPlaylistsWithPageable(pageable, queries, nickname);
+    public AllPlaylistResponseWithPageCount getAllPlaylistsResponse(Pageable pageable){
+        TempPlaylistDto fetchResult = playlistRepository.findAllPlaylistsWithPageable(pageable);
         int totalPages = getTotalPageCount(fetchResult.getTotalCount());
         List<AllPlaylistsResponse> responses = fetchResult.getPlaylists();
 
-        if(totalPages<=1)
-            totalPages=1;
+        if(totalPages<=1) {
+            totalPages = 1;
+        }
 
         responses.forEach(pr->pr.updateData(getFirstThumbnailInPlaylist(pr.getId()),findAllVideosInPlaylist(pr.getId()).size()));
         return new AllPlaylistResponseWithPageCount(totalPages, responses);
