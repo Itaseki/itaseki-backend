@@ -6,11 +6,8 @@ import com.example.backend.myPage.dto.DetailPlaylistDto;
 import com.example.backend.myPage.dto.LikeDataDto;
 import com.example.backend.myPage.dto.MyDataDto;
 import com.example.backend.myPage.dto.MyPagePlaylistDto;
-import com.example.backend.myPage.dto.MySubscribeDto;
-import com.example.backend.myPage.dto.SubscribeRequest;
-import com.example.backend.myPage.dto.UserEditInfoDto;
+import com.example.backend.myPage.dto.UserInfoResponse;
 import com.example.backend.myPage.dto.UserEditRequest;
-import com.example.backend.myPage.dto.UserInfoDto;
 import com.example.backend.user.domain.UserCounter;
 import com.example.backend.user.domain.User;
 import com.example.backend.user.service.UserService;
@@ -27,7 +24,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -59,7 +55,7 @@ public class MyPageController {
     }
 
     @GetMapping("/info")
-    public ResponseEntity<UserInfoDto> getHeaderUserInformation(@PathVariable Long userId) {
+    public ResponseEntity<UserInfoResponse> getUserInformation(@PathVariable Long userId) {
         return new ResponseEntity<>(myPageService.findUserBasicInformation(findUserAndCheckAuthority(userId)),
                 HttpStatus.OK);
     }
@@ -92,26 +88,6 @@ public class MyPageController {
                                                                      @PathVariable Long playlistId) {
         findUserAndCheckAuthority(userId);
         return new ResponseEntity<>(myPageService.getMyPagePlaylistDetail(playlistId), HttpStatus.OK);
-    }
-
-    @GetMapping("/subscribe")
-    public ResponseEntity<MySubscribeDto> getSubscribeInformation(@PathVariable Long userId) {
-        return new ResponseEntity<>(myPageService.getMyPageSubscribeInfo(findUserAndCheckAuthority(userId)),
-                HttpStatus.OK);
-    }
-
-    @PostMapping("/subscribe")
-    public ResponseEntity<String> subscribeUser(@PathVariable Long userId, @RequestBody SubscribeRequest request) {
-        User user = findUserAndCheckAuthority(userId);
-        User target = userService.findExistingUser(request.getTargetId());
-        myPageService.saveSubscribe(user, target);
-        return new ResponseEntity<>("구독 정보 업데이트 성공", HttpStatus.OK);
-    }
-
-    @GetMapping("/edit")
-    public ResponseEntity<UserEditInfoDto> getUserInfoForEdit(@PathVariable Long userId) {
-        return new ResponseEntity<>(myPageService.getUserInfoForEdit(findUserAndCheckAuthority(userId)),
-                HttpStatus.OK);
     }
 
     @PostMapping(value = "/edit", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})

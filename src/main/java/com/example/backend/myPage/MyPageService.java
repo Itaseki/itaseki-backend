@@ -18,9 +18,8 @@ import com.example.backend.myPage.dto.MyPagePlaylistDto;
 import com.example.backend.myPage.dto.MyPageVideoDto;
 import com.example.backend.myPage.dto.MySubscribeDto;
 import com.example.backend.myPage.dto.SubscribeUserDto;
-import com.example.backend.myPage.dto.UserEditInfoDto;
+import com.example.backend.myPage.dto.UserInfoResponse;
 import com.example.backend.myPage.dto.UserEditRequest;
-import com.example.backend.myPage.dto.UserInfoDto;
 import com.example.backend.playlist.domain.Playlist;
 import com.example.backend.playlist.domain.PlaylistComment;
 import com.example.backend.playlist.domain.UserSavedPlaylist;
@@ -62,11 +61,8 @@ public class MyPageService {
     private final static long RECOMMENDATION_LIMIT = 1L;
     private final static int SUBSCRIBE_SHOW_COUNT = 5;
 
-    public UserInfoDto findUserBasicInformation(User user) {
-        return UserInfoDto.fromUserAndDetail(user,
-                findAllPublicPlaylistByUser(user).size(),
-                findMySubscribers(user).size(),
-                getUserReportedCount(user));
+    public UserInfoResponse findUserBasicInformation(User user) {
+        return UserInfoResponse.ofUser(user);
     }
 
     public LikeDataDto getAllLikedData(User user) {
@@ -111,8 +107,8 @@ public class MyPageService {
         user.updateUserProfileInfo(request.getNickname(), request.getDescription(), awsS3Service.uploadFile(profileImage));
     }
 
-    public UserEditInfoDto getUserInfoForEdit(User user) {
-        return UserEditInfoDto.ofUser(user);
+    public UserInfoResponse getUserInfoForEdit(User user) {
+        return UserInfoResponse.ofUser(user);
     }
 
     public String deleteUser(User user) {
