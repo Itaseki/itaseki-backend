@@ -12,4 +12,5 @@ import java.util.List;
 public interface UserSavedPlaylistRepository extends JpaRepository<UserSavedPlaylist, Long> {
     UserSavedPlaylist findByUserAndPlaylist(User user, Playlist playlist);
     List<UserSavedPlaylist> findAllByUser(User user);
+    List<UserSavedPlaylist> findAllByUserAndStatusOrderByCreatedTimeDesc(User user, boolean status);
 }

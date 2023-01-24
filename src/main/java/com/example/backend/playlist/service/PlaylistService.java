@@ -112,6 +112,7 @@ public class PlaylistService {
                 .playlist(playlist)
                 .user(user)
                 .status(true)
+                .createdTime(LocalDateTime.now())
                 .build();
         savedPlaylistRepository.save(userSavedPlaylist); //saveCount 도 변경
         playlist.updateSaveCount();

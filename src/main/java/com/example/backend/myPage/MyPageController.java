@@ -2,18 +2,16 @@ package com.example.backend.myPage;
 
 import com.example.backend.blackList.domain.BlackList;
 import com.example.backend.blackList.service.BlackListService;
-import com.example.backend.myPage.dto.DetailPlaylistDto;
-import com.example.backend.myPage.dto.LikeDataDto;
-import com.example.backend.myPage.dto.MyDataDto;
-import com.example.backend.myPage.dto.MyPagePlaylistDto;
+import com.example.backend.myPage.dto.MyPagePageableResponse;
 import com.example.backend.myPage.dto.UserInfoResponse;
 import com.example.backend.myPage.dto.UserEditRequest;
 import com.example.backend.user.domain.UserCounter;
 import com.example.backend.user.domain.User;
 import com.example.backend.user.service.UserService;
 import com.example.backend.utils.JwtAuthenticationProvider;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +23,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
@@ -60,34 +59,19 @@ public class MyPageController {
                 HttpStatus.OK);
     }
 
-    @GetMapping("/likes")
-    public ResponseEntity<LikeDataDto> getMyPageLikeData(@PathVariable Long userId) {
-        return new ResponseEntity<>(myPageService.getAllLikedData(findUserAndCheckAuthority(userId)), HttpStatus.OK);
-    }
-
-    @GetMapping("/my")
-    public ResponseEntity<MyDataDto> getMyPageUploadedDataByUser(@PathVariable Long userId) {
-        return new ResponseEntity<>(myPageService.getAllDataUploadedByUser(findUserAndCheckAuthority(userId)),
+    @GetMapping("/playlist")
+    public ResponseEntity<MyPagePageableResponse> getMyPagePlaylist(@PathVariable Long userId,
+                                                                    @RequestParam(required = false, defaultValue = "my") String type,
+                                                                    @PageableDefault(size = 8) Pageable pageable) {
+        return new ResponseEntity<>(myPageService.findPlaylistsForMyPage(findUserAndCheckAuthority(userId), type, pageable),
                 HttpStatus.OK);
     }
 
-    @GetMapping("/my/playlist")
-    public ResponseEntity<List<MyPagePlaylistDto>> getMyUploadedPlaylist(@PathVariable Long userId) {
-        return new ResponseEntity<>(myPageService.findAllPlaylistByUser(findUserAndCheckAuthority(userId)),
+    @GetMapping("/video")
+    public ResponseEntity<MyPagePageableResponse> getMyPageVideo(@PathVariable Long userId,
+                                                                 @PageableDefault(size = 8) Pageable pageable) {
+        return new ResponseEntity<>(myPageService.findVideosForMyPage(findUserAndCheckAuthority(userId), pageable),
                 HttpStatus.OK);
-    }
-
-    @GetMapping("/my/saved/playlist")
-    public ResponseEntity<List<MyPagePlaylistDto>> getSavedPlaylist(@PathVariable Long userId) {
-        return new ResponseEntity<>(myPageService.findAllSavedPlaylist(findUserAndCheckAuthority(userId)),
-                HttpStatus.OK);
-    }
-
-    @GetMapping("/my/playlist/{playlistId}")
-    public ResponseEntity<DetailPlaylistDto> getDetailMyPagePlaylist(@PathVariable Long userId,
-                                                                     @PathVariable Long playlistId) {
-        findUserAndCheckAuthority(userId);
-        return new ResponseEntity<>(myPageService.getMyPagePlaylistDetail(playlistId), HttpStatus.OK);
     }
 
     @PostMapping(value = "/edit", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
@@ -109,8 +93,8 @@ public class MyPageController {
     }
 
     private User findUserAndCheckAuthority(Long userId) {
-        User user = userService.findExistingUser(userId); // 존재하지 않는 user 에 대한 마이페이지 요청이면 예외 발생
-        userService.checkUserAuthority(findUserByAuthentication().getUserId(), userId); // 로그인한 사용자와 요청한 유저가 다르다면 예외 발생
+        User user = userService.findExistingUser(userId);
+        userService.checkUserAuthority(findUserByAuthentication().getUserId(), userId);
         return user;
     }
 }
