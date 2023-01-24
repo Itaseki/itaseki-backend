@@ -63,6 +63,7 @@ public class MyPageService {
         return savedPlaylistRepository.findAllByUserAndStatusOrderByCreatedTimeDesc(user, true)
                 .stream()
                 .map(UserSavedPlaylist::getPlaylist)
+                .filter(Playlist::getIsPublic)
                 .collect(Collectors.toList());
     }
 
