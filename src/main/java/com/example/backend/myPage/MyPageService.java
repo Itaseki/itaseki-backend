@@ -1,8 +1,10 @@
 package com.example.backend.myPage;
 
 import com.amazonaws.util.StringUtils;
-import com.example.backend.myPage.dto.MyCommentDto;
+import com.example.backend.globalexception.WrongParamException;
+import com.example.backend.myPage.dto.DetailCommentResponse;
 import com.example.backend.myPage.dto.DetailDataResponse;
+import com.example.backend.myPage.dto.MyPageCommentPageableResponse;
 import com.example.backend.myPage.dto.MyPagePageableResponse;
 import com.example.backend.myPage.dto.UserInfoResponse;
 import com.example.backend.playlist.domain.Playlist;
@@ -48,11 +50,18 @@ public class MyPageService {
         if (type.equals("saved")) {
             return toSavedPlaylistResponse(findAllSavedPlaylist(user), pageable);
         }
-        return toUserUploadedPlaylistResponse(findAllPlaylistByUser(user), pageable);
+        if (type.equals("my")) {
+            return toUserUploadedPlaylistResponse(findAllPlaylistByUser(user), pageable);
+        }
+        throw new WrongParamException();
     }
 
     public MyPagePageableResponse findVideosForMyPage(User user, Pageable pageable) {
         return toUserUploadedVideoResponse(findAllVideoByUser(user), pageable);
+    }
+
+    public MyPageCommentPageableResponse findCommentsForMyPage(User user, Pageable pageable) {
+        return toUserUploadedCommentResponse(findAllCommentsByUser(user), pageable);
     }
 
     public String updateProfileImage(User user, MultipartFile file) {
@@ -122,23 +131,30 @@ public class MyPageService {
         return pvRepository.findFirstThumbnailUrl(playlist);
     }
 
-    private List<MyCommentDto> findAllCommentsByUser(User user) {
+    private MyPageCommentPageableResponse toUserUploadedCommentResponse(List<DetailCommentResponse> comments, Pageable pageable) {
+        return MyPageCommentPageableResponse.of(comments.stream()
+                .skip(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .collect(Collectors.toList()), calculateTotalPage(comments.size(), pageable.getPageSize()));
+    }
+
+    private List<DetailCommentResponse> findAllCommentsByUser(User user) {
         return Stream.concat(findAllPlaylistCommentByUser(user), findAllVideoCommentByUser(user))
-                .sorted(Comparator.comparing(MyCommentDto::getCreatedTime).reversed())
+                .sorted(Comparator.comparing(DetailCommentResponse::getCreatedTime).reversed())
                 .collect(Collectors.toList());
     }
 
-    private Stream<MyCommentDto> findAllVideoCommentByUser(User user) {
+    private Stream<DetailCommentResponse> findAllVideoCommentByUser(User user) {
         return videoCommentRepository.findAllByUser(user)
                 .stream()
                 .filter(VideoComment::getStatus)
-                .map(MyCommentDto::ofVideo);
+                .map(DetailCommentResponse::ofVideo);
     }
 
-    private Stream<MyCommentDto> findAllPlaylistCommentByUser(User user) {
+    private Stream<DetailCommentResponse> findAllPlaylistCommentByUser(User user) {
         return playlistCommentRepository.findAllByUser(user)
                 .stream()
                 .filter(PlaylistComment::getStatus)
-                .map(MyCommentDto::ofPlaylist);
+                .map(DetailCommentResponse::ofPlaylist);
     }
 }

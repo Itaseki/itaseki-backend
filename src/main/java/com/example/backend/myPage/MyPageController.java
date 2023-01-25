@@ -2,6 +2,7 @@ package com.example.backend.myPage;
 
 import com.example.backend.blackList.domain.BlackList;
 import com.example.backend.blackList.service.BlackListService;
+import com.example.backend.myPage.dto.MyPageCommentPageableResponse;
 import com.example.backend.myPage.dto.MyPagePageableResponse;
 import com.example.backend.myPage.dto.UserInfoResponse;
 import com.example.backend.myPage.dto.NicknameEditRequest;
@@ -57,7 +58,7 @@ public class MyPageController {
                 HttpStatus.OK);
     }
 
-    @GetMapping("/playlist")
+    @GetMapping("/playlists")
     public ResponseEntity<MyPagePageableResponse> getMyPagePlaylist(@PathVariable Long userId,
                                                                     @RequestParam(required = false, defaultValue = "my") String type,
                                                                     @PageableDefault(size = 8) Pageable pageable) {
@@ -65,16 +66,22 @@ public class MyPageController {
                 HttpStatus.OK);
     }
 
-    @GetMapping("/video")
+    @GetMapping("/videos")
     public ResponseEntity<MyPagePageableResponse> getMyPageVideo(@PathVariable Long userId,
                                                                  @PageableDefault(size = 8) Pageable pageable) {
         return new ResponseEntity<>(myPageService.findVideosForMyPage(findUserAndCheckAuthority(userId), pageable),
                 HttpStatus.OK);
     }
 
+    @GetMapping("/comments")
+    public ResponseEntity<MyPageCommentPageableResponse> getMyPageComment(@PathVariable Long userId,
+                                                                          @PageableDefault(size = 10) Pageable pageable) {
+        return new ResponseEntity<>(myPageService.findCommentsForMyPage(findUserAndCheckAuthority(userId), pageable),
+                HttpStatus.OK);
+    }
+
     @PatchMapping("/info/image")
-    public ResponseEntity<String> updateProfileInfo(@PathVariable Long userId,
-                                                    MultipartFile file) {
+    public ResponseEntity<String> updateProfileInfo(@PathVariable Long userId, MultipartFile file) {
         return new ResponseEntity<>(myPageService.updateProfileImage(findUserAndCheckAuthority(userId), file),
                 HttpStatus.OK);
     }
