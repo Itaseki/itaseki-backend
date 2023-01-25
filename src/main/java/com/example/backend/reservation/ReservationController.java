@@ -1,5 +1,6 @@
 package com.example.backend.reservation;
 
+import com.example.backend.globalexception.ExceptionHeader;
 import com.example.backend.reservation.domain.ConfirmedReservation;
 import com.example.backend.reservation.domain.Reservation;
 import com.example.backend.reservation.dto.*;
@@ -30,15 +31,12 @@ public class ReservationController {
     private final ReservationService reservationService;
     private final VideoService videoService;
     private final UserService userService;
+    private final ExceptionHeader exceptionHeader;
 
-    @PostMapping("")
+    @PostMapping(value = "", consumes = "text/html; charset=UTF-8")
     public ResponseEntity<String> registerVideoReservation(@RequestBody ReservationDto reservationDto) {
         User user = findUserByAuthentication();
         Video video = videoService.findVideoEntityById(reservationDto.getVideoId());
-        if (video == null) {
-            return new ResponseEntity<>("잘못된 영상에 대한 예약 요청", HttpStatus.NOT_FOUND);
-        }
-
         reservationService.saveReservation(reservationDto, user, video);
         return new ResponseEntity<>("예약 등록 성공", HttpStatus.CREATED);
     }
@@ -80,27 +78,27 @@ public class ReservationController {
 
     @ExceptionHandler(DateTimeParseException.class)
     ResponseEntity<String> handleWrongDateFormat(DateTimeParseException exception) {
-        return new ResponseEntity<>("날짜 및 숫자 입력 포맷이 잘못되었습니다.", HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>("날짜 및 숫자 입력 포맷이 잘못되었습니다.", exceptionHeader.header, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(DuplicateReservationException.class)
     ResponseEntity<String> handleDuplicateReservationRequest(DuplicateReservationException exception) {
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
+        return new ResponseEntity<>(exception.getMessage(), exceptionHeader.header, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(WrongEndTimeException.class)
     ResponseEntity<String> handleEndTimeOverNextDay(WrongEndTimeException exception) {
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(exception.getMessage(), exceptionHeader.header, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ConfirmExistException.class)
     ResponseEntity<String> handleConfirmedReservationExistence(ConfirmExistException exception) {
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.OK);
+        return new ResponseEntity<>(exception.getMessage(), exceptionHeader.header, HttpStatus.OK);
     }
 
     @ExceptionHandler(ReservationTimeConflictException.class)
     ResponseEntity<String> handleRequestTimeConflict(ReservationTimeConflictException exception) {
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
+        return new ResponseEntity<>(exception.getMessage(), exceptionHeader.header, HttpStatus.CONFLICT);
     }
 
     @GetMapping("/{reservationId}")

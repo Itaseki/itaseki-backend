@@ -41,7 +41,7 @@ public class MyPageController {
     /**
      * 로그아웃
      */
-    @PatchMapping("/edit")
+    @PatchMapping(value = "/edit", produces = "text/html; charset=UTF-8")
     public ResponseEntity<String> logout(HttpServletRequest request) {
         String accessToken = jwtAuthenticationProvider.resolveToken(request);   // API를 요청한 토큰(Access Token) 가져오기
         BlackList blackList = new BlackList();
@@ -79,7 +79,7 @@ public class MyPageController {
                 HttpStatus.OK);
     }
 
-    @PatchMapping("/info/nickname")
+    @PatchMapping(value = "/info/nickname", produces = "text/html; charset=UTF-8")
     public ResponseEntity<String> updateNickname(@PathVariable Long userId,
                                                  @RequestBody NicknameEditRequest nicknameEditRequest) {
         return new ResponseEntity<>(myPageService.updateNickname(findUserAndCheckAuthority(userId),
@@ -87,7 +87,7 @@ public class MyPageController {
                 HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "/edit")
+    @DeleteMapping(value = "/edit", produces = "text/html; charset=UTF-8")
     public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
         return new ResponseEntity<>(myPageService.deleteUser(findUserAndCheckAuthority(userId)), HttpStatus.NO_CONTENT);
     }
