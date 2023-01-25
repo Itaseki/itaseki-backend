@@ -4,6 +4,8 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.example.backend.s3Image.exception.EmptyFileException;
+import com.example.backend.s3Image.exception.FileUploadFailException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,7 +25,7 @@ public class AwsS3Service {
 
     public String uploadFile(MultipartFile multipartFile) {
         if (multipartFile == null || multipartFile.isEmpty()) {
-            return null;
+            throw new EmptyFileException();
         }
 
         String fileName = CommonUtils.buildFileName(multipartFile.getOriginalFilename());
@@ -35,7 +37,7 @@ public class AwsS3Service {
             amazonS3Client.putObject(new PutObjectRequest(bucketName, fileName, inputStream, objectMetadata)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new FileUploadFailException();
         }
 
         return amazonS3Client.getUrl(bucketName, fileName).toString();

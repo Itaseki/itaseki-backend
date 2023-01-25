@@ -1,10 +1,10 @@
 package com.example.backend.myPage;
 
+import com.amazonaws.util.StringUtils;
 import com.example.backend.myPage.dto.MyCommentDto;
 import com.example.backend.myPage.dto.DetailDataResponse;
 import com.example.backend.myPage.dto.MyPagePageableResponse;
 import com.example.backend.myPage.dto.UserInfoResponse;
-import com.example.backend.myPage.dto.UserEditRequest;
 import com.example.backend.playlist.domain.Playlist;
 import com.example.backend.playlist.domain.PlaylistComment;
 import com.example.backend.playlist.domain.UserSavedPlaylist;
@@ -55,6 +55,22 @@ public class MyPageService {
         return toUserUploadedVideoResponse(findAllVideoByUser(user), pageable);
     }
 
+    public String updateProfileImage(User user, MultipartFile file) {
+        return user.updateProfileImage(awsS3Service.uploadFile(file));
+    }
+
+    public String updateNickname(User user, String nickname) {
+        if (StringUtils.isNullOrEmpty(nickname)) {
+            return "";
+        }
+        return user.updateNickname(nickname);
+    }
+
+    public String deleteUser(User user) {
+        user.deleteUser();
+        return "삭제 성공";
+    }
+
     private List<Playlist> findAllPlaylistByUser(User user) {
         return playlistRepository.findAllByUserAndStatusOrderByCreatedTimeDesc(user, true);
     }
@@ -77,10 +93,6 @@ public class MyPageService {
     private int calculateTotalPage(double totalCount, int pageSize) {
         return (int) Math.ceil(totalCount / pageSize);
     }
-
-//    private int calculateOffset(int page) {
-//        return page * PAGE_SIZE;
-//    }
 
     private MyPagePageableResponse toUserUploadedPlaylistResponse(List<Playlist> playlists, Pageable pageable) {
         return MyPagePageableResponse.of(playlists.stream()
@@ -108,15 +120,6 @@ public class MyPageService {
 
     private String findFirstThumbnail(Playlist playlist) {
         return pvRepository.findFirstThumbnailUrl(playlist);
-    }
-
-    public void editUserInfo(User user, UserEditRequest request, MultipartFile profileImage) {
-        user.updateUserProfileInfo(request.getNickname(), request.getDescription(), awsS3Service.uploadFile(profileImage));
-    }
-
-    public String deleteUser(User user) {
-        user.deleteUser();
-        return "삭제 성공";
     }
 
     private List<MyCommentDto> findAllCommentsByUser(User user) {
