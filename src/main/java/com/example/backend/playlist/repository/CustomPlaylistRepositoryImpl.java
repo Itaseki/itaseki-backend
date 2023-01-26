@@ -59,20 +59,15 @@ public class CustomPlaylistRepositoryImpl implements CustomPlaylistRepository {
     }
 
     @Override
-    public List<AllPlaylistsResponse> findAllForSearch(String sort, List<String> queries, String tag) {
-        List<OrderSpecifier> orders=new ArrayList<>();
-        if(sort.contains("like")){
-            orders.add(new OrderSpecifier(Order.DESC, playlist.likeCount));
-        }
-        orders.add(new OrderSpecifier(Order.DESC, playlist.id));
-
+    public List<AllPlaylistsResponse> findAllForSearch(Pageable pageable, List<String> queries, String tag) { // pageable 추가
         return jpaQueryFactory.select(Projections.fields(AllPlaylistsResponse.class,
                         playlist.id.as("id"), playlist.title.as("title"),
                         playlist.user.nickname.as("writerNickname"), playlist.likeCount.as("likeCount"), playlist.saveCount.as("saveCount")))
                 .from(playlist)
                 .where(predicate(queries, tag), playlist.status.eq(true), playlist.isPublic.eq(true))
-                .orderBy(orders.toArray(OrderSpecifier[]::new))
-                .limit(8)
+                .orderBy(order(pageable.getSort()).toArray(OrderSpecifier[]::new))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
     }
 
@@ -106,9 +101,6 @@ public class CustomPlaylistRepositoryImpl implements CustomPlaylistRepository {
         for(Sort.Order order : sort){
             String orderProperty = order.getProperty();
             switch (orderProperty){
-                case "id":
-                    orders.add(new OrderSpecifier(direction,playlist.id));
-                    return orders;
                 case "likeCount":
                     orders.add(new OrderSpecifier(direction,playlist.likeCount));
                     break;
@@ -117,6 +109,7 @@ public class CustomPlaylistRepositoryImpl implements CustomPlaylistRepository {
                     break;
             }
         }
+        orders.add(new OrderSpecifier(direction, playlist.id));
         return orders;
     }
 

@@ -162,9 +162,9 @@ public class PlaylistService {
         return new AllPlaylistResponseWithPageCount(totalPages, responses);
     }
 
-    public List<AllPlaylistsResponse> getAllPlaylistForSearch(String q, String sort, String tag){
+    public List<AllPlaylistsResponse> getAllPlaylistForSearch(String q, Pageable pageable, String tag){
         List<String> queries = Arrays.stream(q.split(" ")).collect(Collectors.toList());
-        List<AllPlaylistsResponse> searchResult = playlistRepository.findAllForSearch(sort, queries, tag);
+        List<AllPlaylistsResponse> searchResult = playlistRepository.findAllForSearch(pageable, queries, tag);
         searchResult.forEach(playlist -> playlist.updateData(
                 getFirstThumbnailInPlaylist(playlist.getId()), findAllVideosInPlaylist(playlist.getId()).size()));
         return searchResult;
