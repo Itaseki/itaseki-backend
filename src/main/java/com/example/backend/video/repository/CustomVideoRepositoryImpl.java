@@ -9,6 +9,8 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import java.util.ArrayList;
@@ -43,24 +45,25 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository{
     }
 
     @Override
-    public List<Video> findAllForSearch(List<String> tags, List<String> queries, String sort) {
-        List<OrderSpecifier> orders=new ArrayList<>();
-        if(sort.contains("like")){
-            orders.add(new OrderSpecifier(Order.DESC, video.likeCount));
-        }
-        orders.add(new OrderSpecifier(Order.DESC, video.id));
+    public Page<Video> findAllForSearch(String tag, List<String> queries, Pageable pageable) { // pageable 추가 + tag 한 개로
+        return new PageImpl<>(jpaQueryFactory.selectFrom(video)
+                .where(video.status.eq(true), predicate(tag, queries))
+                .orderBy(order(pageable.getSort()).toArray(OrderSpecifier[]::new))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch(), pageable, calculateTotalPageCount(tag, queries));
+    }
 
-        return jpaQueryFactory.selectFrom(video)
-                    .where(video.status.eq(true), predicate(tags, queries))
-                    .orderBy(orders.toArray(OrderSpecifier[]::new))
-                    .limit(8)
-                    .fetch();
-
+    private Long calculateTotalPageCount(String tag, List<String> queries) {
+        return jpaQueryFactory.select(video.count())
+                .from(video)
+                .where(video.status.eq(true), predicate(tag, queries))
+                .fetchOne();
     }
 
     @Override
     public TempVideoDto findAllByPageable(Pageable pageable) {
-        long pageOffset= pageable.getOffset() - 4; // 첫 페이지는 4개, 그 이후부터는 8개 조회
+        long pageOffset= pageable.getOffset() - 4; // 첫 페이지는 8개, 그 이후부터는 12개 조회
         int pageSize = pageable.getPageSize();
         if(pageable.getPageNumber() == 0){
             pageOffset=0;
@@ -85,8 +88,8 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository{
         return new TempVideoDto(totalCount,videos);
     }
 
-    private BooleanExpression predicate(List<String> tags, List<String> queries){
-        return Expressions.allOf(checkTag(tags), checkQuery(queries));
+    private BooleanExpression predicate(String tag, List<String> queries){
+        return Expressions.allOf(checkTag(tag), checkQuery(queries));
     }
 
     private BooleanExpression checkQuery(List<String> queryList){
@@ -98,16 +101,7 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository{
                 .toArray(BooleanExpression[]::new));
     }
 
-    private BooleanExpression checkTag(List<String> tags){
-        if (tags.isEmpty()) {
-            return null;
-        }
-        return Expressions.anyOf(tags.stream()
-                .map(this::isTagInVideo)
-                .toArray(BooleanExpression[]::new));
-    }
-
-    private BooleanExpression isTagInVideo(String tag) {
+    private BooleanExpression checkTag(String tag){
         if (StringUtils.isNullOrEmpty(tag)) {
             return null;
         }
@@ -120,12 +114,11 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository{
         for(Sort.Order order : sort){
             String orderProperty = order.getProperty();
             switch (orderProperty){
+                case "likeCount":
+                    orders.add(new OrderSpecifier(Order.DESC, video.likeCount));
                 case "id":
                     orders.add(new OrderSpecifier(Order.DESC, video.id));
                     return orders;
-                case "likeCount":
-                    orders.add(new OrderSpecifier(Order.DESC, video.likeCount));
-                    break;
             }
         }
         return orders;

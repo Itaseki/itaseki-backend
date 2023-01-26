@@ -17,6 +17,7 @@ import com.example.backend.video.dto.PlaylistVideoResponse;
 import com.example.backend.video.repository.VideoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -162,12 +163,9 @@ public class PlaylistService {
         return new AllPlaylistResponseWithPageCount(totalPages, responses);
     }
 
-    public List<AllPlaylistsResponse> getAllPlaylistForSearch(String q, String sort, String tag){
+    public Page<Playlist> getAllPlaylistForSearch(String q, Pageable pageable, String tag){
         List<String> queries = Arrays.stream(q.split(" ")).collect(Collectors.toList());
-        List<AllPlaylistsResponse> searchResult = playlistRepository.findAllForSearch(sort, queries, tag);
-        searchResult.forEach(playlist -> playlist.updateData(
-                getFirstThumbnailInPlaylist(playlist.getId()), findAllVideosInPlaylist(playlist.getId()).size()));
-        return searchResult;
+        return playlistRepository.findAllForSearch(pageable, queries, tag);
     }
 
     public String getFirstThumbnailInPlaylist(Long playlistId){

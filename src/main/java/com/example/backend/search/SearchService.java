@@ -1,15 +1,18 @@
 package com.example.backend.search;
 
-import com.example.backend.community.dto.AllCommunityBoardsResponse;
-import com.example.backend.community.service.CommunityBoardService;
-import com.example.backend.image.repository.ImageBoardRepository;
-import com.example.backend.main.dto.MainImageResponse;
+import com.example.backend.playlist.domain.Playlist;
+import com.example.backend.playlist.domain.PlaylistVideo;
+import com.example.backend.search.dto.SearchPlaylistPageableResponse;
+import com.example.backend.search.dto.SearchPlaylistResponse;
+import com.example.backend.search.dto.SearchVideoPageableResponse;
 import com.example.backend.search.dto.SearchVideoResponse;
-import com.example.backend.playlist.dto.AllPlaylistsResponse;
 import com.example.backend.playlist.service.PlaylistService;
-import com.example.backend.user.service.UserService;
+import com.example.backend.video.domain.Video;
 import com.example.backend.video.service.VideoService;
+import java.util.Collections;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,39 +21,82 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class SearchService {
-    private final CommunityBoardService communityService;
-    private final ImageBoardRepository imageRepository;
     private final VideoService videoService;
     private final PlaylistService playlistService;
 
-    public List<AllCommunityBoardsResponse> getCommunityForSearch(String q, String sort) {
-        return communityService.getSearchedCommunityBoards(q, sort);
+    public SearchVideoPageableResponse getVideoForSearch(String q, String tag, Pageable pageable) {
+        return findSearchResultForVideo(videoService.getAllVideoForSearch(q, tag, pageable));
     }
 
-    public List<MainImageResponse> getImageForSearch(String query, String tag, String sort) {
-        String[] queryList = null;
-        if (query != null) {
-            queryList = query.split(" ");
-        }
-        return imageRepository.findAllForSearch(sort, queryList, tag)
-                .stream()
-                .map(MainImageResponse::fromEntity)
-                .collect(Collectors.toList());
+    public SearchPlaylistPageableResponse getPlaylistsForSearch(String q, String tag, Pageable pageable) {
+        return findSearchResultForPlaylist(playlistService.getAllPlaylistForSearch(q, pageable, tag), tag);
     }
 
-    public List<SearchVideoResponse> getVideoForSearch(String q, String tag, String sort) {
-        List<SearchVideoResponse> responses = videoService.getAllVideoForSearch(q, tag, sort)
+    private SearchPlaylistPageableResponse findSearchResultForPlaylist(Page<Playlist> playlists, String tag) {
+        return SearchPlaylistPageableResponse.of(mapPlaylistToResponse(playlists.getContent(), tag),
+                playlists.getTotalPages());
+    }
+
+    private SearchVideoPageableResponse findSearchResultForVideo(Page<Video> videos) {
+        return SearchVideoPageableResponse.of(updateTagsInVideo(videos.getContent()), videos.getTotalPages());
+    }
+
+    private List<SearchVideoResponse> updateTagsInVideo(List<Video> videos) {
+        List<SearchVideoResponse> data = videos
                 .stream()
-                .map(SearchVideoResponse::fromAllResponse)
+                .map(SearchVideoResponse::fromEntity)
                 .collect(Collectors.toList());
 
-        responses.forEach(video -> video.updateTags(
+        data.forEach(video -> video.updateTags(
                 videoService.getHashtagKeywordStringInVideo(videoService.findVideoEntityById(video.getId()))));
-        return responses;
+
+        return data;
     }
 
-    public List<AllPlaylistsResponse> getPlaylistsForSearch(String sort, String q, String tag) {
-        return playlistService.getAllPlaylistForSearch(q, sort, tag);
+    private List<SearchPlaylistResponse> mapPlaylistToResponse(List<Playlist> playlists, String tag) {
+        List<SearchPlaylistResponse> data = playlists.stream()
+                .map(playlist -> SearchPlaylistResponse.fromPlaylistAndData(playlist,
+                        playlistService.getFirstThumbnailInPlaylist(playlist.getId()),
+                        playlistService.findAllVideosInPlaylist(playlist.getId()).size()))
+                .collect(Collectors.toList());
+
+        data.forEach(playlist -> playlist.updateTags(findTagsForPlaylistBySearchTag(tag, playlist.getId())));
+
+        return data;
+    }
+
+    private List<String> findTagsForPlaylistBySearchTag(String searchTag, long playlistId) {
+        Video videoContainingTag = playlistService.findPlaylistEntity(playlistId)
+                .getVideos().stream()
+                .map(PlaylistVideo::getVideo)
+                .filter(video -> isVideoContainingSearchTag(searchTag, video))
+                .findFirst()
+                .orElse(null);
+        // 검색된 태그를 가지는 영상의 해시태그를 반환한다.
+
+        // 태그 검색이 아닌 경우, 플레이리스트 내부 첫 번쨰 영상의 태그를 반환한다
+        if (videoContainingTag == null) {
+            return findFirstVideoTagInPlaylist(playlistId);
+        }
+
+        return videoService.getHashtagKeywordStringInVideo(videoContainingTag);
+    }
+
+    private List<String> findFirstVideoTagInPlaylist(long playlistId) {
+        PlaylistVideo playlistVideo = playlistService.findAllVideosInPlaylist(playlistId)
+                .stream()
+                .findFirst()
+                .orElse(null);
+
+        if (playlistVideo == null) {
+            return Collections.emptyList();
+        }
+
+        return videoService.getHashtagKeywordStringInVideo(playlistVideo.getVideo());
+    }
+
+    private boolean isVideoContainingSearchTag(String searchTag, Video videoInPlaylist) {
+        return videoService.getHashtagKeywordStringInVideo(videoInPlaylist).contains(searchTag);
     }
 
 }

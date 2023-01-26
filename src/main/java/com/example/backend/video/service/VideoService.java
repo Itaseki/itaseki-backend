@@ -10,6 +10,7 @@ import com.example.backend.video.exception.NoSuchVideoException;
 import com.example.backend.video.repository.*;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -187,10 +188,9 @@ public class VideoService {
         return new AllVideoResponseWithPageCount(allVideoResponses, getTotalPageCount(tempDto.getTotalCount()));
     }
 
-    public List<AllVideoResponse> getAllVideoForSearch(String q, String tag, String sort) {
-        List<String> tags = Arrays.stream(tag.split(",")).collect(Collectors.toList());
+    public Page<Video> getAllVideoForSearch(String q, String tag, Pageable pageable) {
         List<String> queries = Arrays.stream(q.split(" ")).collect(Collectors.toList());
-        return toAllResponse(videoRepository.findAllForSearch(tags, queries, sort));
+        return videoRepository.findAllForSearch(tag, queries, pageable);
     }
 
     private int getTotalPageCount(long pages) {
