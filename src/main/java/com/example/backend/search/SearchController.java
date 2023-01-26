@@ -1,7 +1,7 @@
 package com.example.backend.search;
 
+import com.example.backend.search.dto.SearchPlaylistPageableResponse;
 import com.example.backend.search.dto.SearchVideoPageableResponse;
-import com.example.backend.playlist.dto.AllPlaylistsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/search")
@@ -31,9 +29,9 @@ public class SearchController {
     }
 
     @GetMapping("/playlist")
-    public ResponseEntity<List<AllPlaylistsResponse>> getMainPlaylistBoards(@RequestParam(required = false, defaultValue = EMPTY) String q,
-                                                                            @RequestParam(required = false) String tag,
-                                                                            @PageableDefault(size = 8, sort = "id", direction = Direction.DESC) Pageable pageable) {
+    public ResponseEntity<SearchPlaylistPageableResponse> getMainPlaylistBoards(@RequestParam(required = false, defaultValue = EMPTY) String q,
+                                                                                @RequestParam(required = false, defaultValue = EMPTY) String tag,
+                                                                                @PageableDefault(size = 8, sort = "id", direction = Direction.DESC) Pageable pageable) {
         return new ResponseEntity<>(searchService.getPlaylistsForSearch(q, tag, pageable),HttpStatus.OK);
     }
 }

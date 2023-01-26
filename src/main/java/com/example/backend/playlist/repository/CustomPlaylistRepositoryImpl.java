@@ -1,5 +1,6 @@
 package com.example.backend.playlist.repository;
 
+import com.example.backend.playlist.domain.Playlist;
 import com.example.backend.playlist.domain.QPlaylistVideo;
 import com.example.backend.playlist.dto.AllPlaylistsResponse;
 import com.example.backend.playlist.dto.TempPlaylistDto;
@@ -11,6 +12,8 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.util.StringUtils;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
@@ -59,16 +62,20 @@ public class CustomPlaylistRepositoryImpl implements CustomPlaylistRepository {
     }
 
     @Override
-    public List<AllPlaylistsResponse> findAllForSearch(Pageable pageable, List<String> queries, String tag) { // pageable 추가
-        return jpaQueryFactory.select(Projections.fields(AllPlaylistsResponse.class,
-                        playlist.id.as("id"), playlist.title.as("title"),
-                        playlist.user.nickname.as("writerNickname"), playlist.likeCount.as("likeCount"), playlist.saveCount.as("saveCount")))
-                .from(playlist)
+    public Page<Playlist> findAllForSearch(Pageable pageable, List<String> queries, String tag) { // pageable 추가
+        return new PageImpl<>(jpaQueryFactory.selectFrom(playlist)
                 .where(predicate(queries, tag), playlist.status.eq(true), playlist.isPublic.eq(true))
                 .orderBy(order(pageable.getSort()).toArray(OrderSpecifier[]::new))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .fetch();
+                .fetch(), pageable, calculateSearchCount(queries, tag));
+    }
+
+    private Long calculateSearchCount(List<String> queries, String tag) {
+        return jpaQueryFactory.select(playlist.count())
+                .from(playlist)
+                .where(predicate(queries, tag), playlist.status.eq(true), playlist.isPublic.eq(true))
+                .fetchOne();
     }
 
     private BooleanExpression predicate(List<String> queries, String tag){
