@@ -100,10 +100,14 @@ public class User implements UserDetails{
         return user;
     }
 
-    public void updateUserProfileInfo(String nickname, String description, String imageUrl) {
+    public String updateProfileImage(String url) {
+        this.profileUrl = url;
+        return this.profileUrl;
+    }
+
+    public String updateNickname(String nickname) {
         this.nickname = nickname;
-        this.userDescription = description;
-        updateProfileImage(imageUrl);
+        return this.nickname;
     }
 
     public void deleteUser() {
@@ -113,13 +117,6 @@ public class User implements UserDetails{
 
     public boolean isUserExist() {
         return this.status;
-    }
-
-    private void updateProfileImage(String imageUrl) {
-        if (imageUrl == null) {
-            return;
-        }
-        this.profileUrl = imageUrl;
     }
 }
 

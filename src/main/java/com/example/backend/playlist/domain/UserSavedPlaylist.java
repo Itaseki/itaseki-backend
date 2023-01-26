@@ -1,12 +1,14 @@
 package com.example.backend.playlist.domain;
 
 import com.example.backend.user.domain.User;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import org.springframework.data.annotation.CreatedDate;
 
 @Data
 @Entity
@@ -32,5 +34,9 @@ public class UserSavedPlaylist {
 
     @Column(name = "save_status")
     private Boolean status;
+
+    @CreatedDate
+    @Column
+    private LocalDateTime createdTime;
 
 }

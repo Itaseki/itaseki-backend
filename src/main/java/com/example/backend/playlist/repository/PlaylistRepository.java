@@ -9,5 +9,6 @@ import java.util.List;
 
 @Repository
 public interface PlaylistRepository extends JpaRepository<Playlist, Long>, CustomPlaylistRepository {
+    List<Playlist> findAllByUserAndStatusOrderByCreatedTimeDesc(User user, boolean status);
     List<Playlist> findAllByUser(User user);
 }
