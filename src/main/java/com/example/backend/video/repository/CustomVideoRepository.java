@@ -11,5 +11,5 @@ public interface CustomVideoRepository {
     TempVideoDto findAllByPageable(Pageable pageable);
     List<Video> findBestVideos(int videoCount);
     List<Video> findTitleLike(String searchTitle, String order);
-    Page<Video> findAllForSearch(List<String> tags, List<String> queries, Pageable pageable);
+    Page<Video> findAllForSearch(String tag, List<String> queries, Pageable pageable);
 }

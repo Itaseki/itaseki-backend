@@ -189,9 +189,8 @@ public class VideoService {
     }
 
     public Page<Video> getAllVideoForSearch(String q, String tag, Pageable pageable) {
-        List<String> tags = Arrays.stream(tag.split(",")).collect(Collectors.toList());
         List<String> queries = Arrays.stream(q.split(" ")).collect(Collectors.toList());
-        return videoRepository.findAllForSearch(tags, queries, pageable);
+        return videoRepository.findAllForSearch(tag, queries, pageable);
     }
 
     private int getTotalPageCount(long pages) {
