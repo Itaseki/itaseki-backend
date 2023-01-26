@@ -1,14 +1,9 @@
 package com.example.backend.search;
 
-import com.example.backend.community.dto.AllCommunityBoardsResponse;
-import com.example.backend.community.service.CommunityBoardService;
-import com.example.backend.image.repository.ImageBoardRepository;
-import com.example.backend.main.dto.MainImageResponse;
-import com.example.backend.search.dto.SearchPageableResponse;
+import com.example.backend.search.dto.SearchVideoPageableResponse;
 import com.example.backend.search.dto.SearchVideoResponse;
 import com.example.backend.playlist.dto.AllPlaylistsResponse;
 import com.example.backend.playlist.service.PlaylistService;
-import com.example.backend.user.service.UserService;
 import com.example.backend.video.domain.Video;
 import com.example.backend.video.service.VideoService;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +20,7 @@ public class SearchService {
     private final VideoService videoService;
     private final PlaylistService playlistService;
 
-    public SearchPageableResponse getVideoForSearch(String q, String tag, Pageable pageable) {
+    public SearchVideoPageableResponse getVideoForSearch(String q, String tag, Pageable pageable) {
         return findSearchResultForVideo(videoService.getAllVideoForSearch(q, tag, pageable));
     }
 
@@ -33,8 +28,8 @@ public class SearchService {
         return playlistService.getAllPlaylistForSearch(q, pageable, tag);
     }
 
-    private SearchPageableResponse findSearchResultForVideo(Page<Video> videos) {
-        return SearchPageableResponse.of(updateTagsInVideo(videos.getContent()), videos.getTotalPages());
+    private SearchVideoPageableResponse findSearchResultForVideo(Page<Video> videos) {
+        return SearchVideoPageableResponse.of(updateTagsInVideo(videos.getContent()), videos.getTotalPages());
     }
 
     private List<SearchVideoResponse> updateTagsInVideo(List<Video> videos) {

@@ -1,6 +1,6 @@
 package com.example.backend.search;
 
-import com.example.backend.search.dto.SearchPageableResponse;
+import com.example.backend.search.dto.SearchVideoPageableResponse;
 import com.example.backend.playlist.dto.AllPlaylistsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -23,9 +23,9 @@ public class SearchController {
     private final static String EMPTY = "";
 
     @GetMapping("/video")
-    public ResponseEntity<SearchPageableResponse> searchVideoBoards(@RequestParam(required = false, defaultValue = EMPTY) String q,
-                                                                    @RequestParam(required = false, defaultValue = EMPTY) String tag,
-                                                                    @PageableDefault(size = 8, sort = "id", direction = Direction.DESC)
+    public ResponseEntity<SearchVideoPageableResponse> searchVideoBoards(@RequestParam(required = false, defaultValue = EMPTY) String q,
+                                                                         @RequestParam(required = false, defaultValue = EMPTY) String tag,
+                                                                         @PageableDefault(size = 8, sort = "id", direction = Direction.DESC)
                                                                        Pageable pageable) {
         return new ResponseEntity<>(searchService.getVideoForSearch(q,tag,pageable),HttpStatus.OK);
     }
