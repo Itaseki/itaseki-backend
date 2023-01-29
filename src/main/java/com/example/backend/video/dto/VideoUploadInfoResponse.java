@@ -1,24 +1,29 @@
 package com.example.backend.video.dto;
 
+import com.example.backend.playlist.domain.Playlist;
+import com.example.backend.video.domain.Hashtag;
+import com.example.backend.video.domain.Series;
+import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.List;
 
 @Getter
-@Setter
 @Builder
 public class VideoUploadInfoResponse {
-    private List<InnerInfoResponse> series;
-    private List<InnerInfoResponse> hashtags;
-    private List<InnerInfoResponse> playlists;
+    private List<NameIdResponse> series;
+    private List<NameIdResponse> hashtags;
+    private List<NameIdResponse> playlists;
 
-    public static VideoUploadInfoResponse toInfoResponse(List<InnerInfoResponse> series,List<InnerInfoResponse> hashtags, List<InnerInfoResponse> playlists){
+    public static VideoUploadInfoResponse toInfoResponse(List<Series> series, List<Hashtag> hashtags, List<Playlist> playlists){
         return VideoUploadInfoResponse.builder()
-                .series(series)
-                .hashtags(hashtags)
-                .playlists(playlists)
+                .series(series.stream()
+                        .map(NameIdResponse::new).collect(Collectors.toList()))
+                .hashtags(hashtags.stream()
+                        .map(NameIdResponse::new).collect(Collectors.toList()))
+                .playlists(playlists.stream()
+                        .map(NameIdResponse::new).collect(Collectors.toList()))
                 .build();
 
     }

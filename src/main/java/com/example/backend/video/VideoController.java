@@ -43,7 +43,7 @@ public class VideoController {
 
     @GetMapping("/info/{userId}")
     public ResponseEntity<VideoUploadInfoResponse> getInfoForVideoUpload(@PathVariable Long userId) {
-        return new ResponseEntity<>(videoService.getPreInfoForVideoUpload(findUserAndCheckAuthority(userId)),HttpStatus.OK);
+        return new ResponseEntity<>(videoService.getPreInfoForVideoUpload(findUserAndCheckAuthority(userId)), HttpStatus.OK);
     }
 
     @PostMapping("")
@@ -153,7 +153,7 @@ public class VideoController {
     }
 
     @GetMapping("/series/search")
-    public ResponseEntity<List<InnerInfoResponse>> searchSeriesName(@RequestParam String q) {
+    public ResponseEntity<List<NameIdResponse>> searchSeriesName(@RequestParam String q) {
         return new ResponseEntity<>(videoService.findSeriesNameByQuery(q),HttpStatus.OK);
     }
 

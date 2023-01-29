@@ -112,28 +112,10 @@ public class VideoService {
         return "등록 가능";
     }
 
-    private List<InnerInfoResponse> findAllSeries() {
-        return seriesRepository.findAll().stream()
-                .map(InnerInfoResponse::new)
-                .collect(Collectors.toList());
-    }
-
-    private List<InnerInfoResponse> findAllHashtags() {
-        return hashtagRepository.findAll()
-                .stream()
-                .map(InnerInfoResponse::new)
-                .collect(Collectors.toList());
-    }
-
-    private List<InnerInfoResponse> findAllPlayListsOfUser(User user) {
-        return playlistService.findAllPlaylistByUser(user)
-                .stream()
-                .map(InnerInfoResponse::new)
-                .collect(Collectors.toList());
-    }
-
     public VideoUploadInfoResponse getPreInfoForVideoUpload(User user) {
-        return VideoUploadInfoResponse.toInfoResponse(findAllSeries(), findAllHashtags(), findAllPlayListsOfUser(user));
+        return VideoUploadInfoResponse.toInfoResponse(seriesRepository.findAll(),
+                hashtagRepository.findAll(),
+                playlistService.findAllPlaylistByUser(user));
     }
 
     public Video findVideoEntityById(Long id) {
@@ -206,10 +188,10 @@ public class VideoService {
                 .forEach(pv -> playlistService.deleteVideoInPlaylist(video, pv.getPlaylist().getId()));
     }
 
-    public List<InnerInfoResponse> findSeriesNameByQuery(String q) {
+    public List<NameIdResponse> findSeriesNameByQuery(String q) {
         return seriesRepository.findBySeriesNameContainsIgnoreCase(q)
                 .stream()
-                .map(InnerInfoResponse::new)
+                .map(NameIdResponse::new)
                 .collect(Collectors.toList());
     }
 
