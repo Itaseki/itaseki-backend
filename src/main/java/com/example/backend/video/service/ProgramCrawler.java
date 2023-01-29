@@ -3,6 +3,8 @@ package com.example.backend.video.service;
 import com.example.backend.video.domain.Series;
 import com.example.backend.video.repository.SeriesRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.joda.time.LocalDateTime;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -19,12 +21,15 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class ProgramCrawler {
     private final SeriesRepository seriesRepository;
+    private final String CRAWLER_ACTIVE = "%s program crawling";
 
     // 초 분 시간 일 월 요일 -> 매주 일요일 0시 0분 0초에 수행 -> cron = "0 0 0 ? * 1", zone = "Asia/Seoul"
     @Scheduled(cron = "0 0 0 ? * 1", zone = "Asia/Seoul")
     private void updatePrograms() {
+        log.info(String.format(CRAWLER_ACTIVE, LocalDateTime.now()));
         tvn().stream().filter(this::isNotSaved)
                 .forEach(this::saveSeries);
 
