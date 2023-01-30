@@ -24,7 +24,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String[] PERMIT_URL_ARRAY = {
             "/","/**/*.png","/**/*.jpg","/**/*.js","/**/*.css","/**/*.html","/**/*.gif","/**/*.svg"
             ,"/signup","/signup/**","/signin","/signin/**"//소셜 로그인 관련한 부분도 추가
-            ,"/test","/test-db","/test-db/**" //s3, rds 연동 테스트때 사용한 url 들 일단 접근 허가
             ,"/oauth", "/oauth/**"
     };
 
@@ -35,6 +34,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             ,"/main", "/main/**"
             ,"/search", "/search/**"
             ,"/chat/**", "/chat"
+            ,"/test","/test-db","/test-db/**" //s3, rds 연동 테스트때 사용한 url 들 일단 접근 허가
     };
 
     @Override
