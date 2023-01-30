@@ -15,6 +15,7 @@ public class NextRunResponse {
     private Long videoId;
     private String title;
     private String runTime;
+    private String thumbnailUrl;
     private String videoUrl;
     private Long count;
     private String reservationDate;
@@ -27,6 +28,7 @@ public class NextRunResponse {
                 .videoId(video.getId())
                 .title(video.getDescription())
                 .runTime(video.getConvertedRuntime())
+                .thumbnailUrl(video.getThumbnailUrl())
                 .videoUrl(video.getVideoUrl())
                 .count(res.getReservationCount())
                 .reservationDate(res.getReservationDate().toString())

@@ -1,5 +1,6 @@
 package com.example.backend.video;
 
+import com.example.backend.globalexception.ExceptionHeader;
 import com.example.backend.like.Like;
 import com.example.backend.like.LikeService;
 import com.example.backend.report.Report;
@@ -9,6 +10,7 @@ import com.example.backend.user.domain.User;
 import com.example.backend.video.domain.Video;
 import com.example.backend.video.domain.VideoComment;
 import com.example.backend.video.dto.*;
+import com.example.backend.video.exception.WrongVideoUrlException;
 import com.example.backend.video.service.VideoCommentService;
 import com.example.backend.video.service.VideoService;
 import lombok.RequiredArgsConstructor;
@@ -32,15 +34,16 @@ public class VideoController {
     private final VideoCommentService commentService;
     private final LikeService likeService;
     private final ReportService reportService;
+    private final ExceptionHeader exceptionHeader;
 
-    @GetMapping("/verify")
+    @GetMapping(value = "/verify", produces = "text/html; charset=UTF-8")
     public ResponseEntity<String> verifyVideoUrl(@RequestParam String url) {
-        return new ResponseEntity<>(videoService.checkVideoUrlExistence(url),HttpStatus.OK);
+        return new ResponseEntity<>(videoService.checkVideoUrlExistence(url), HttpStatus.OK);
     }
 
     @GetMapping("/info/{userId}")
     public ResponseEntity<VideoUploadInfoResponse> getInfoForVideoUpload(@PathVariable Long userId) {
-        return new ResponseEntity<>(videoService.getPreInfoForVideoUpload(findUserAndCheckAuthority(userId)),HttpStatus.OK);
+        return new ResponseEntity<>(videoService.getPreInfoForVideoUpload(findUserAndCheckAuthority(userId)), HttpStatus.OK);
     }
 
     @PostMapping("")
@@ -150,7 +153,7 @@ public class VideoController {
     }
 
     @GetMapping("/series/search")
-    public ResponseEntity<List<InnerInfoResponse>> searchSeriesName(@RequestParam String q) {
+    public ResponseEntity<List<NameIdResponse>> searchSeriesName(@RequestParam String q) {
         return new ResponseEntity<>(videoService.findSeriesNameByQuery(q),HttpStatus.OK);
     }
 
@@ -172,5 +175,10 @@ public class VideoController {
         }
         UserDetails user = (UserDetails) principal;
         return userService.findUserById(Long.parseLong(user.getUsername()));
+    }
+
+    @ExceptionHandler(WrongVideoUrlException.class)
+    public ResponseEntity<String> handleWrongValueException(WrongVideoUrlException exception) {
+        return new ResponseEntity<>(exception.getMessage(), exceptionHeader.header, HttpStatus.BAD_REQUEST);
     }
 }
