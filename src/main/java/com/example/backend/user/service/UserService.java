@@ -30,7 +30,7 @@ public class UserService implements UserDetailsService {
     }
 
     public User findUserByKakaoId(Long kakaoId){
-        Optional<User> user = userRepository.findByKakaoId(kakaoId);
+        Optional<User> user = userRepository.findByKakaoIdAndStatus(kakaoId,true);
         return user.orElse(null);
     }
 
