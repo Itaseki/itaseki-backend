@@ -25,18 +25,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/","/**/*.png","/**/*.jpg","/**/*.js","/**/*.css","/**/*.html","/**/*.gif","/**/*.svg"
             ,"/signup","/signup/**","/signin","/signin/**"//소셜 로그인 관련한 부분도 추가
             ,"/test","/test-db","/test-db/**" //s3, rds 연동 테스트때 사용한 url 들 일단 접근 허가
-            ,"/boards/**"
-            ,"/run/reservations","/run/reservations/**" //로그인 구현 전 영상 달리기 예약 위해 임시허가
-            ,"/boards/image", "/boards/image/**"
-            ,"/chat/**", "/chat"
             ,"/oauth", "/oauth/**"
-            ,"/user", "/user/**"    // 마이페이지 관련 부분 (임시허가)
-            ,"/main", "/main/**"
-            ,"/search", "/search/**"
     };
 
     private static final String[] AUTHENTICATED_URL_ARRAY={
             "/jwt"  // Spring Security 테스트 (나중에는 Permit Url 여기로 옮기기)
+            ,"/user", "/user/**"    // 마이페이지 관련 부분 (임시허가)
+            ,"/run/reservations","/run/reservations/**" //로그인 구현 전 영상 달리기 예약 위해 임시허가
+            ,"/main", "/main/**"
+            ,"/search", "/search/**"
+            ,"/chat/**", "/chat"
     };
 
     @Override
