@@ -45,6 +45,15 @@ public class OAuthController {
 
         if(user == null){
             User newUser = new User();
+            JsonNode tempEmail = userInfo.get("kakao_account").get("email");
+            if(tempEmail == null || tempEmail.isNull()){
+                newUser.setEmail(null);
+            }
+            else{
+                String email = tempEmail.toString();
+                email = email.substring(1, email.length()-1);
+                newUser.setEmail(email);
+            }
             newUser.setKakaoId(kakaoId);
             newUser.setProfileUrl(profileUrl);
             newUser.setNickname(nickname);

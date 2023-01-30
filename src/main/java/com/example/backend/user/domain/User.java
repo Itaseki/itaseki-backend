@@ -40,6 +40,9 @@ public class User implements UserDetails{
     private String profileUrl;
 
     @Column(nullable = true)
+    private String email;
+
+    @Column(nullable = true)
     private String userDescription;
 
     @Column(nullable = false)
