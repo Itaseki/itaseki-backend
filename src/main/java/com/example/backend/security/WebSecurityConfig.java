@@ -20,22 +20,36 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtAuthenticationProvider jwtAuthenticationProvider;
     private final BlackListService blackListService;
 
+    /**
+     * 토큰이 필요한 url 먼저 검사한다.
+     * */
+
     //토큰 인증이 불가능해도 졉근 가능해야 하는 url 들 (보통 로그인, 회원가입 등)
     private static final String[] PERMIT_URL_ARRAY = {
             "/","/**/*.png","/**/*.jpg","/**/*.js","/**/*.css","/**/*.html","/**/*.gif","/**/*.svg"
-            ,"/signup","/signup/**","/signin","/signin/**"//소셜 로그인 관련한 부분도 추가
-            ,"/oauth", "/oauth/**"
-            ,"/boards", "/boards/**"
-            ,"/test","/test-db","/test-db/**" //s3, rds 연동 테스트때 사용한 url 들 일단 접근 허가
             ,"/main", "/main/**"
             ,"/search", "/search/**"
+            ,"/oauth", "/oauth/**"  // 카카오톡 소셜로그인
+            ,"/boards", "/boards/**"
+            ,"/run", "/run/**"
     };
 
     private static final String[] AUTHENTICATED_URL_ARRAY={
-            "/jwt"  // Spring Security 테스트 (나중에는 Permit Url 여기로 옮기기)
-            ,"/user", "/user/**"    // 마이페이지 관련 부분 (임시허가)
-            ,"/run/reservations","/run/reservations/**" //로그인 구현 전 영상 달리기 예약 위해 임시허가
+            "/user", "/user/**"
+            ,"/main/user"
+            ,"/boards/video/**/likes", "/boards/video/**/reports"
+            ,"/boards/video/{videoId}", "/boards/video/info/{userId}"
+            ,"/boards/video/{videoId}/comments", "/boards/video/{videoId}/comments/{videoCommentId}"
+            ,"/boards/video/{videoId}/comments/{videoCommentId}/reports"
+            ,"/boards/video"
+            ,"/run/reservations"
+            ,"/boards/playlist/user/{userId}", "/boards/playlist/saved", "/boards/playlist"
+            ,"/boards/playlist/{playlistId}", "/boards/playlist/{playlistId}", "/boards/playlist/saved"
+            ,"/boards/playlist/subscribe", "/boards/playlist/{playlistId}/likes", "/boards/playlist/{playlistId}/reports"
+            ,"/boards/playlist/{playlistId}", "/boards/playlist/{playlistId}/comments", "/boards/playlist/{playlistId}/comments/{commentId}"
+            ,"/boards/playlist/{playlistId}/comments/{commentId}"
             ,"/chat/**", "/chat"
+
     };
 
     @Override
