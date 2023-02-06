@@ -2,7 +2,7 @@ package com.example.backend.video.repository;
 
 import com.amazonaws.util.StringUtils;
 import com.example.backend.video.domain.Video;
-import com.example.backend.video.dto.TempVideoDto;
+import com.example.backend.video.dto.AllVideoWithDataCountDto;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -19,9 +19,8 @@ import java.util.List;
 import static com.example.backend.video.domain.QVideo.video;
 
 @RequiredArgsConstructor
-public class CustomVideoRepositoryImpl implements CustomVideoRepository{
+public class CustomVideoRepositoryImpl implements CustomVideoRepository {
     private final JPAQueryFactory jpaQueryFactory;
-    private final String EMPTY = "";
 
     @Override
     public List<Video> findBestVideos(int videoCount) {
@@ -33,15 +32,15 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository{
     }
 
     @Override
-    public List<Video> findTitleLike(String searchTitle,String order) {
+    public List<Video> findTitleLike(String searchTitle, String order) {
         OrderSpecifier orderSpecifier = new OrderSpecifier(Order.DESC, video.id);
-        if(order.equals("likeCount"))
-            orderSpecifier=new OrderSpecifier(Order.DESC,video.likeCount);
+        if (order.equals("likeCount")) {
+            orderSpecifier = new OrderSpecifier(Order.DESC, video.likeCount);
+        }
         return jpaQueryFactory.selectFrom(video)
                 .where(video.status.eq(true), video.description.containsIgnoreCase(searchTitle))
                 .orderBy(orderSpecifier) //좋아요순 정렬
                 .fetch();
-
     }
 
     @Override
@@ -62,37 +61,35 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository{
     }
 
     @Override
-    public TempVideoDto findAllByPageable(Pageable pageable) {
-        long pageOffset= pageable.getOffset() - 4; // 첫 페이지는 8개, 그 이후부터는 12개 조회
+    public AllVideoWithDataCountDto findAllByPageable(Pageable pageable) {
+        long pageOffset = pageable.getOffset() - 4;
         int pageSize = pageable.getPageSize();
-        if(pageable.getPageNumber() == 0){
-            pageOffset=0;
-            pageSize=8;
+
+        if (pageable.getPageNumber() == 0) {
+            pageOffset = 0;
+            pageSize = 8;
         }
-        List<Video> videos = jpaQueryFactory.selectFrom(video)
+
+        return new AllVideoWithDataCountDto(jpaQueryFactory.selectFrom(video)
                 .where(video.status.eq(true))
                 .orderBy(order(pageable.getSort()).toArray(OrderSpecifier[]::new))
                 .offset(pageOffset)
                 .limit(pageSize)
-                .fetch();
+                .fetch(), calculateTotalDataCount());
+    }
 
-        Long totalCount = jpaQueryFactory.select(video.count())
+    private Long calculateTotalDataCount() {
+        return jpaQueryFactory.select(video.count())
                 .from(video)
                 .where(video.status.eq(true))
                 .fetchOne();
-
-        if (totalCount == null) {
-            totalCount = 0L;
-        }
-
-        return new TempVideoDto(totalCount,videos);
     }
 
-    private BooleanExpression predicate(String tag, List<String> queries){
+    private BooleanExpression predicate(String tag, List<String> queries) {
         return Expressions.allOf(checkTag(tag), checkQuery(queries));
     }
 
-    private BooleanExpression checkQuery(List<String> queryList){
+    private BooleanExpression checkQuery(List<String> queryList) {
         if (queryList.isEmpty()) {
             return null;
         }
@@ -101,7 +98,7 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository{
                 .toArray(BooleanExpression[]::new));
     }
 
-    private BooleanExpression checkTag(String tag){
+    private BooleanExpression checkTag(String tag) {
         if (StringUtils.isNullOrEmpty(tag)) {
             return null;
         }
@@ -109,11 +106,11 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository{
                 .or(video.customHashtags.any().customHashtagName.eq(tag));
     }
 
-    private List<OrderSpecifier> order(Sort sort){
-        List<OrderSpecifier> orders=new ArrayList<>();
-        for(Sort.Order order : sort){
+    private List<OrderSpecifier> order(Sort sort) {
+        List<OrderSpecifier> orders = new ArrayList<>();
+        for (Sort.Order order : sort) {
             String orderProperty = order.getProperty();
-            switch (orderProperty){
+            switch (orderProperty) {
                 case "likeCount":
                     orders.add(new OrderSpecifier(Order.DESC, video.likeCount));
                 case "id":

@@ -1,6 +1,5 @@
 package com.example.backend.video.domain;
 
-import com.example.backend.community.domain.CommunityBoard;
 import com.example.backend.report.Report;
 import com.example.backend.user.domain.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -56,12 +55,21 @@ public class VideoComment {
     private List<Report> reports;
 
     @Builder
-    public VideoComment(String content, Long parentId,Video video, User user){
+    public VideoComment(String content, VideoComment parentComment, Video video, User user){
         this.content=content;
-        this.isParentComment= parentId==0;
+        this.parentComment = parentComment;
+        this.isParentComment = isThisParentComment(parentComment);
         this.createdTime=LocalDateTime.now();
         this.video=video;
         this.user=user;
+    }
+
+    public boolean isReportCountOverLimit() {
+        return reports.size() >= 5;
+    }
+
+    private boolean isThisParentComment(VideoComment parentComment) {
+        return parentComment == null;
     }
 
 }

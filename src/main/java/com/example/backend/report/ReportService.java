@@ -20,7 +20,6 @@ public class ReportService {
     private final ReportRepository reportRepository;
     private final UserRepository userRepository;
 
-    // 신고 당한 사용자도 업데이트
     public void saveReport(Report report, User reportedUser) {
         reportRepository.save(report);
         reportedUser.updateUserReportCount();
@@ -42,14 +41,12 @@ public class ReportService {
         return report != null;
     }
 
-    public Boolean checkReportExistence(User user, Video video) {
-        Report report = reportRepository.findByUserAndVideo(user, video);
-        return report != null;
+    public boolean isAlreadyReported(User user, Video video) {
+        return reportRepository.findByUserAndVideo(user, video).isPresent();
     }
 
-    public Boolean checkReportExistence(User user, VideoComment comment) {
-        Report report = reportRepository.findByUserAndVideoComment(user, comment);
-        return report != null;
+    public boolean isAlreadyReported(User user, VideoComment comment) {
+        return reportRepository.findByUserAndVideoComment(user, comment).isPresent();
     }
 
     public Boolean checkReportExistence(User user, Playlist playlist) {
@@ -58,6 +55,20 @@ public class ReportService {
 
     public Boolean checkReportExistence(User user, PlaylistComment comment) {
         return reportRepository.findByUserAndPlaylistComment(user, comment) != null;
+    }
+
+    public void createNewReport(Video video, User user) {
+        saveReport(Report.builder()
+                .user(user)
+                .video(video)
+                .build(), video.getUser());
+    }
+
+    public void createNewReport(VideoComment comment, User user) {
+        saveReport(Report.builder()
+                .user(user)
+                .videoComment(comment)
+                .build(), comment.getUser());
     }
 
 }

@@ -28,30 +28,41 @@ public class DetailVideoResponse {
     private String writerNickname;
     private Boolean isThisUserWriter;
     private Integer commentCount;
-    private List<VideoCommentsResponse> comments;
+    private List<VideoCommentResponse> comments;
 
-    public static DetailVideoResponse fromEntity(Video video, List<VideoCommentsResponse> comments, Long loginId, List<String> hashtags){
+    public static DetailVideoResponse fromEntity(Video video, List<VideoCommentResponse> comments, Long loginId, List<String> hashtags){
 //        hashtag 리스트 받아서 저장
         User boardWriter=video.getUser();
         return DetailVideoResponse.builder()
-                .id(video.getId()).description(video.getDescription()).videoTitle(video.getOriginVideoTitle())
-                .createdTime(video.getCreatedTime()).viewCount(video.getViewCount()).likeCount(video.getLikeCount())
-                .comments(comments).series(video.getSeries().getSeriesName()).url(video.getVideoUrl())
-                .episode(video.getEpisodeNumber()).hashtags(hashtags)
-                .writerId(boardWriter.getUserId()).writerNickname(boardWriter.getNickname()).isThisUserWriter(boardWriter.getUserId().equals(loginId))
+                .id(video.getId())
+                .description(video.getDescription())
+                .videoTitle(video.getOriginVideoTitle())
+                .createdTime(video.getCreatedTime())
+                .viewCount(video.getViewCount())
+                .likeCount(video.getLikeCount())
+                .comments(comments)
+                .series(video.getSeries().getSeriesName())
+                .url(video.getVideoUrl())
+                .episode(video.getEpisodeNumber())
+                .hashtags(hashtags)
+                .writerId(boardWriter.getUserId())
+                .writerNickname(boardWriter.getNickname())
+                .isThisUserWriter(boardWriter.getUserId().equals(loginId))
                 .videoUploader(video.getVideoUploader())
-                .commentCount(getVideoCommentCount(comments))
+                .commentCount(calculateCommentCount(comments))
                 .build();
     }
 
-    private static Integer getVideoCommentCount(List<VideoCommentsResponse> comments){
-        if(comments==null)
+    private static int calculateCommentCount(List<VideoCommentResponse> comments){
+        if (comments == null) {
             return 0;
+        }
         int count=comments.size();
-        for(VideoCommentsResponse r: comments){
-            if(r.getNestedComments()==null)
+        for (VideoCommentResponse comment : comments) {
+            if (comment.getNestedComments() == null) {
                 continue;
-            count+=r.getNestedComments().size();
+            }
+            count += comment.getNestedComments().size();
         }
         return count;
     }

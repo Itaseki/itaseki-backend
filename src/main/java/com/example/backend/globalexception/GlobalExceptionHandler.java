@@ -6,7 +6,10 @@ import com.example.backend.s3Image.exception.FileUploadFailException;
 import com.example.backend.user.exception.NoSuchUserException;
 import com.example.backend.user.exception.WrongAuthorizationException;
 import com.example.backend.video.exception.NoSuchCommentException;
+import com.example.backend.video.exception.NoSuchHashtagException;
+import com.example.backend.video.exception.NoSuchSeriesException;
 import com.example.backend.video.exception.NoSuchVideoException;
+import com.example.backend.video.exception.WrongParentCommentException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +32,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({NoSuchCommentException.class,
             NoSuchUserException.class,
             NoSuchVideoException.class,
-            NoSuchPlaylistException.class})
+            NoSuchPlaylistException.class,
+            NoSuchSeriesException.class,
+            NoSuchHashtagException.class,
+            WrongParentCommentException.class})
     ResponseEntity<String> handleNoSuchElementException(RuntimeException exception) {
         return new ResponseEntity<>(exception.getMessage(), exceptionHeader.header, HttpStatus.NOT_FOUND);
     }

@@ -139,8 +139,7 @@ public class PlaylistService {
         return changedPlaylist.getIsPublic();
     }
 
-    public void deleteVideoInPlaylist(Video video, Long playlistId){
-        Playlist playlist = findPlaylistEntity(playlistId);
+    public void deleteVideoInPlaylist(Video video, Playlist playlist){
         PlaylistVideo playlistVideo = this.findExistingPlaylistVideo(video, playlist);
         if(playlistVideo == null) {
             return;
