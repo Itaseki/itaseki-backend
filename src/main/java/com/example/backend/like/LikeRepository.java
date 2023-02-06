@@ -17,7 +17,7 @@ public interface LikeRepository extends JpaRepository<Like,Long> {
     List<Like> findAllByCommunityBoard(CommunityBoard communityBoard);
     Like findByUserAndImageBoard(User user, ImageBoard imageBoard);
     List<Like> findAllByImageBoard(ImageBoard imageBoard);
-    Like findByUserAndVideo(User user, Video video);
+    Optional<Like> findByUserAndVideo(User user, Video video);
     Optional<Like> findByUserAndPlaylist(User user, Playlist playlist);
     List<Like> findAllByUser(User user); // 사용자가 좋아요한 모든 데이터 조회
 }

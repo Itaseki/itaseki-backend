@@ -1,78 +1,107 @@
 package com.example.backend.video.service;
 
+import com.example.backend.report.ReportService;
+import com.example.backend.user.domain.User;
+import com.example.backend.video.domain.Video;
 import com.example.backend.video.domain.VideoComment;
-import com.example.backend.video.dto.VideoCommentsResponse;
+import com.example.backend.video.dto.VideoCommentResponse;
 import com.example.backend.video.exception.NoSuchCommentException;
+import com.example.backend.video.exception.WrongParentCommentException;
 import com.example.backend.video.repository.VideoCommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class VideoCommentService {
     private final VideoCommentRepository commentRepository;
+    private final ReportService reportService;
+    private final String DELETED_COMMENT = "삭제된 댓글입니다.";
 
-    public void saveVideoComment(VideoComment comment, Long parentId){
-        VideoComment parentComment = checkParentComment(parentId);
-        if(parentComment!=null)
-            comment.setParentComment(parentComment);
+    public void saveVideoComment(VideoComment comment) {
         commentRepository.save(comment);
     }
 
-    private VideoComment checkParentComment(Long parentId){
-        if(parentId.equals(0L))
+    public VideoComment findParentComment(long parentId, Video video) {
+        if (parentId == 0L) {
             return null;
-        Optional<VideoComment> comment = commentRepository.findById(parentId);
-        if(comment.isPresent()&&comment.get().getStatus())
-            return comment.get();
-        return null;
+        }
+        return commentRepository.findByIdAndStatusAndVideo(parentId, true, video)
+                .orElseThrow(WrongParentCommentException::new);
     }
 
-    public List<VideoCommentsResponse> getVideoCommentResponses(List<VideoComment> comments,Long loginId, Long boardWriterId){
-        return comments.stream()
-                .map(comment->toVideoCommentResponse(comment,boardWriterId,loginId))
+    public List<VideoCommentResponse> getVideoCommentResponses(Video video, long loginId, long boardWriterId) {
+        return findParentCommentsInVideo(video).stream()
+                .map(comment -> toVideoCommentResponse(comment, boardWriterId, loginId))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
-
     }
 
-    private VideoCommentsResponse toVideoCommentResponse(VideoComment comment, Long boardWriterId, Long loginId){
-        VideoCommentsResponse response = VideoCommentsResponse.fromEntity(comment, boardWriterId, loginId);
-        if(!comment.getIsParentComment()){
-            response.setNestedComments(null);
-        }else{
-            List<VideoComment> childComments = comment.getChildComments();
-            //각 부모 댓글들의 자식 댓글들 세팅
-            List<VideoCommentsResponse> childResponses = childComments.stream()
-                    .filter(childComment -> childComment.getStatus().equals(true)) //자식댓글들 중, status true인 애들만 세팅
-                    .map(childComment -> VideoCommentsResponse.fromEntity(childComment, boardWriterId, loginId))
-                    .collect(Collectors.toList());
-            if(!comment.getStatus()){
-                if(childResponses.isEmpty())
-                    return null;
-                response.setContent("삭제된 댓글입니다");
-            }
-            response.setNestedComments(childResponses);
-        }
-        return response;
+    public VideoComment findVideoCommentById(long id, Video video) {
+        return commentRepository.findByIdAndStatusAndVideo(id, true, video)
+                .orElseThrow(NoSuchCommentException::new);
     }
 
-    public VideoComment findVideoCommentById(Long id) {
-        Optional<VideoComment> comment = commentRepository.findById(id);
-        if(comment.isPresent() && comment.get().getStatus()){
-            return comment.get();
-        }
-        throw new NoSuchCommentException();
-    }
-
-    public void deleteVideoComment(VideoComment comment){
+    public void deleteVideoComment(VideoComment comment) {
         comment.setStatus(false);
         commentRepository.save(comment);
+    }
+
+    public boolean isCommentAlreadyReported(VideoComment comment, User user) {
+        if (reportService.isAlreadyReported(user, comment)) {
+            return true;
+        }
+        reportService.createNewReport(comment, user);
+        return false;
+    }
+
+    public boolean isCommentDeletedByReport(VideoComment comment) {
+        if (comment.isReportCountOverLimit()) {
+            deleteVideoComment(comment);
+            return true;
+        }
+        return false;
+    }
+
+    private List<VideoComment> findParentCommentsInVideo(Video video) {
+        return video.getVideoComments()
+                .stream()
+                .filter(VideoComment::getIsParentComment)
+                .collect(Collectors.toList());
+    }
+
+    private VideoCommentResponse toVideoCommentResponse(VideoComment comment, long boardWriterId, long loginId) {
+        return setChildComments(VideoCommentResponse.fromEntity(comment, boardWriterId, loginId), comment,
+                boardWriterId, loginId);
+    }
+
+    private VideoCommentResponse setChildComments(VideoCommentResponse response, VideoComment comment,
+                                                  long boardWriterId, long loginId) {
+        if (!comment.getIsParentComment()) {
+            response.setNestedComments(null);
+            return response;
+        }
+        List<VideoCommentResponse> childResponses = comment.getChildComments().stream()
+                .filter(VideoComment::getStatus)
+                .map(child -> VideoCommentResponse.fromEntity(child, boardWriterId, loginId))
+                .collect(Collectors.toList());
+
+        return filterDeletedParentComment(response, childResponses, !comment.getStatus());
+    }
+
+    private VideoCommentResponse filterDeletedParentComment(VideoCommentResponse response,
+                                                            List<VideoCommentResponse> childs, boolean isDeleted) {
+        if (isDeleted) {
+            if (childs.isEmpty()) {
+                return null;
+            }
+            response.setContent(DELETED_COMMENT);
+        }
+        response.setNestedComments(childs);
+        return response;
     }
 
 }

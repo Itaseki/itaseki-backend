@@ -17,8 +17,10 @@ public class AllVideoResponse {
 
     public static AllVideoResponse fromEntity(Video video){
         return AllVideoResponse.builder()
-                .id(video.getId()).title(video.getDescription())
-                .writerNickname(video.getUser().getNickname()).likeCount(video.getLikeCount())
+                .id(video.getId())
+                .title(video.getDescription())
+                .writerNickname(video.getUser().getNickname())
+                .likeCount(video.getLikeCount())
                 .thumbnailUrl(video.getThumbnailUrl())
                 .build();
 

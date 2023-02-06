@@ -53,7 +53,7 @@ public class Like {
     }
 
     public Boolean modifyLikeStatus(){
-        this.likeStatus=!this.likeStatus;
+        this.likeStatus = !this.likeStatus;
         return this.likeStatus;
     }
 }
