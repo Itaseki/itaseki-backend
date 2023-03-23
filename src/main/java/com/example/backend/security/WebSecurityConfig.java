@@ -65,6 +65,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.httpBasic().disable()
                 .authorizeRequests()// 요청에 대한 사용권한 체크
                 .antMatchers(HttpMethod.POST).authenticated()
+                .antMatchers(HttpMethod.GET, "/boards/video/info/{userId}").authenticated() // authenticated 필터링이 안되길래 임시 추가
                 .antMatchers(HttpMethod.GET).permitAll()
                 .antMatchers(AUTHENTICATED_URL_ARRAY).authenticated()
                 .antMatchers(PERMIT_URL_ARRAY).permitAll()
