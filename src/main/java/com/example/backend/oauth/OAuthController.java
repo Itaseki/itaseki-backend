@@ -32,7 +32,7 @@ public class OAuthController {
         JsonNode userInfo = oAuthService.getUserInfo(accessCode);
 
         JsonNode jsonKakaoId = userInfo.get("id");
-        JsonNode jsonUserNickname = userInfo.get("properties").get("nickname");
+        JsonNode jsonUserNickname = userInfo.get("properties").get("profile_nicknam");
         JsonNode jsonProfileUrl = userInfo.get("properties").get("profile_image");
 
         String nickname = jsonUserNickname.toString();
