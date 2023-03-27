@@ -7,6 +7,7 @@ import com.example.backend.user.domain.User;
 import com.example.backend.utils.JwtAuthenticationProvider;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/oauth/")
+@Slf4j
 public class OAuthController {
 
     private final OAuthService oAuthService;
@@ -32,7 +34,9 @@ public class OAuthController {
         JsonNode userInfo = oAuthService.getUserInfo(accessCode);
 
         JsonNode jsonKakaoId = userInfo.get("id");
-        JsonNode jsonUserNickname = userInfo.get("properties").get("profile_nicknam");
+        log.info(String.valueOf(jsonKakaoId));
+        JsonNode jsonUserNickname = userInfo.get("properties").get("profile_nickname");
+        log.info(String.valueOf(jsonUserNickname));
         JsonNode jsonProfileUrl = userInfo.get("properties").get("profile_image");
 
         String nickname = jsonUserNickname.toString();
