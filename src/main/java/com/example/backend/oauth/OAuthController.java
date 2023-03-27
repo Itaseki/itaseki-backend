@@ -35,14 +35,15 @@ public class OAuthController {
 
         JsonNode jsonKakaoId = userInfo.get("id");
         log.info(String.valueOf(jsonKakaoId));
-        JsonNode jsonUserNickname = userInfo.get("properties").get("profile_nickname");
-        log.info(String.valueOf(jsonUserNickname));
-        JsonNode jsonProfileUrl = userInfo.get("properties").get("profile_image");
+//        JsonNode jsonUserNickname = userInfo.get("properties").get("profile_nickname");
+//        log.info(String.valueOf(jsonUserNickname));
+//        JsonNode jsonProfileUrl = userInfo.get("properties").get("profile_image");
 
-        String nickname = jsonUserNickname.toString();
-        nickname = nickname.substring(1,nickname.length()-1);
-        String profileUrl = jsonProfileUrl.toString();
-        profileUrl = profileUrl.substring(1,profileUrl.length()-1);
+//        String nickname = jsonUserNickname.toString();
+//        nickname = nickname.substring(1,nickname.length()-1);
+//        String profileUrl = jsonProfileUrl.toString();
+//        profileUrl = profileUrl.substring(1,profileUrl.length()-1);
+        String nickname = "테스트 계정 닉네임";
         Long kakaoId = Long.parseLong(jsonKakaoId.toString());
 
         User user = userService.findUserByKakaoId(kakaoId);
@@ -59,7 +60,7 @@ public class OAuthController {
                 newUser.setEmail(email);
             }
             newUser.setKakaoId(kakaoId);
-            newUser.setProfileUrl(profileUrl);
+            newUser.setProfileUrl(null);
             newUser.setNickname(nickname);
             newUser.setUserDescription(null);
             userService.saveUser(newUser);
