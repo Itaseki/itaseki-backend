@@ -12,10 +12,10 @@ public class UserInfoResponse {
     private UserInfoResponse(User user) {
         this.nickname = user.getNickname();
         this.profileUrl = user.getProfileUrl();
-        this.email = user.getUserDescription();
+        this.email = user.getEmail();
     }
 
-    public static UserInfoResponse ofUser(User user) {
+    public static UserInfoResponse fromUser(User user) {
         return new UserInfoResponse(user);
     }
 }
