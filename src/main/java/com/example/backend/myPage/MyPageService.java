@@ -43,7 +43,7 @@ public class MyPageService {
     private final AwsS3Service awsS3Service;
 
     public UserInfoResponse findUserBasicInformation(User user) {
-        return UserInfoResponse.ofUser(user);
+        return UserInfoResponse.fromUser(user);
     }
 
     public MyPagePageableResponse findPlaylistsForMyPage(User user, String type, Pageable pageable) {

@@ -67,8 +67,11 @@ public class VideoService {
     }
 
     public String checkVideoUrlExistence(String url) {
-        Optional<Video> video = videoRepository.findByVideoUrlContains(VideoUrlType.extractVideoId(url));
-        if (video.isPresent() && video.get().getStatus()) {
+        List<Video> videos = videoRepository.findAllByVideoUrlContains(
+            VideoUrlType.extractVideoId(url));
+        boolean isExist = videos.stream()
+            .anyMatch(Video::getStatus);
+        if (isExist) {
             return "등록 불가능";
         }
         return "등록 가능";
