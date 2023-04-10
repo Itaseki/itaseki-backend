@@ -9,6 +9,7 @@ import com.example.backend.user.domain.User;
 import com.example.backend.video.VideoUrlType;
 import com.example.backend.video.domain.*;
 import com.example.backend.video.dto.*;
+import com.example.backend.video.exception.DuplicateVideoException;
 import com.example.backend.video.exception.NoSuchHashtagException;
 import com.example.backend.video.exception.NoSuchSeriesException;
 import com.example.backend.video.exception.NoSuchVideoException;
@@ -41,6 +42,9 @@ public class VideoService {
 
     public void saveVideo(VideoPostRequest videoPostRequest, User user) {
         Video video = videoPostRequest.toEntityWithUserAndSeries(user, findSeriesById(videoPostRequest.getSeries()));
+        if (isDuplicateUrl(video.getVideoUrl())) {
+            throw new DuplicateVideoException();
+        }
         saveVideoHashtag(video, getHashtagsByIds(videoPostRequest.getHashtags()));
         saveVideoKeywords(videoPostRequest.getKeywords(), video);
         addUploadedVideoToPlaylist(videoPostRequest.getPlaylists(), videoRepository.save(video).getId());
@@ -67,15 +71,18 @@ public class VideoService {
     }
 
     public String checkVideoUrlExistence(String url) {
-        List<Video> videos = videoRepository.findAllByVideoUrlContains(
-            VideoUrlType.extractVideoId(url));
-        boolean isExist = videos.stream()
-            .anyMatch(Video::getStatus);
-        if (isExist) {
+        if (isDuplicateUrl(url)) {
             return "등록 불가능";
         }
         return "등록 가능";
     }
+
+    private boolean isDuplicateUrl(String url) {
+        List<Video> videos = videoRepository.findAllByVideoUrlContains(VideoUrlType.extractVideoId(url));
+        return videos.stream()
+            .anyMatch(Video::getStatus);
+    }
+
 
     public VideoUploadInfoResponse getPreInfoForVideoUpload(User user) {
         return VideoUploadInfoResponse.toInfoResponse(seriesRepository.findAll(),
