@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.example.backend.playlist.domain.QPlaylist.playlist;
+import static com.example.backend.video.domain.QVideo.video;
 
 @RequiredArgsConstructor
 public class CustomPlaylistRepositoryImpl implements CustomPlaylistRepository {
@@ -62,24 +63,24 @@ public class CustomPlaylistRepositoryImpl implements CustomPlaylistRepository {
     }
 
     @Override
-    public Page<Playlist> findAllForSearch(Pageable pageable, List<String> queries, String tag) { // pageable 추가
+    public Page<Playlist> findAllForSearch(Pageable pageable, List<String> queries, String tag, String series) { // pageable 추가
         return new PageImpl<>(jpaQueryFactory.selectFrom(playlist)
-                .where(predicate(queries, tag), playlist.status.eq(true), playlist.isPublic.eq(true))
+                .where(predicate(queries, tag, series), playlist.status.eq(true), playlist.isPublic.eq(true))
                 .orderBy(order(pageable.getSort()).toArray(OrderSpecifier[]::new))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .fetch(), pageable, calculateSearchCount(queries, tag));
+                .fetch(), pageable, calculateSearchCount(queries, tag, series));
     }
 
-    private Long calculateSearchCount(List<String> queries, String tag) {
+    private Long calculateSearchCount(List<String> queries, String tag, String series) {
         return jpaQueryFactory.select(playlist.count())
                 .from(playlist)
-                .where(predicate(queries, tag), playlist.status.eq(true), playlist.isPublic.eq(true))
+                .where(predicate(queries, tag, series), playlist.status.eq(true), playlist.isPublic.eq(true))
                 .fetchOne();
     }
 
-    private BooleanExpression predicate(List<String> queries, String tag){
-        return Expressions.allOf(checkQuery(queries), videoContainsTag(tag));
+    private BooleanExpression predicate(List<String> queries, String tag, String series){
+        return Expressions.allOf(checkQuery(queries), videoContainsTag(tag), checkSeries(series));
     }
 
     private BooleanExpression checkQuery(List<String> queryList){
@@ -100,6 +101,14 @@ public class CustomPlaylistRepositoryImpl implements CustomPlaylistRepository {
 
     private BooleanExpression containsTitle(String title){
         return playlist.title.contains(title).or(playlist.videos.any().video.description.contains(title));
+    }
+
+    private BooleanExpression checkSeries(String series) {
+        if (StringUtils.isNullOrEmpty(series)) {
+            return null;
+        }
+        QPlaylistVideo videoInPlaylist = playlist.videos.any();
+        return videoInPlaylist.video.series.seriesName.contains(series);
     }
 
     private List<OrderSpecifier> order(Sort sort){

@@ -112,9 +112,9 @@ public class VideoService {
         return AllVideoResponseWithPageCount.fromAllVideoQuery(videoRepository.findAllByPageable(pageable));
     }
 
-    public Page<Video> getAllVideoForSearch(String q, String tag, Pageable pageable) {
+    public Page<Video> getAllVideoForSearch(String q, String tag, String series, Pageable pageable) {
         List<String> queries = Arrays.stream(q.split(" ")).collect(Collectors.toList());
-        return videoRepository.findAllForSearch(tag, queries, pageable);
+        return videoRepository.findAllForSearch(tag, queries, series, pageable);
     }
 
     public List<AllVideoResponse> getBestVideos() {
