@@ -1,6 +1,6 @@
 package com.example.backend.video.repository;
 
-import com.amazonaws.util.StringUtils;
+import com.querydsl.core.util.StringUtils;
 import com.example.backend.video.domain.Video;
 import com.example.backend.video.dto.AllVideoWithDataCountDto;
 import com.querydsl.core.types.Order;
@@ -44,19 +44,19 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository {
     }
 
     @Override
-    public Page<Video> findAllForSearch(String tag, List<String> queries, Pageable pageable) { // pageable 추가 + tag 한 개로
+    public Page<Video> findAllForSearch(String tag, List<String> queries, String series, Pageable pageable) { // pageable 추가 + tag 한 개로
         return new PageImpl<>(jpaQueryFactory.selectFrom(video)
-                .where(video.status.eq(true), predicate(tag, queries))
+                .where(video.status.eq(true), predicate(tag, queries, series))
                 .orderBy(order(pageable.getSort()).toArray(OrderSpecifier[]::new))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .fetch(), pageable, calculateTotalPageCount(tag, queries));
+                .fetch(), pageable, calculateTotalPageCount(tag, queries, series));
     }
 
-    private Long calculateTotalPageCount(String tag, List<String> queries) {
+    private Long calculateTotalPageCount(String tag, List<String> queries, String series) {
         return jpaQueryFactory.select(video.count())
                 .from(video)
-                .where(video.status.eq(true), predicate(tag, queries))
+                .where(video.status.eq(true), predicate(tag, queries, series))
                 .fetchOne();
     }
 
@@ -85,8 +85,8 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository {
                 .fetchOne();
     }
 
-    private BooleanExpression predicate(String tag, List<String> queries) {
-        return Expressions.allOf(checkTag(tag), checkQuery(queries));
+    private BooleanExpression predicate(String tag, List<String> queries, String series) {
+        return Expressions.allOf(checkTag(tag), checkQuery(queries), checkSeries(series));
     }
 
     private BooleanExpression checkQuery(List<String> queryList) {
@@ -104,6 +104,13 @@ public class CustomVideoRepositoryImpl implements CustomVideoRepository {
         }
         return video.videoHashtags.any().hashtag.hashtagName.eq(tag)
                 .or(video.customHashtags.any().customHashtagName.eq(tag));
+    }
+
+    private BooleanExpression checkSeries(String series) {
+        if (StringUtils.isNullOrEmpty(series)) {
+            return null;
+        }
+        return video.series.seriesName.contains(series);
     }
 
     private List<OrderSpecifier> order(Sort sort) {

@@ -24,12 +24,12 @@ public class SearchService {
     private final VideoService videoService;
     private final PlaylistService playlistService;
 
-    public SearchVideoPageableResponse getVideoForSearch(String q, String tag, Pageable pageable) {
-        return findSearchResultForVideo(videoService.getAllVideoForSearch(q, tag, pageable));
+    public SearchVideoPageableResponse getVideoForSearch(String q, String tag, String series, Pageable pageable) {
+        return findSearchResultForVideo(videoService.getAllVideoForSearch(q, tag, series, pageable));
     }
 
-    public SearchPlaylistPageableResponse getPlaylistsForSearch(String q, String tag, Pageable pageable) {
-        return findSearchResultForPlaylist(playlistService.getAllPlaylistForSearch(q, pageable, tag), tag);
+    public SearchPlaylistPageableResponse getPlaylistsForSearch(String q, String tag, String series, Pageable pageable) {
+        return findSearchResultForPlaylist(playlistService.getAllPlaylistForSearch(q, pageable, tag, series), tag);
     }
 
     private SearchPlaylistPageableResponse findSearchResultForPlaylist(Page<Playlist> playlists, String tag) {

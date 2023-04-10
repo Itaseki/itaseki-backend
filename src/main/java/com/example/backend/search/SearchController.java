@@ -23,15 +23,17 @@ public class SearchController {
     @GetMapping("/video")
     public ResponseEntity<SearchVideoPageableResponse> searchVideoBoards(@RequestParam(required = false, defaultValue = EMPTY) String q,
                                                                          @RequestParam(required = false, defaultValue = EMPTY) String tag,
+                                                                         @RequestParam(required = false, defaultValue = EMPTY) String series,
                                                                          @PageableDefault(size = 8, sort = "id", direction = Direction.DESC)
                                                                        Pageable pageable) {
-        return new ResponseEntity<>(searchService.getVideoForSearch(q,tag,pageable),HttpStatus.OK);
+        return new ResponseEntity<>(searchService.getVideoForSearch(q,tag, series, pageable),HttpStatus.OK);
     }
 
     @GetMapping("/playlist")
     public ResponseEntity<SearchPlaylistPageableResponse> getMainPlaylistBoards(@RequestParam(required = false, defaultValue = EMPTY) String q,
                                                                                 @RequestParam(required = false, defaultValue = EMPTY) String tag,
+                                                                                @RequestParam(required = false, defaultValue = EMPTY) String series,
                                                                                 @PageableDefault(size = 8, sort = "id", direction = Direction.DESC) Pageable pageable) {
-        return new ResponseEntity<>(searchService.getPlaylistsForSearch(q, tag, pageable),HttpStatus.OK);
+        return new ResponseEntity<>(searchService.getPlaylistsForSearch(q, tag, series, pageable),HttpStatus.OK);
     }
 }

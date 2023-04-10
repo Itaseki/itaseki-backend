@@ -6,6 +6,7 @@ import com.example.backend.user.domain.User;
 import com.example.backend.video.domain.Video;
 import com.example.backend.video.domain.VideoComment;
 import com.example.backend.video.dto.*;
+import com.example.backend.video.exception.DuplicateVideoException;
 import com.example.backend.video.exception.WrongVideoUrlException;
 import com.example.backend.video.service.VideoCommentService;
 import com.example.backend.video.service.VideoService;
@@ -150,4 +151,10 @@ public class VideoController {
     public ResponseEntity<String> handleWrongValueException(WrongVideoUrlException exception) {
         return new ResponseEntity<>(exception.getMessage(), exceptionHeader.header, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(DuplicateVideoException.class)
+    public ResponseEntity<String> handleDuplicateVideoException(DuplicateVideoException exception) {
+        return new ResponseEntity<>(exception.getMessage(), exceptionHeader.header, HttpStatus.CONFLICT);
+    }
+
 }

@@ -11,5 +11,5 @@ import java.util.List;
 public interface CustomPlaylistRepository {
     TempPlaylistDto findAllPlaylistsWithPageable(Pageable pageable);
     List<AllPlaylistsResponse> findBestPlaylists(int count);
-    Page<Playlist> findAllForSearch(Pageable pageable, List<String> q, String tag);
+    Page<Playlist> findAllForSearch(Pageable pageable, List<String> q, String tag, String series);
 }

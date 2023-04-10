@@ -162,9 +162,9 @@ public class PlaylistService {
         return new AllPlaylistResponseWithPageCount(totalPages, responses);
     }
 
-    public Page<Playlist> getAllPlaylistForSearch(String q, Pageable pageable, String tag){
+    public Page<Playlist> getAllPlaylistForSearch(String q, Pageable pageable, String tag, String series){
         List<String> queries = Arrays.stream(q.split(" ")).collect(Collectors.toList());
-        return playlistRepository.findAllForSearch(pageable, queries, tag);
+        return playlistRepository.findAllForSearch(pageable, queries, tag, series);
     }
 
     public String getFirstThumbnailInPlaylist(Long playlistId){
